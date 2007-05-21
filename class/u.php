@@ -58,7 +58,7 @@ class
 	static function count_chars($str, $mode = 1)
 	{
 		if (1 != $mode && 3 != $mode) trigger_error('u::count_chars(): allowed $mode is 1 or 3', E_USER_ERROR);
-		preg_match_all('/./us', $str, $str) || $str = array(array());
+		preg_match_all('/./us', $str, $str);
 		$str = array_count_values($str[0]);
 		return 1 == $mode ? $str[0] : implode('', $str[0]);
 	}
@@ -96,7 +96,7 @@ class
 
 	static function str_shuffle($str)
 	{
-		preg_match_all('/./us', $str, $str) || $str = array(array());
+		preg_match_all('/./us', $str, $str);
 		shuffle($str[0]);
 		return implode('', $str[0]);
 	}
@@ -108,7 +108,7 @@ class
 		if ($len < 1) return false;
 		if (self::strlen($str) <= $len) return array(&$str);
 
-		preg_match_all('/.{' . $len . '}|.+?$/us', $str, $str) || $str = array(array());
+		preg_match_all('/.{' . $len . '}|.+?$/us', $str, $str);
 
 		return $str[0];
 	}
@@ -155,7 +155,7 @@ class
 
 	static function strrev($str)
 	{
-		preg_match_all('/./us', $str, $str) || $str = array(array());
+		preg_match_all('/./us', $str, $str);
 		return implode('', array_reverse($str[0]));
 	}
 
@@ -169,8 +169,8 @@ class
 	{
 		if (null !== $to)
 		{
-			preg_match_all('/./us', $from, $from) || $from = array(array());
-			preg_match_all('/./us', $to  , $to  ) || $to   = array(array());
+			preg_match_all('/./us', $from, $from);
+			preg_match_all('/./us', $to  , $to  );
 
 			$from = $from[0]; $a = count($from); 
 			$to   = $to[0]  ; $b = count($to);
@@ -197,8 +197,8 @@ class
 
 	static function substr_replace($str, $replace, $start, $len = null)
 	{
-		preg_match_all('/./us', $str    , $str    ) || $str     = array(array());
-		preg_match_all('/./us', $replace, $replace) || $replace = array(array());
+		preg_match_all('/./us', $str    , $str    );
+		preg_match_all('/./us', $replace, $replace);
 
 		if (null === $len) $len = count($str[0]);
 
