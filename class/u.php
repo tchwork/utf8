@@ -25,15 +25,9 @@
  * Not implemented, but could be worth:
 
 chr - Return a specific character
-count_chars - Return information about characters used in a string
 ord - Return ASCII value of character
 str_pad - Pad a string to a certain length with another string
-str_word_count - Return information about words used in a string
-strpbrk - Search a string for any of a set of characters
 strtok - Tokenize string
-strtr - Translate certain characters
-substr_compare - Binary safe optionally case insensitive comparison of 2 strings from an offset, up to length characters
-substr_count - Count the number of substring occurrences
 
  * Via transliteration ?
 metaphone - Calculate the metaphone key of a string
@@ -47,7 +41,7 @@ class
 	static function strlen($str)     {return strlen(utf8_decode($str));}
 	static function strtolower($str) {return mb_strtolower($str, 'UTF-8');}
 	static function strtoupper($str) {return mb_strtoupper($str, 'UTF-8');}
-	static function substr  ($str, $start, $length = null) {return mb_substr($str, $start, $length, 'UTF-8');}
+	static function substr  ($str, $start, $len = null) {return mb_substr($str, $start, $len, 'UTF-8');}
 	static function strpos  ($str, $needle, $offset = 0) {return mb_strpos  ($str, $needle, $offset, 'UTF-8');}
 	static function strrpos ($str, $needle, $offset = 0) {return mb_strrpos ($str, $needle, $offset, 'UTF-8');}
 	static function stripos ($str, $needle, $offset = 0) {return mb_stripos ($str, $needle, $offset, 'UTF-8');}
@@ -56,23 +50,29 @@ class
 	static function strrchr ($str, $needle) {return mb_strrchr ($str, $needle, false, 'UTF-8');}
 	static function strrichr($str, $needle) {return mb_strrichr($str, $needle, false, 'UTF-8');}
 	static function strstr  ($str, $needle) {return mb_strstr  ($str, $needle, false, 'UTF-8');}
-	static function strchr  ($str, $needle) {return self::strstr($str, $needle);}
 	static function html_entity_decode($str, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {return html_entity_decode($str, $quote_style, $charset);}
 	static function htmlentities      ($str, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {return htmlentities      ($str, $quote_style, $charset);}
 	static function htmlspecialchars  ($str, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {return htmlspecialchars  ($str, $quote_style, $charset);}
 	static function wordwrap($str, $width = 75, $break = "\n", $cut = false) {return pipe_wordwrap::php($str, $width, $break, $cut);}
-	static function chop($str, $charlist = null) {return self::rtrim($str, $charlist);}
+
+	static function count_chars($str, $mode = 1)
+	{
+		if (1 != $mode && 3 != $mode) trigger_error('u::count_chars(): allowed $mode is 1 or 3', E_USER_ERROR);
+		preg_match_all('/./us', $str, $str) || $str = array(array());
+		$str = array_count_values($str[0]);
+		return 1 == $mode ? $str[0] : implode('', $str[0]);
+	}
 
 	static function ltrim($str, $charlist = null)
 	{
-		$charlist = null === $charlist ? '\s' : preg_quote($charlist, "'");
-		return preg_replace("'^[{$charlist}]+'u", '', $str);
+		$charlist = null === $charlist ? '\s' : preg_quote($charlist, '/');
+		return preg_replace("/^[{$charlist}]+/u", '', $str);
 	}
 
 	static function rtrim($str, $charlist = null)
 	{
-		$charlist = null === $charlist ? '\s' : preg_quote($charlist, "'");
-		return preg_replace("'[{$charlist}]+$'u", '', $str);
+		$charlist = null === $charlist ? '\s' : preg_quote($charlist, '/');
+		return preg_replace("/[{$charlist}]+$/u", '', $str);
 	}
 
 	static function trim($str, $charlist = null) {return self::rtrim(self::ltrim($str, $charlist), $charlist);}
@@ -91,14 +91,14 @@ class
 
 	static function str_ireplace($search, $replace, $subject, &$count = null)
 	{
-		return preg_replace("'" . preg_quote($search, "'") . "'ui", $replace, $subject, -1, $count);
+		return preg_replace('/' . preg_quote($search, '/') . '/ui', $replace, $subject, -1, $count);
 	}
 
 	static function str_shuffle($str)
 	{
-		preg_match_all('/./us', $str, $str);
-		shuffle($str);
-		return implode('', $str);
+		preg_match_all('/./us', $str, $str) || $str = array(array());
+		shuffle($str[0]);
+		return implode('', $str[0]);
 	}
 
 	static function str_split($str, $len = 1)
@@ -108,21 +108,38 @@ class
 		if ($len < 1) return false;
 		if (self::strlen($str) <= $len) return array(&$str);
 
-		preg_match_all('/.{' . $len . '}|.+?$/us', $str, $str);
+		preg_match_all('/.{' . $len . '}|.+?$/us', $str, $str) || $str = array(array());
 
 		return $str[0];
+	}
+
+	function str_word_count($str, $format = 0, $charlist = '')
+	{
+		$charlist = '[\pL' . preg_quote($charlist, '/') . ']';
+		$str = preg_split("/({$charlist}+(?:[\pPd’']{$charlist}+)*)/u", $str, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+		$charlist = array();
+		$len = count($str);
+
+		if (1 == $format) for ($i = 1; $i < $len; $i+=2) $charlist[] = $str[$i];
+		else if (2 == $format)
+		{
+			$offset = self::strlen($str[0]);
+			for ($i = 1; $i < $len; $i+=2)
+			{
+				$charlist[$offset] = $str[$i];
+				$offset += self::strlen($str[$i]) + self::strlen($str[$i+1]);
+			}
+		}
+		else $charlist = ($len - 1) / 2;
+
+		return $charlist;
 	}
 
 	static function strcasecmp   ($a, $b) {return strcmp   (self::strtolower($a), self::strtolower($b));}
 	static function strnatcasecmp($a, $b) {return strnatcmp(self::strtolower($a), self::strtolower($b));}
 	static function strncasecmp  ($a, $b, $len) {return self::strncmp(self::strtolower($a), self::strtolower($b), $len);}
 	static function strncmp      ($a, $b, $len) {return strcmp(self::substr($a, 0, $len), self::substr($b, 0, $len));}
-
-	static function strrev($str)
-	{
-		preg_match_all('/./us', $str, $str);
-		return implode('', array_reverse($str[0]));
-	}
 
 	static function strcspn($str, $mask, $start = null, $len = null)
 	{
@@ -131,16 +148,57 @@ class
 		return preg_match('/^[^' . preg_quote($mask) . ']+/u', $str, $str) ? self::strlen($str[0]) : 0;
 	}
 
+	static function strpbrk($str, $charlist)
+	{
+		return preg_match('/[' . preg_quote($charlist, '/') . '].*/us', $str, $str) ? $str[0] : false;
+	}
+
+	static function strrev($str)
+	{
+		preg_match_all('/./us', $str, $str) || $str = array(array());
+		return implode('', array_reverse($str[0]));
+	}
+
 	static function strspn($str, $mask, $start = null, $len = null)
 	{
 		if (null !== $start || null !== $len) $str = self::substr($str, $start, $len);
 		return preg_match('/^['  . preg_quote($mask) . ']+/u', $str, $str) ? self::strlen($str[0]) : 0;
 	}
 
+	static function strtr($str, $from, $to = null)
+	{
+		if (null !== $to)
+		{
+			preg_match_all('/./us', $from, $from) || $from = array(array());
+			preg_match_all('/./us', $to  , $to  ) || $to   = array(array());
+
+			$from = $from[0]; $a = count($from); 
+			$to   = $to[0]  ; $b = count($to);
+
+			     if ($a > $b) $from = array_slice($from, 0, $b);
+			else if ($a < $b) $to   = array_slice($to  , 0, $a);
+
+			$from = array_combine($from, $to);
+		}
+
+		return strtr($str, $from);
+	}
+
+	static function substr_compare($a, $b, $offset, $len = null, $i = 0)
+	{
+		$a = self::substr($offset, $len);
+		return $i ? self::strcasecmp($a, $b) : strcmp($a, $b);
+	}
+
+	static function substr_count($str, $needle, $offset = 0, $len = null)
+	{
+		return substr_count(self::substr($str, $offset, $len), $needle);
+	}
+
 	static function substr_replace($str, $replace, $start, $len = null)
 	{
-		preg_match_all('/./us', $str    , $str    );
-		preg_match_all('/./us', $replace, $replace);
+		preg_match_all('/./us', $str    , $str    ) || $str     = array(array());
+		preg_match_all('/./us', $replace, $replace) || $replace = array(array());
 
 		if (null === $len) $len = count($str[0]);
 
@@ -151,12 +209,12 @@ class
 
 	static function ucfirst($str)
 	{
-		return preg_replace_callback("'^.'u", array(__CLASS__, 'uc_callback'), $str);
+		return preg_replace_callback('/^./u', array(__CLASS__, 'uc_callback'), $str);
 	}
 
 	static function ucwords($str)
 	{
-		return preg_replace_callback("'(?<=[\t-\r ])[^\t-\r ]'u", array(__CLASS__, 'uc_callback'), $str);
+		return preg_replace_callback('/(?<=[\t-\r ])[^\t-\r ]/u', array(__CLASS__, 'uc_callback'), $str);
 	}
 
 
