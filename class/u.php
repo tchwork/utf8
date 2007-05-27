@@ -57,7 +57,7 @@ class
 
 	static function count_chars($str, $mode = 1)
 	{
-		if (1 != $mode && 3 != $mode) trigger_error('u::count_chars(): allowed $mode is 1 or 3', E_USER_ERROR);
+		if (1 != $mode && 3 != $mode) trigger_error('u::count_chars(): allowed $mode are 1 or 3', E_USER_ERROR);
 		preg_match_all('/./us', $str, $str);
 		$str = array_count_values($str[0]);
 		return 1 == $mode ? $str[0] : implode('', $str[0]);
@@ -80,12 +80,7 @@ class
 	static function get_html_translation_table($table = HTML_SPECIALCHARS, $quote_style = ENT_COMPAT)
 	{
 		$quote_style = get_html_translation_table($table, $quote_style);
-		if (HTML_ENTITIES == $table)
-		{
-			$table = array();
-			foreach ($quote_style as $k => &$v) $table[ utf8_encode($k) ] =& $v;
-			$quote_style =& $table;
-		}
+		if (HTML_ENTITIES == $table) $quote_style = array_combine(array_map('utf8_encode', array_keys($quote_style)), $quote_style);
 		return $quote_style;
 	}
 
@@ -113,7 +108,7 @@ class
 		return $str[0];
 	}
 
-	function str_word_count($str, $format = 0, $charlist = '')
+	static function str_word_count($str, $format = 0, $charlist = '')
 	{
 		$charlist = '[\pL' . preg_quote($charlist, '/') . ']';
 		$str = preg_split("/({$charlist}+(?:[\pPd’']{$charlist}+)*)/u", $str, -1, PREG_SPLIT_DELIM_CAPTURE);
