@@ -18,20 +18,8 @@
  * (Normalization Form C, Canonical Composition).
 
  * See also:
- * http://phputf8.sf.net/
+ * http://phputf8.sf.net/ and its "see also" section
  * http://annevankesteren.nl/2005/05/unicode
-
-
- * Not implemented, but could be worth:
-
-chr - Return a specific character
-ord - Return ASCII value of character
-str_pad - Pad a string to a certain length with another string
-strtok - Tokenize string
-
- * Via transliteration ?
-metaphone - Calculate the metaphone key of a string
-soundex - Calculate the soundex key of a string
 
  */
 
@@ -55,6 +43,17 @@ class
 	static function htmlspecialchars  ($str, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {return htmlspecialchars  ($str, $quote_style, $charset);}
 	static function wordwrap($str, $width = 75, $break = "\n", $cut = false) {return pipe_wordwrap::php($str, $width, $break, $cut);}
 
+	static function chr($c)
+	{
+		$c %= 0x200000;
+
+		return $c < 0x80    ? chr($c) : (
+			   $c < 0x800   ? chr(0xc0 | $c>> 6) . chr(0x80 | $c     & 0x3f) : (
+			   $c < 0x10000 ? chr(0xe0 | $c>>12) . chr(0x80 | $c>> 6 & 0x3f) . chr(0x80 | $c    & 0x3f) : (
+			                  chr(0xf0 | $c>>18) . chr(0x80 | $c>>12 & 0x3f) . chr(0x80 | $c>>6 & 0x3f) . chr(0x80 | $c & 0x3f)
+		)));
+	}
+
 	static function count_chars($str, $mode = 1)
 	{
 		if (1 != $mode && 3 != $mode) trigger_error('u::count_chars(): allowed $mode are 1 or 3', E_USER_ERROR);
@@ -67,6 +66,17 @@ class
 	{
 		$charlist = null === $charlist ? '\s' : preg_quote($charlist, '/');
 		return preg_replace("/^[{$charlist}]+/u", '', $str);
+	}
+
+	static function ord($str)
+	{
+		$str = unpack('C*', );
+		$a = $str ? $str[0] : 0;
+
+		return $a >= 240 && $a <= 255 ? (($a-240) << 18) + (($str[1]-128) << 12) + (($str[2]-128) << 6) + $str[3]-128 : (
+			   $a >= 224 && $a <= 239 ? (($a-224) << 12) + (($str[1]-128) <<  6) +   $str[2]-128 : (
+			   $a >= 192 && $a <= 223 ? (($a-192) <<  6) +   $str[1]-128 : (
+			   $a)));
 	}
 
 	static function rtrim($str, $charlist = null)
@@ -87,6 +97,34 @@ class
 	static function str_ireplace($search, $replace, $subject, &$count = null)
 	{
 		return preg_replace('/' . preg_quote($search, '/') . '/ui', $replace, $subject, -1, $count);
+	}
+
+	static function str_pad($str, $len, $pad = ' ', $type = STR_PAD_RIGHT)
+	{
+		$strlen = self::strlen($str);
+		if ($len <= $strlen) return $str;
+
+		$padlen = self::strlen($pad);
+		$freelen = $len - $strlen;
+		$len = $freelen % $padlen;
+
+		if (STR_PAD_RIGHT == $type) return $str . str_repeat($pad, $freelen / $padlen) . ($len ? self::substr($pad, 0, $len) : '');
+		if (STR_PAD_LEFT  == $type) return        str_repeat($pad, $freelen / $padlen) . ($len ? self::substr($pad, 0, $len) : '') . $str;
+
+		if (STR_PAD_BOTH == $type)
+		{
+			$freelen /= 2;
+
+			$type = ceil($freelen);
+			$len = $type % $padlen;
+			$str .= str_repeat($pad, $type / $padlen) . ($len ? self::substr($pad, 0, $len) : '');
+
+			$type = floor($freelen);
+			$len = $type % $padlen;
+			return  str_repeat($pad, $type / $padlen) . ($len ? self::substr($pad, 0, $len) : '') . $str;
+		}
+
+		trigger_error('u::str_pad(): Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH.');
 	}
 
 	static function str_shuffle($str)
