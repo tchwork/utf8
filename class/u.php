@@ -70,7 +70,7 @@ class
 
 	static function ord($str)
 	{
-		$str = unpack('C*', );
+		$str = unpack('C*', $str);
 		$a = $str ? $str[0] : 0;
 
 		return $a >= 240 && $a <= 255 ? (($a-240) << 18) + (($str[1]-128) << 12) + (($str[2]-128) << 6) + $str[3]-128 : (

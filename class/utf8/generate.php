@@ -21,58 +21,18 @@ class
 	{
 		$rx = '';
 
-
-		// First get normalization properties
-
 		$h = fopen('http://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt', 'rt');
 		while (false !== $line = fgets($h))
 		{
-			if (preg_match( '/^([0-9A-F]+(?:..[0-9A-F]+)?)\s*;\s*NFC_QC\s*;\s*[MN]/', $line, $m))
+			if (preg_match('/^([0-9A-F]+(?:\.\.[0-9A-F]+)?)\s*;\s*NFC_QC\s*;\s*[MN]/', $line, $m))
 			{
 				$m = explode('..', $m[1]);
-				$m[0] = u::chr(hexdec($m[0]));
-				isset($m[1]) && $m[1] = u::chr(hexdec($m[1]));
-
-				$m = implode('-', $m);
-				$rx .= $m;
+				$rx .= '\x' . $m[0] . (isset($m[1]) ? (hexdec($m[0])+1 == hexdec($m[1]) ? '' : '-') . '\x' . $m[1] : '');
 			}
 		}
 
 		fclose($h);
 
-
-		// Then get combining characters who might need sorting
-
-		$last = 0;
-		$interval = 0;
-
-		$h = fopen('http://www.unicode.org/Public/UNIDATA/UnicodeData.txt', 'rt');
-		while (false !== $line = fgets($h))
-		{
-			if (preg_match( '/^([0-9A-F]+);[^;]*;[^;]*;([1-9]\d*)/', $line, $m))
-			{
-				$m = hexdec($m[1]);
-
-				if ($last+1 == $m)
-				{
-					++$last;
-					++$interval;
-				}
-				else
-				{
-					$interval && $rx .= ($interval > 1 ? '-' : '') . u::chr($last);
-
-					$rx .= u::chr($m);
-
-					$last = $m;
-					$interval = 0;
-				}
-			}
-		}
-
-		fclose($h);
-
-
-		return '/[' . $rx . ']/u';
+		return $rx;
 	}
 }
