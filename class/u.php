@@ -2,12 +2,12 @@
  *
  *   Copyright : (C) 2006 Nicolas Grekas. All rights reserved.
  *   Email     : nicolas.grekas+patchwork@espci.org
- *   License   : http://www.gnu.org/licenses/gpl.txt GNU/GPL, see COPYING
+ *   License   : http://www.gnu.org/licenses/lgpl.txt GNU/LGPL, see LGPL
  *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 2 of the License, or
- *   (at your option) any later version.
+ *   This library is free software; you can redistribute it and/or
+ *   modify it under the terms of the GNU Lesser General Public
+ *   License as published by the Free Software Foundation; either
+ *   version 2.1 of the License, or (at your option) any later version.
  *
  ***************************************************************************/
 
