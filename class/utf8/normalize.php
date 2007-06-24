@@ -84,31 +84,23 @@ class
 
 	protected static function compose($s)
 	{
-		// Decompose
-
-		$s = self::toNFD($s[0], self::$K);
-
-
-		// Recompose
-
 		static $map;
 		isset($map) || $map = unserialize(file_get_contents(resolvePath('data/utf8/canonicalComposition.ser')));
 
+		// Decompose
+		$s = self::toNFD($s[0], self::$K);
+
+		// Recompose
 		$s = strtr($s, $map);
 
-
 		// Compose Hangul chars
-
-		$s = preg_replace_callback('/[\x1100-\x1112][\x1161-\x1175][\x11a7-\x11C2]/u', array(__CLASS__, 'composeHangul'), $s);
-
+		$s = preg_replace_callback('/[\x{1100}-\x{1112}][\x{1161}-\x{1175}][\x{11a7}-\x{11C2}]/u', array(__CLASS__, 'composeHangul'), $s);
 
 		return $s;
 	}
 
 	protected static function decompose($s)
 	{
-		// Decompose
-
 		if (self::$K)
 		{
 			static $compatibility;
@@ -122,18 +114,14 @@ class
 			$map =& $canonical;
 		}
 
+		// Decompose
+
 		$s = strtr($s[0], $map);
-
-
 		// Decompose Hangul chars
-
-		$s = preg_replace_callback('/[\xAC00-\xD7A3]/u', array(__CLASS__, 'decomposeHangul'), $s);
-
+		$s = preg_replace_callback('/[\x{AC00}-\x{D7A3}]/u', array(__CLASS__, 'decomposeHangul'), $s);
 
 		// Sort combining chars
-
 		$s = preg_replace_callback("'[" . self::$combiningCheck . "]{2,}'u", array(__CLASS__, 'sortCombining'), $s);
-
 
 		return $s;
 	}

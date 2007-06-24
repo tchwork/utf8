@@ -42,7 +42,7 @@ class
 			if (preg_match('/^([0-9A-F]+(?:\.\.[0-9A-F]+)?)\s*;\s*' . $type . '_QC\s*;\s*[MN]/', $m, $m))
 			{
 				$m = explode('..', $m[1]);
-				$rx .= '\x' . $m[0] . (isset($m[1]) ? (hexdec($m[0])+1 == hexdec($m[1]) ? '' : '-') . '\x' . $m[1] : '');
+				$rx .= '\x{' . $m[0] . '}' . (isset($m[1]) ? (hexdec($m[0])+1 == hexdec($m[1]) ? '' : '-') . '\x{' . $m[1] . '}' : '');
 			}
 		}
 
@@ -79,7 +79,7 @@ class
 				{
 					$interval && $rx .= ($interval > 1 ? '-' : '') . $lastChr;
 
-					$lastChr = '\x' . $m[1];
+					$lastChr = '\x{' . $m[1] . '}';
 					$lastOrd = $ord;
 					$interval = 0;
 
@@ -106,7 +106,7 @@ class
 			. "\n" . self::quickCheck('NFKD')
 			. "\n" . self::combiningCheck();
 
-		$a = preg_replace("'\\\\x([0-9A-F]+)'e", 'u::chr(hexdec("$1"))', $a);
+		$a = preg_replace("'\\\\x\\{([0-9A-F]+)\\}'e", 'u::chr(hexdec("$1"))', $a);
 
 		file_put_contents(self::$utf8Data . 'quickChecks.txt', $a);
 	}
