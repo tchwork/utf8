@@ -115,8 +115,8 @@ class
 		}
 
 		// Decompose
-
 		$s = strtr($s[0], $map);
+
 		// Decompose Hangul chars
 		$s = preg_replace_callback('/[\x{AC00}-\x{D7A3}]/u', array(__CLASS__, 'decomposeHangul'), $s);
 
