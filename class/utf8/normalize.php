@@ -63,10 +63,20 @@ class
 	static function toNFKC($s) {return self::toNFC($s, true);}
 	static function toNFKD($s) {return self::toNFD($s, true);}
 
+
+	// Some remaining ligatures for search engine decomposition
+
+	static $lig = array(
+		'Æ' => 'Ae', 'æ' => 'ae', 'ß' => 'ss', 'Œ' => 'Oe', 'œ' => 'oe', 'ʤ' => 'dz',
+		'ʣ' => 'dz', 'ʥ' => 'dz', 'ƕ' => 'hv', 'Ƣ' => 'Oi', 'ƣ' => 'oi', 'ʨ' => 'tc',
+		'ʦ' => 'ts', 'ƻ' => '2' , 'Ŋ' => 'Ng', 'ŋ' => 'ng',
+	);
+
 	static function toSearchString($s)
 	{
 		$s = self::toNFKD($s);
 		$s = preg_replace_callback('/[' . self::$combiningCheck . ']+/', '', $s);
+		$s = strtr($s, self::$lig);
 
 		return $s;
 	}
