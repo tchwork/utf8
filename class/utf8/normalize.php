@@ -101,27 +101,23 @@ class
 
 	protected static function decompose($s)
 	{
+		// Decompose
+		static $canonical;
+		isset($canonical) || $canonical = unserialize(file_get_contents(resolvePath('data/utf8/canonicalDecomposition.ser')));
+		$s = strtr($s[0], $canonical);
+
 		if (self::$K)
 		{
 			static $compatibility;
 			isset($compatibility) || $compatibility = unserialize(file_get_contents(resolvePath('data/utf8/compatibilityDecomposition.ser')));
-			$map =& $compatibility;
+			$s = strtr($s[0], $compatibility);
 		}
-		else
-		{
-			static $canonical;
-			isset($canonical) || $canonical = unserialize(file_get_contents(resolvePath('data/utf8/canonicalDecomposition.ser')));
-			$map =& $canonical;
-		}
-
-		// Decompose
-		$s = strtr($s[0], $map);
 
 		// Decompose Hangul chars
 		$s = preg_replace_callback('/[\x{AC00}-\x{D7A3}]/u', array(__CLASS__, 'decomposeHangul'), $s);
 
 		// Sort combining chars
-		$s = preg_replace_callback("'[" . self::$combiningCheck . "]{2,}'u", array(__CLASS__, 'sortCombining'), $s);
+		$s = preg_replace_callback('/[' . self::$combiningCheck . ']{2,}/u', array(__CLASS__, 'sortCombining'), $s);
 
 		return $s;
 	}
@@ -168,7 +164,7 @@ class
 		static $combiningClass;
 		isset($combiningClass) || $combiningClass = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
 
-		preg_match_all("'.'u", $s[0], $s);
+		preg_match_all('/./u', $s[0], $s);
 
 		$a = array();
 		foreach ($s[0] as $s) $a[$s] = $combiningClass[$s];

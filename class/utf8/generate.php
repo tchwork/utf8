@@ -160,13 +160,12 @@ class
 				$decomp = array_map(array('u','chr'), $decomp);
 				$decomp = implode('', $decomp);
 
-				$compatibilityDecomposition[$k] = $decomp;
-
 				if ($canonic)
 				{
 					$canonicalDecomposition[$k] = $decomp;
 					$exclude || $canonicalComposition[$decomp] = $k;
 				}
+				else $compatibilityDecomposition[$k] = $decomp;
 			}
 		}
 
@@ -174,14 +173,14 @@ class
 
 		uksort($canonicalComposition, array(__CLASS__, 'cmpByLength'));
 
-		$combiningClass = serialize($combiningClass);
-		$canonicalComposition = serialize($canonicalComposition);
-		$canonicalDecomposition = serialize($canonicalDecomposition);
+		$combiningClass             = serialize($combiningClass);
+		$canonicalComposition       = serialize($canonicalComposition);
+		$canonicalDecomposition     = serialize($canonicalDecomposition);
 		$compatibilityDecomposition = serialize($compatibilityDecomposition);
 
-		file_put_contents(self::$utf8Data . 'combiningClass.ser', $combiningClass);
-		file_put_contents(self::$utf8Data . 'canonicalComposition.ser', $canonicalComposition);
-		file_put_contents(self::$utf8Data . 'canonicalDecomposition.ser', $canonicalDecomposition);
+		file_put_contents(self::$utf8Data . 'combiningClass.ser'            , $combiningClass);
+		file_put_contents(self::$utf8Data . 'canonicalComposition.ser'      , $canonicalComposition);
+		file_put_contents(self::$utf8Data . 'canonicalDecomposition.ser'    , $canonicalDecomposition);
 		file_put_contents(self::$utf8Data . 'compatibilityDecomposition.ser', $compatibilityDecomposition);
 	}
 
