@@ -150,7 +150,6 @@ class
 		return u::chr(self::SBase + ($l * self::VCount + $v) * self::TCount + $t);
 	}
 
-
 	protected static function sortCombining($s)
 	{
 		static $combiningClass;

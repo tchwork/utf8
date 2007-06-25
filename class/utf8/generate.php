@@ -70,29 +70,13 @@ class
 		{
 			if (preg_match('/^([0-9A-F]+);[^;]*;[^;]*;([1-9]\d*)/', $m, $m))
 			{
-				$ord = hexdec($m[1]);
-				$chr = '\x{' . $m[1] . '}';
-
-				if ($lastOrd+1 == $ord)
-				{
-					$lastChr = $chr;
-					++$lastOrd;
-					++$interval;
-				}
-				else
-				{
-					$interval && $rx .= ($interval > 1 ? '-' : '') . $lastChr;
-
-					$lastChr = $chr;
-					$lastOrd = $ord;
-					$interval = 0;
-
-					$rx .= $chr;
-				}
+				$rx .= '\x{' . $m[1] . '}';
 			}
 		}
 
 		fclose($h);
+
+		$rx = self::optimizeRx($rx);
 
 		return $rx;
 	}
@@ -194,7 +178,7 @@ class
 
 	static function optimizeRx($rx)
 	{
-		$rx = preg_replace('/\\\\x\\{([0-9A-F]+)\\}-\\\\x\\{([0-9A-F]+)\\}/e', '"\x{".implode("}\x{",array_map("dechex",range(0x$1, 0x$2)))."}"', $rx);
+		$rx = preg_replace('/\\\\x\\{([0-9A-Fa-f]+)\\}-\\\\x\\{([0-9A-Fa-f]+)\\}/e', '"\x{".implode("}\x{",array_map("dechex",range(0x$1, 0x$2)))."}"', $rx);
 
 		preg_match_all('/[0-9A-Fa-f]+/', $rx, $rx);
 
