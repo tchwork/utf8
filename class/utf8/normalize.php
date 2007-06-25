@@ -38,6 +38,7 @@ class
 	{
 		self::$K = $K;
 		$K ? ($K =& self::$quickCheckNFKC) : ($K =& self::$quickCheckNFC);
+		$s = preg_replace('/^[' . self::$combiningCheck . ']*/u', ' ', $s) . ' ';
 		$s = preg_replace_callback($K, array(__CLASS__, 'compose'), $s);
 
 		return substr($s, 1, -1);
@@ -59,15 +60,15 @@ class
 	// Some remaining ligatures for search engine decomposition
 
 	static $lig = array(
-		'Æ' => 'Ae', 'æ' => 'ae', 'ß' => 'ss', 'Œ' => 'Oe', 'œ' => 'oe', 'ʤ' => 'dz',
-		'ʣ' => 'dz', 'ʥ' => 'dz', 'ƕ' => 'hv', 'Ƣ' => 'Oi', 'ƣ' => 'oi', 'ʨ' => 'tc',
-		'ʦ' => 'ts', 'ƻ' => '2' , 'Ŋ' => 'Ng', 'ŋ' => 'ng',
+		' ' => 'Ae', 'æ' => 'ae', 'x' => 'ss', '' => 'Oe', '' => 'oe', 'ʤ' => 'dz',
+		'ʣ' => 'dz', 'ʥ' => 'dz', '"' => 'hv', 'Ƣ' => 'Oi', 'ƣ' => 'oi', 'ʨ' => 'tc',
+		'ʦ' => 'ts', 'ƻ' => '2' , '`' => 'Ng', '9' => 'ng',
 	);
 
 	static function toSearchString($s)
 	{
 		$s = self::toNFKD($s);
-		$s = preg_replace_callback('/[' . self::$combiningCheck . ']+/', '', $s);
+		$s = preg_replace('/[' . self::$combiningCheck . ']+/u', '', $s);
 		$s = strtr($s, self::$lig);
 
 		return $s;
