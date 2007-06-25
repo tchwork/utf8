@@ -66,12 +66,14 @@ class
 		$h = fopen(self::$UnicodeData, 'rt');
 		while (false !== $m = fgets($h))
 		{
-			if (preg_match( '/^([0-9A-F]+);[^;]*;[^;]*;([1-9]\d*)/', $m, $m))
+			if (preg_match('/^([0-9A-F]+);[^;]*;[^;]*;([1-9]\d*)/', $m, $m))
 			{
 				$ord = hexdec($m[1]);
+				$chr = '\x{' . $m[1] . '}';
 
 				if ($lastOrd+1 == $ord)
 				{
+					$lastChr = $chr;
 					++$lastOrd;
 					++$interval;
 				}
@@ -79,12 +81,11 @@ class
 				{
 					$interval && $rx .= ($interval > 1 ? '-' : '') . $lastChr;
 
-					$lastChr = '\x{' . $m[1] . '}';
+					$lastChr = $chr;
 					$lastOrd = $ord;
 					$interval = 0;
 
-					$rx .= $lastChr;
-
+					$rx .= $chr;
 				}
 			}
 		}
