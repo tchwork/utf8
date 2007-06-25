@@ -86,7 +86,7 @@ class
 		$s = strtr($s, $map);
 
 		// Compose Hangul chars
-		$s = preg_replace_callback('/[\x{1100}-\x{1112}][\x{1161}-\x{1175}][\x{11a7}-\x{11C2}]/u', array(__CLASS__, 'composeHangul'), $s);
+		$s = preg_replace_callback('/[\x{1100}-\x{1112}][\x{1161}-\x{1175}][\x{11a7}-\x{11C2}]?/u', array(__CLASS__, 'composeHangul'), $s);
 
 		return $s;
 	}
@@ -145,7 +145,7 @@ class
 
 		$l = u::ord(substr($s, 0, 3)) - self::LBase;
 		$v = u::ord(substr($s, 3, 3)) - self::VBase;
-		$t = u::ord(substr($s, 6, 3)) - self::TBase;
+		$t = 9 == strlen($s) ? u::ord(substr($s, 6)) - self::TBase : 0;
 
 		return u::chr(self::SBase + ($l * self::VCount + $v) * self::TCount + $t);
 	}
