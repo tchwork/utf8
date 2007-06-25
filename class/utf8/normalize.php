@@ -60,9 +60,9 @@ class
 	// Some remaining ligatures for search engine decomposition
 
 	static $lig = array(
-		' ' => 'Ae', 'æ' => 'ae', 'x' => 'ss', '' => 'Oe', '' => 'oe', 'ʤ' => 'dz',
-		'ʣ' => 'dz', 'ʥ' => 'dz', '"' => 'hv', 'Ƣ' => 'Oi', 'ƣ' => 'oi', 'ʨ' => 'tc',
-		'ʦ' => 'ts', 'ƻ' => '2' , '`' => 'Ng', '9' => 'ng',
+		'Æ' => 'Ae', 'æ' => 'ae', 'ß' => 'ss', 'Œ' => 'Oe', 'œ' => 'oe', 'ʤ' => 'dz',
+		'ʣ' => 'dz', 'ʥ' => 'dz', 'ƕ' => 'hv', 'Ƣ' => 'Oi', 'ƣ' => 'oi', 'ʨ' => 'tc',
+		'ʦ' => 'ts', 'ƻ' => '2' , 'Ŋ' => 'Ng', 'ŋ' => 'ng',
 	);
 
 	static function toSearchString($s)
