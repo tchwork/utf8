@@ -28,8 +28,8 @@ class
 		$a = file_get_contents(resolvePath('data/utf8/quickChecks.txt'));
 		$a = explode("\n", $a);
 		self::$quickCheckNFC  = $a[1];
-		self::$quickCheckNFD  = $a[2];
-		self::$quickCheckNFKC = $a[3];
+		self::$quickCheckNFD  = $a[3];
+		self::$quickCheckNFKC = $a[2];
 		self::$quickCheckNFKD = $a[4];
 		self::$combiningCheck = $a[5];
 	}
@@ -37,12 +37,8 @@ class
 	static function toNFC($s, $K = false)
 	{
 		self::$K = $K;
-
-		$s = preg_replace_callback(
-			'/(?:.[' . ($K ? self::$quickCheckNFKC : self::$quickCheckNFC) . self::$combiningCheck . ']+)+./u',
-			array(__CLASS__, 'compose'),
-			' ' . $s . ' '
-		);
+		$K ? ($K =& self::$quickCheckNFKC) : ($K =& self::$quickCheckNFC);
+		$s = preg_replace_callback($K, array(__CLASS__, 'compose'), $s);
 
 		return substr($s, 1, -1);
 	}
@@ -50,12 +46,8 @@ class
 	static function toNFD($s, $K = false)
 	{
 		self::$K = $K;
-
-		$s = preg_replace_callback(
-			'/[' . ($K ? self::$quickCheckNFKD : self::$quickCheckNFD) . self::$combiningCheck . ']+/u',
-			array(__CLASS__, 'decompose'),
-			$s
-		);
+		$K ? ($K =& self::$quickCheckNFKD) : ($K =& self::$quickCheckNFD);
+		$s = preg_replace_callback($K, array(__CLASS__, 'decompose'), $s);
 
 		return $s;
 	}
