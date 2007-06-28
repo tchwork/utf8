@@ -48,7 +48,7 @@ class
 
 		fclose($h);
 
-		$rx = self::optimizeRx($rx . self::combiningCheck());
+		$rx = self::optimizeRx($rx);
 
 		return $rx;
 	}
