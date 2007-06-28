@@ -64,7 +64,7 @@ class
 
 	static $lig = array(
 		'Æ' => 'AE', 'æ' => 'ae', 'ß' => 'ss', 'Œ' => 'OE', 'œ' => 'oe', 'ʤ' => 'dz',
-		'ʣ' => 'dz', 'ʥ' => 'dz', 'ƕ' => 'hv', 'Ƣ' => 'Oi', 'ƣ' => 'oi', 'ʨ' => 'tc',
+		'ʣ' => 'dz', 'ʥ' => 'dz', 'ƕ' => 'hv', 'Ƣ' => 'OI', 'ƣ' => 'oi', 'ʨ' => 'tc',
 		'ʦ' => 'ts', 'ƻ' => '2' , 'Ŋ' => 'NG', 'ŋ' => 'ng', 'Ð' => 'D' , 'ð' => 'd' ,
 		'Ø' => 'O' , 'ø' => 'o' , 'Þ' => 'TH', 'þ' => 'th', 'Θ' => 'T' , 'θ' => 'T' ,
 		'Ʃ' => 'SH', 'ʃ' => 'sh', 'Ʒ' => 'ZH', 'ʒ' => 'zh', 'Ʊ' => 'U' , 'ʊ' => 'u' ,
@@ -74,9 +74,10 @@ class
 
 	static function removeAccents($s)
 	{
-		$s = self::toNFKD($s);
+		$s = self::toNFD($s, true);
 		$s = preg_replace('/\Mn+/u', '', $s);
 		$s = strtr($s, self::$lig);
+		$s = self::toNFC($s);
 
 		return $s;
 	}
