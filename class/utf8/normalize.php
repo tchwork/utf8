@@ -12,6 +12,8 @@
  ***************************************************************************/
 
 
+// See http://www.unicode.org/reports/tr15/
+
 class
 {
 	protected static $K;
@@ -57,18 +59,23 @@ class
 	static function toNFKD($s) {return self::toNFD($s, true);}
 
 
-	// Some remaining ligatures for search engine decomposition
+	// Some remaining chars for accents decomposition
+	// from http://www.unicode.org/cldr/
 
 	static $lig = array(
-		'Æ' => 'Ae', 'æ' => 'ae', 'ß' => 'ss', 'Œ' => 'Oe', 'œ' => 'oe', 'ʤ' => 'dz',
+		'Æ' => 'AE', 'æ' => 'ae', 'ß' => 'ss', 'Œ' => 'OE', 'œ' => 'oe', 'ʤ' => 'dz',
 		'ʣ' => 'dz', 'ʥ' => 'dz', 'ƕ' => 'hv', 'Ƣ' => 'Oi', 'ƣ' => 'oi', 'ʨ' => 'tc',
-		'ʦ' => 'ts', 'ƻ' => '2' , 'Ŋ' => 'Ng', 'ŋ' => 'ng',
+		'ʦ' => 'ts', 'ƻ' => '2' , 'Ŋ' => 'NG', 'ŋ' => 'ng', 'Ð' => 'D' , 'ð' => 'd' ,
+		'Ø' => 'O' , 'ø' => 'o' , 'Þ' => 'TH', 'þ' => 'th', 'Θ' => 'T' , 'θ' => 'T' ,
+		'Ʃ' => 'SH', 'ʃ' => 'sh', 'Ʒ' => 'ZH', 'ʒ' => 'zh', 'Ʊ' => 'U' , 'ʊ' => 'u' ,
+		'Ə' => 'A' , 'ə' => 'a' , 'Ɔ' => 'O' , 'ɔ' => 'o' , 'Ɛ' => 'E' , 'ɛ' => 'e' ,
+		'ʔ' => '?' , 'ɪ' => 'i' , 'ʌ' => 'v',
 	);
 
-	static function toSearchString($s)
+	static function removeAccents($s)
 	{
 		$s = self::toNFKD($s);
-		$s = preg_replace('/[' . self::$combiningCheck . ']+/u', '', $s);
+		$s = preg_replace('/\Mn+/u', '', $s);
 		$s = strtr($s, self::$lig);
 
 		return $s;
