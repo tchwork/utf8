@@ -7,7 +7,7 @@
  *   This library is free software; you can redistribute it and/or
  *   modify it under the terms of the GNU Lesser General Public
  *   License as published by the Free Software Foundation; either
- *   version 2.1 of the License, or (at your option) any later version.
+ *   version 3 of the License, or (at your option) any later version.
  *
  ***************************************************************************/
 
@@ -88,6 +88,8 @@ class
 	}
 
 
+	// Internal protected methods
+
 	protected static function compose($s)
 	{
 		isset(self::$C) || self::$C = unserialize(file_get_contents(resolvePath('data/utf8/canonicalComposition.ser')));
@@ -122,7 +124,7 @@ class
 		}
 
 		// Decompose Hangul chars
-		$s = preg_replace_callback('/[\x{AC00}-\x{D7A3}]/u', array(__CLASS__, 'decomposeHangul'), $s);
+		$s = preg_replace_callback('/[\x{ac00}-\x{d7a3}]/u', array(__CLASS__, 'decomposeHangul'), $s);
 
 		// Sort combining chars
 		$s = preg_replace_callback('/[' . self::$combiningCheck . ']{2,}/u', array(__CLASS__, 'sortCombining'), $s);
@@ -163,6 +165,7 @@ class
 		$l = 0xac00 + ($l * 21 + $v) * 28 + $t;
 		return chr(0xe0 | $l>>12) . chr(0x80 | $l>> 6 & 0x3f) . chr(0x80 | $l & 0x3f);
 	}
+
 
 	protected static function sortCombining($s)
 	{
