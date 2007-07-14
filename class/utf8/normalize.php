@@ -17,6 +17,7 @@
 class
 {
 	protected static $K;
+	protected static $compose = false;
 
 	protected static $quickCheckNFC;
 	protected static $quickCheckNFD;
@@ -44,9 +45,11 @@ class
 
 	static function toNFC($s, $K = false)
 	{
+		self::$compose = true;
 		self::$K = $K;
 		$K ? ($K =& self::$quickCheckNFKC) : ($K =& self::$quickCheckNFC);
 		$s = preg_replace_callback($K, array(__CLASS__, 'compose'), $s);
+		self::$compose = false;
 
 		return $s;
 	}
@@ -98,12 +101,12 @@ class
 		$s = self::toNFD($s[0], self::$K);
 
 		// Recompose
-		$s = strtr($s, self::$C);
 		$s = preg_replace_callback(
-			'/([^' . self::$combiningCheck . '])([' . self::$combiningCheck . ']{2,})/u',
+			'/([^' . self::$combiningCheck . ']?)([' . self::$combiningCheck . ']{2,})/u',
 			array(__CLASS__, 'composeCombining'),
 			$s
 		);
+		$s = strtr($s, self::$C);
 
 		// Compose Hangul chars
 		$s = preg_replace_callback('/[\x{1100}-\x{1112}][\x{1161}-\x{1175}][\x{11a7}-\x{11C2}]?/u', array(__CLASS__, 'composeHangul'), $s);
@@ -127,7 +130,7 @@ class
 		$s = preg_replace_callback('/[\x{ac00}-\x{d7a3}]/u', array(__CLASS__, 'decomposeHangul'), $s);
 
 		// Sort combining chars
-		$s = preg_replace_callback('/[' . self::$combiningCheck . ']{2,}/u', array(__CLASS__, 'sortCombining'), $s);
+		self::$compose || $s = preg_replace_callback('/[' . self::$combiningCheck . ']{2,}/u', array(__CLASS__, 'sortCombining'), $s);
 
 		return $s;
 	}
@@ -187,28 +190,38 @@ class
 
 	protected static function composeCombining($s)
 	{
+		isset(self::$cC) || self::$cC = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
+
 		preg_match_all('/./u', $s[2], $c);
-		$c = $c[0];
 		$s = $s[1];
+
+		$a = array();
+		foreach ($c[0] as $c)
+		{
+			isset($a[self::$cC[$c]]) || $a[self::$cC[$c]] = array();
+			$a[self::$cC[$c]][] = $c;
+		}
+
+		ksort($a);
 
 		$lastClass = 0;
 
-		$i = 0;
-		$l = count($c);
-		while ($i < $l)
+		foreach ($a as $class => &$chars)
 		{
-			if ($lastClass < self::$cC[$c[$i]] && isset(self::$C[$s.$c[$i]]))
+			foreach ($chars as &$c)
 			{
-				$s .= $c[$i];
-				$c[$i] = '';
+				if ($lastClass == $class) ;
+				else if (isset(self::$C[$s . $c]))
+				{
+					$s .= $c;
+					$c = '';
+				}
+				else $lastClass = $class;
 			}
-			else $lastClass = self::$cC[$c[$i]];
 
-			++$i;
+			$chars = implode('', $chars);
 		}
 
-		isset(self::$C[$s]) && $s = self::$C[$s];
-
-		return $s . implode('', $c);
+		return $s . implode('', $a);
 	}
 }
