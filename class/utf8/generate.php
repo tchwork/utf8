@@ -108,6 +108,8 @@ class
 
 	static function unicodeMaps()
 	{
+		$upperCase = array();
+		$lowerCase = array();
 		$combiningClass = array();
 		$canonicalComposition = array();
 		$canonicalDecomposition = array();
@@ -136,6 +138,9 @@ class
 			$k = u::chr(hexdec($m[0]));
 			$combClass = (int) $m[3];
 			$decomp = $m[5];
+
+			$m[12] && $m[12]!=$m[0] && $upperCase[$k] = self::chr(hexdec($m[12]));
+			$m[13] && $m[13]!=$m[0] && $lowerCase[$k] = self::chr(hexdec($m[13]));
 
 			$combClass && $combiningClass[$k] = $combClass;
 
@@ -203,11 +208,15 @@ class
 
 		uksort($canonicalComposition, array(__CLASS__, 'cmpByLength'));
 
+		$upperCase                  = serialize($upperCase);
+		$lowerCase                  = serialize($lowerCase);
 		$combiningClass             = serialize($combiningClass);
 		$canonicalComposition       = serialize($canonicalComposition);
 		$canonicalDecomposition     = serialize($canonicalDecomposition);
 		$compatibilityDecomposition = serialize($compatibilityDecomposition);
 
+		file_put_contents(self::$utf8Data . 'upperCase.ser'                 , $upperCase);
+		file_put_contents(self::$utf8Data . 'lowerCase.ser'                 , $lowerCase);
 		file_put_contents(self::$utf8Data . 'combiningClass.ser'            , $combiningClass);
 		file_put_contents(self::$utf8Data . 'canonicalComposition.ser'      , $canonicalComposition);
 		file_put_contents(self::$utf8Data . 'canonicalDecomposition.ser'    , $canonicalDecomposition);
