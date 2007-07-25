@@ -16,10 +16,10 @@ class
 {
 	static
 
-		$utf8Data,
-		$DerivedNormalizationProps = 'http://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt',
-		$UnicodeData               = 'http://www.unicode.org/Public/UNIDATA/UnicodeData.txt',
-		$CompositionExclusions     = 'http://www.unicode.org/Public/UNIDATA/CompositionExclusions.txt';
+	$utf8Data,
+	$DerivedNormalizationProps = 'http://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt',
+	$UnicodeData               = 'http://www.unicode.org/Public/UNIDATA/UnicodeData.txt',
+	$CompositionExclusions     = 'http://www.unicode.org/Public/UNIDATA/CompositionExclusions.txt';
 
 
 	static function __static_construct()

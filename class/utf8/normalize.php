@@ -17,22 +17,22 @@
 class
 {
 	protected static
-		
-		$K,
-		$compose = false,
-		
-		$quickCheckNFC,
-		$quickCheckNFD,
-		$quickCheckNFKC,
-		$quickCheckNFKD,
-		
-		$combiningCheck,
-		
-		$C,
-		$D,
-		$KD,
-		
-		$cC;
+
+	$K,
+	$compose = false,
+
+	$quickCheckNFC,
+	$quickCheckNFD,
+	$quickCheckNFKC,
+	$quickCheckNFKD,
+
+	$combiningCheck,
+
+	$C,
+	$D,
+	$KD,
+
+	$cC;
 
 
 	static function __static_construct()
