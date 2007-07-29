@@ -33,7 +33,7 @@ class
 	static function toNFD($s)  {return utf8_normalize::toNFD($s);}
 	static function toNFKC($s) {return utf8_normalize::toNFC($s, true);}
 	static function toNFKD($s) {return utf8_normalize::toNFD($s, true);}
-	static function removeAcents($s) {return utf8_normalize::removeAccents($s);}
+	static function removeAccents($s) {return utf8_normalize::removeAccents($s);}
 
 
 	// Here is the complete set of native PHP string functions that need UTF-8 awareness,
@@ -43,8 +43,8 @@ class
 	static function strtolower($s) {return mb_strtolower($s, 'UTF-8');}
 	static function strtoupper($s) {return mb_strtoupper($s, 'UTF-8');}
 	static function substr  ($s, $start, $len = null) {return mb_substr($s, $start, $len, 'UTF-8');}
-	static function strpos  ($s, $needle, $offset = 0) {return mb_strpos  ($s, $needle, $offset, 'UTF-8');}
-	static function strrpos ($s, $needle, $offset = 0) {return mb_strrpos ($s, $needle, $offset, 'UTF-8');}
+	static function strpos  ($s, $needle, $offset = 0) {return ''===$s ? false : mb_strpos  ($s, $needle, $offset, 'UTF-8');}
+	static function strrpos ($s, $needle, $offset = 0) {return ''===$s ? false : mb_strrpos ($s, $needle, $offset, 'UTF-8');}
 	static function stripos ($s, $needle, $offset = 0) {return mb_stripos ($s, $needle, $offset, 'UTF-8');}
 	static function strripos($s, $needle, $offset = 0) {return mb_strripos($s, $needle, $offset, 'UTF-8');}
 	static function stristr ($s, $needle) {return mb_stristr ($s, $needle, false, 'UTF-8');}

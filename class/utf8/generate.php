@@ -139,8 +139,8 @@ class
 			$combClass = (int) $m[3];
 			$decomp = $m[5];
 
-			$m[12] && $m[12]!=$m[0] && $upperCase[$k] = self::chr(hexdec($m[12]));
-			$m[13] && $m[13]!=$m[0] && $lowerCase[$k] = self::chr(hexdec($m[13]));
+			$m[12] && $m[12]!=$m[0] && $upperCase[$k] = u::chr(hexdec($m[12]));
+			$m[13] && $m[13]!=$m[0] && $lowerCase[$k] = u::chr(hexdec($m[13]));
 
 			$combClass && $combiningClass[$k] = $combClass;
 
