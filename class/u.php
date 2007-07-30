@@ -13,10 +13,14 @@
 
 
 /* UTF-8 aware string manipulations.
-
+ *
+ * TODO:
+ * - handle grapheme clusters & co. (http://unicode.org/reports/tr29/)
+ * - add support for security mechanisms (http://unicode.org/reports/tr39/)
+ *
  * See also:
- * http://phputf8.sf.net/ and its "see also" section
- * http://annevankesteren.nl/2005/05/unicode
+ * - http://phputf8.sf.net/ and its "see also" section
+ * - http://annevankesteren.nl/2005/05/unicode
 
  */
 
