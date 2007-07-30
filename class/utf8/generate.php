@@ -162,7 +162,8 @@ class
 					$canonicalDecomposition[$k] = $decomp;
 					$exclude || $canonicalComposition[$decomp] = $k;
 				}
-				else $compatibilityDecomposition[$k] = $decomp;
+
+				$compatibilityDecomposition[$k] = $decomp;
 			}
 		}
 
@@ -180,11 +181,6 @@ class
 					$canonicalDecomposition[$k] = $h;
 					$m = 1;
 				}
-
-				!isset($canonicalComposition[$decomp])
-					&& !isset($exclusion[$k])
-					&& 1 < strlen(utf8_decode($decomp))
-					&& $canonicalComposition[$decomp] = $k;
 			}
 		}
 		while ($m);
@@ -195,8 +191,7 @@ class
 
 			foreach($compatibilityDecomposition as $k => $decomp)
 			{
-				$h = strtr($decomp, $canonicalDecomposition);
-				$h = strtr($h, $compatibilityDecomposition);
+				$h = strtr($decomp, $compatibilityDecomposition);
 				if ($h != $decomp)
 				{
 					$compatibilityDecomposition[$k] = $h;
@@ -205,8 +200,6 @@ class
 			}
 		}
 		while ($m);
-
-		uksort($canonicalComposition, array(__CLASS__, 'cmpByLength'));
 
 		$upperCase                  = serialize($upperCase);
 		$lowerCase                  = serialize($lowerCase);

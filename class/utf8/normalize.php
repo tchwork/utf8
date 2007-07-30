@@ -17,9 +17,8 @@
 class
 {
 	protected static
-
+	
 	$K,
-	$compose = false,
 
 	$quickCheckNFC,
 	$quickCheckNFD,
@@ -32,7 +31,9 @@ class
 	$D,
 	$KD,
 
-	$cC;
+	$cC,
+
+	$utf_len_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
 
 
 	static function __static_construct()
@@ -48,22 +49,16 @@ class
 
 	static function toNFC($s, $K = false)
 	{
-		self::$compose = true;
 		self::$K = $K;
 		$K ? ($K =& self::$quickCheckNFKC) : ($K =& self::$quickCheckNFC);
-		$s = preg_replace_callback($K, array(__CLASS__, 'compose'), $s);
-		self::$compose = false;
-
-		return $s;
+		return preg_replace_callback($K, array(__CLASS__, 'compose'), $s);
 	}
 
 	static function toNFD($s, $K = false)
 	{
 		self::$K = $K;
 		$K ? ($K =& self::$quickCheckNFKD) : ($K =& self::$quickCheckNFD);
-		$s = preg_replace_callback($K, array(__CLASS__, 'decompose'), $s);
-
-		return $s;
+		return preg_replace_callback($K, array(__CLASS__, 'decompose'), $s);
 	}
 
 	static function toNFKC($s) {return self::toNFC($s, true);}
@@ -98,133 +93,168 @@ class
 
 	protected static function compose($s)
 	{
-		isset(self::$C) || self::$C = unserialize(file_get_contents(resolvePath('data/utf8/canonicalComposition.ser')));
-
 		// Decompose
+
 		$s = self::toNFD($s[0], self::$K);
 
-		// Recompose
-		$s = preg_replace_callback(
-			'/([^' . self::$combiningCheck . ']?)([' . self::$combiningCheck . ']{2,})/u',
-			array(__CLASS__, 'composeCombining'),
-			$s
-		);
-		$s = strtr($s, self::$C);
 
-		// Compose Hangul chars
-		$s = preg_replace_callback('/[\x{1100}-\x{1112}][\x{1161}-\x{1175}][\x{11a7}-\x{11C2}]?/u', array(__CLASS__, 'composeHangul'), $s);
+		// Load decomposition tables
 
-		return $s;
+		isset(self::$C)  || self::$C  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalComposition.ser')));
+		isset(self::$cC) || self::$cC = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
+
+
+		// Compose
+
+		$t = $tail = '';
+
+		$i = $s[0] < "\x80" ? 1 : self::$utf_len_mask[$s[0] & "\xF0"];
+		$len = strlen($s);
+
+		$last_utf_chr = substr($s, 0, $i);
+		$last_utf_cls = isset(self::$cC[$last_utf_chr]) ? 256 : 0;
+
+		while ($i < $len)
+		{
+			$utf_len = $s[$i] < "\x80" ? 1 : self::$utf_len_mask[$s[$i] & "\xF0"];
+			$utf_chr = substr($s, $i, $utf_len);
+
+			if ($last_utf_cls
+				||      $utf_chr < "\xe1\x85\xa1" || "\xe1\x85\xb5" < $utf_chr
+				|| $last_utf_chr < "\xe1\x84\x80" || "\xe1\x84\x92" < $last_utf_chr)
+			{
+				// Tables lookup
+
+				$utf_cls = isset(self::$cC[$utf_chr]) ? self::$cC[$utf_chr] : 0;
+
+				if (isset(self::$C[$last_utf_chr . $utf_chr]) && (!$last_utf_cls || $last_utf_cls < $utf_cls))
+				{
+					$last_utf_chr = self::$C[$last_utf_chr . $utf_chr];
+				}
+				else if ($last_utf_cls = $utf_cls) $tail .= $utf_chr;
+				else
+				{
+					$t .= $last_utf_chr . $tail;
+					$tail = '';
+					$last_utf_chr = $utf_chr;
+				}
+			}
+			else
+			{
+				// Hangul chars
+
+				$L = ord($last_utf_chr[2]) - 0x80;
+				$V = ord($utf_chr[2]) - 0xa1;
+				$T = 0;
+
+				if ($i + $utf_len < $len && "\xe1" == $s[$i + $utf_len])
+				{
+					$utf_chr = substr($s, $i + $utf_len, 3);
+
+					if ("\xe1\x86\xa7" <= $utf_chr && $utf_chr <= "\xe1\x87\x82")
+					{
+						$T = ord($utf_chr[2]) - 0xa7;
+						0 > $T && $T += 0x40;
+						$utf_len += 3;
+					}
+				}
+
+				$L = 0xac00 + ($L * 21 + $V) * 28 + $T;
+				$last_utf_chr = chr(0xe0 | $L>>12) . chr(0x80 | $L>>6 & 0x3f) . chr(0x80 | $L & 0x3f);
+			}
+
+			$i += $utf_len;
+		}
+
+		return $t . $last_utf_chr . $tail;
 	}
 
 	protected static function decompose($s)
 	{
-		// Decompose
-		isset(self::$D) || self::$D = unserialize(file_get_contents(resolvePath('data/utf8/canonicalDecomposition.ser')));
-		$s = strtr($s[0], self::$D);
+		$s = $s[0];
+
+
+		// Load decomposition tables
 
 		if (self::$K)
 		{
 			isset(self::$KD) || self::$KD = unserialize(file_get_contents(resolvePath('data/utf8/compatibilityDecomposition.ser')));
-			$s = strtr($s, self::$KD);
+			$map =& self::$KD;
+		}
+		else
+		{
+			isset(self::$D)  || self::$D  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalDecomposition.ser')));
+			$map =& self::$D;
 		}
 
-		// Decompose Hangul chars
-		$s = preg_replace_callback('/[\x{ac00}-\x{d7a3}]/u', array(__CLASS__, 'decomposeHangul'), $s);
+
+		// Decompose
+
+		$t = '';
+		$i = 0;
+		$len = strlen($s);
+
+		while ($i < $len)
+		{
+			$utf_len = self::$utf_len_mask[$s[$i] & "\xF0"];
+			$utf_chr = substr($s, $i, $utf_len);
+
+			if ($utf_chr < "\xEA\xB0\x80" || "\xED\x9E\xA3" < $utf_chr)
+			{
+				// Table lookup
+
+				isset($map[$utf_chr]) && $utf_chr = $map[$utf_chr];
+			}
+			else
+			{
+				// Hangul chars
+
+				$utf_chr = unpack('C*', $utf_chr);
+				$j = (($utf_chr[1]-224) << 12) + (($utf_chr[2]-128) << 6) + $utf_chr[3] - 0xac80;
+
+				$utf_chr = "\xe1\x84" . chr(0x80 + (int)  ($j / 588))
+				         . "\xe1\x85" . chr(0xa1 + (int) (($j % 588) / 28));
+
+				if ($j %= 28)
+				{
+					$utf_chr .= $j < 25
+						? ("\xe1\x86" . chr(0xa7 + $j))
+						: ("\xe1\x87" . chr(0x67 + $j));
+				}
+			}
+
+			$t .= $utf_chr;
+			$i += $utf_len;
+		}
 
 		// Sort combining chars
-		self::$compose || $s = preg_replace_callback('/[' . self::$combiningCheck . ']{2,}/u', array(__CLASS__, 'sortCombining'), $s);
+		$t = preg_replace_callback('/[' . self::$combiningCheck . ']{2,}/u', array(__CLASS__, 'sortCombining'), $t);
 
-		return $s;
+		return $t;
 	}
-
-
-	protected static function decomposeHangul($s)
-	{
-		$s = unpack('C*', $s[0]);
-		$i = (($s[1]-224) << 12) + (($s[2]-128) << 6) + $s[3] - 0xac80;
-
-		$l = (int)  ($i / 588);
-		$v = (int) (($i % 588) / 28);
-		$t = $i % 28;
-
-		$s = "\xe1\x84" . chr(0x80 + $l) . "\xe1\x85" . chr(0xa1 + $v);
-		$t && $s .= $t >= 25 ? ("\xe1\x87" . chr(0x67 + $t)) : ("\xe1\x86" . chr(0xa7 + $t));
-
-		return $s;
-	}
-
-	protected static function composeHangul($s)
-	{
-		$s = $s[0];
-
-		$l = ord($s[2]) - 0x80;
-		$v = ord($s[5]) - 0xa1;
-
-		if (9 == strlen($s))
-		{
-			$t = ord($s[8]) - 0xa7;
-			0 > $t && $t += 0x40;
-		}
-		else $t = 0;
-
-		$l = 0xac00 + ($l * 21 + $v) * 28 + $t;
-		return chr(0xe0 | $l>>12) . chr(0x80 | $l>> 6 & 0x3f) . chr(0x80 | $l & 0x3f);
-	}
-
 
 	protected static function sortCombining($s)
 	{
 		isset(self::$cC) || self::$cC = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
 
-		preg_match_all('/./u', $s[0], $s);
-
+		$s = $s[0];
 		$a = array();
-		foreach ($s[0] as $s)
+		$i = 0;
+		$len = strlen($s);
+
+		while ($i < $len)
 		{
-			isset($a[self::$cC[$s]]) || $a[self::$cC[$s]] = '';
-			$a[self::$cC[$s]] .= $s;
+			$utf_len = self::$utf_len_mask[$s[$i] & "\xF0"];
+			$utf_chr = substr($s, $i, $utf_len);
+
+			isset($a[self::$cC[$utf_chr]]) || $a[self::$cC[$utf_chr]] = '';
+			$a[self::$cC[$utf_chr]] .= $utf_chr;
+
+			$i += $utf_len;
 		}
 
 		ksort($a);
 
 		return implode('', $a);
-	}
-
-	protected static function composeCombining($s)
-	{
-		isset(self::$cC) || self::$cC = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
-
-		preg_match_all('/./u', $s[2], $c);
-		$s = $s[1];
-
-		$a = array();
-		foreach ($c[0] as $c)
-		{
-			isset($a[self::$cC[$c]]) || $a[self::$cC[$c]] = array();
-			$a[self::$cC[$c]][] = $c;
-		}
-
-		ksort($a);
-
-		$lastClass = 0;
-
-		foreach ($a as $class => &$chars)
-		{
-			foreach ($chars as &$c)
-			{
-				if ($lastClass == $class) ;
-				else if (isset(self::$C[$s . $c]))
-				{
-					$s .= $c;
-					$c = '';
-				}
-				else $lastClass = $class;
-			}
-
-			$chars = implode('', $chars);
-		}
-
-		return $s . implode('', $a);
 	}
 }
