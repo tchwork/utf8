@@ -1,6 +1,6 @@
 <?php /*********************************************************************
  *
- *   Copyright : (C) 2006 Nicolas Grekas. All rights reserved.
+ *   Copyright : (C) 2007 Nicolas Grekas. All rights reserved.
  *   Email     : nicolas.grekas+patchwork@espci.org
  *   License   : http://www.gnu.org/licenses/lgpl.txt GNU/LGPL, see LGPL
  *
@@ -16,8 +16,27 @@
 
 class
 {
-	protected static
+	// ASCII characters, by frequency
+	const ascii = "\x20\x65\x69\x61\x73\x6E\x74\x72\x6F\x6C\x75\x64\x5D\x5B\x63\x6D\x70\x27\x0A\x67\x7C\x68\x76\x2E\x66\x62\x2C\x3A\x3D\x2D\x71\x31\x30\x43\x32\x2A\x79\x78\x29\x28\x4C\x39\x41\x53\x2F\x50\x22\x45\x6A\x4D\x49\x6B\x33\x3E\x35\x54\x3C\x44\x34\x7D\x42\x7B\x38\x46\x77\x52\x36\x37\x55\x47\x4E\x3B\x4A\x7A\x56\x23\x48\x4F\x57\x5F\x26\x21\x4B\x3F\x58\x51\x25\x59\x5C\x09\x5A\x2B\x7E\x5E\x24\x40\x60\x7F\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F";
+
+
+	static
 	
+	// Some remaining chars for accents decomposition
+	// from http://www.unicode.org/cldr/
+	$lig = array(
+		'Æ' => 'AE', 'æ' => 'ae', 'ß' => 'ss', 'Œ' => 'OE', 'œ' => 'oe', 'ʤ' => 'dz',
+		'ʣ' => 'dz', 'ʥ' => 'dz', 'ƕ' => 'hv', 'Ƣ' => 'OI', 'ƣ' => 'oi', 'ʨ' => 'tc',
+		'ʦ' => 'ts', 'ƻ' => '2' , 'Ŋ' => 'NG', 'ŋ' => 'ng', 'Ð' => 'D' , 'ð' => 'd' ,
+		'Ø' => 'O' , 'ø' => 'o' , 'Þ' => 'TH', 'þ' => 'th', 'Θ' => 'T' , 'θ' => 'T' ,
+		'Ʃ' => 'SH', 'ʃ' => 'sh', 'Ʒ' => 'ZH', 'ʒ' => 'zh', 'Ʊ' => 'U' , 'ʊ' => 'u' ,
+		'Ə' => 'A' , 'ə' => 'a' , 'Ɔ' => 'O' , 'ɔ' => 'o' , 'Ɛ' => 'E' , 'ɛ' => 'e' ,
+		'ʔ' => '?' , 'ɪ' => 'i' , 'ʌ' => 'v',
+	);
+
+
+	protected static
+
 	$K,
 
 	$quickCheckNFC,
@@ -36,6 +55,21 @@ class
 	$utf_len_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
 
 
+	static function toNFC($s)  {return self::normalize($s, true , false);}
+	static function toNFD($s)  {return self::normalize($s, false, false);}
+	static function toNFKC($s) {return self::normalize($s, true , true );}
+	static function toNFKD($s) {return self::normalize($s, false, true );}
+
+	static function removeAccents($s)
+	{
+		$s = self::toNFKD($s, self::$KD);
+		$s = preg_replace('/\Mn+/u', '', $s);
+		$s = strtr($s, self::$lig);
+
+		return self::recompose($s);
+	}
+
+
 	static function __static_construct()
 	{
 		$a = file_get_contents(resolvePath('data/utf8/quickChecks.txt'));
@@ -45,66 +79,29 @@ class
 		self::$quickCheckNFKC = $a[2];
 		self::$quickCheckNFKD = $a[4];
 		self::$combiningCheck = $a[5];
-	}
 
-	static function toNFC($s, $K = false)
-	{
-		self::$K = $K;
-		$K ? ($K =& self::$quickCheckNFKC) : ($K =& self::$quickCheckNFC);
-		return preg_replace_callback($K, array(__CLASS__, 'compose'), $s);
-	}
-
-	static function toNFD($s, $K = false)
-	{
-		self::$K = $K;
-		$K ? ($K =& self::$quickCheckNFKD) : ($K =& self::$quickCheckNFD);
-		return preg_replace_callback($K, array(__CLASS__, 'decompose'), $s);
-	}
-
-	static function toNFKC($s) {return self::toNFC($s, true);}
-	static function toNFKD($s) {return self::toNFD($s, true);}
-
-
-	// Some remaining chars for accents decomposition
-	// from http://www.unicode.org/cldr/
-
-	static $lig = array(
-		'Æ' => 'AE', 'æ' => 'ae', 'ß' => 'ss', 'Œ' => 'OE', 'œ' => 'oe', 'ʤ' => 'dz',
-		'ʣ' => 'dz', 'ʥ' => 'dz', 'ƕ' => 'hv', 'Ƣ' => 'OI', 'ƣ' => 'oi', 'ʨ' => 'tc',
-		'ʦ' => 'ts', 'ƻ' => '2' , 'Ŋ' => 'NG', 'ŋ' => 'ng', 'Ð' => 'D' , 'ð' => 'd' ,
-		'Ø' => 'O' , 'ø' => 'o' , 'Þ' => 'TH', 'þ' => 'th', 'Θ' => 'T' , 'θ' => 'T' ,
-		'Ʃ' => 'SH', 'ʃ' => 'sh', 'Ʒ' => 'ZH', 'ʒ' => 'zh', 'Ʊ' => 'U' , 'ʊ' => 'u' ,
-		'Ə' => 'A' , 'ə' => 'a' , 'Ɔ' => 'O' , 'ɔ' => 'o' , 'Ɛ' => 'E' , 'ɛ' => 'e' ,
-		'ʔ' => '?' , 'ɪ' => 'i' , 'ʌ' => 'v',
-	);
-
-	static function removeAccents($s)
-	{
-		$s = self::toNFD($s, true);
-		$s = preg_replace('/\Mn+/u', '', $s);
-		$s = strtr($s, self::$lig);
-		$s = self::toNFC($s);
-
-		return $s;
+		self::$C  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalComposition.ser')));
+		self::$D  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalDecomposition.ser')));
+		self::$cC = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
 	}
 
 
-	// Internal protected methods
-
-	protected static function compose($s)
+	protected static function normalize($s, $C, $K)
 	{
-		// Decompose
+		if ($K)
+		{
+			isset(self::$KD) || self::$KD = unserialize(file_get_contents(resolvePath('data/utf8/compatibilityDecomposition.ser')));
+			$K =& self::$KD;
+		}
+		else    $K =& self::$D;
 
-		$s = self::toNFD($s[0], self::$K);
+		return $C ? self::recompose($s, $K) : self::decompose($s, $K);
+	}
 
+	protected static function recompose($s, &$map = false)
+	{
+		$map && $s = self::decompose($s, $map);
 
-		// Load decomposition tables
-
-		isset(self::$C)  || self::$C  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalComposition.ser')));
-		isset(self::$cC) || self::$cC = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
-
-
-		// Compose
 
 		$t = $tail = '';
 
@@ -116,14 +113,31 @@ class
 
 		while ($i < $len)
 		{
-			$utf_len = $s[$i] < "\x80" ? 1 : self::$utf_len_mask[$s[$i] & "\xF0"];
-			$utf_chr = substr($s, $i, $utf_len);
-
-			if ($last_utf_cls
-				||      $utf_chr < "\xe1\x85\xa1" || "\xe1\x85\xb5" < $utf_chr
-				|| $last_utf_chr < "\xe1\x84\x80" || "\xe1\x84\x92" < $last_utf_chr)
+			if ($s[$i] < "\x80")
 			{
-				// Tables lookup
+				// ASCII chars
+
+				$utf_len = 1;
+
+				if ($j = strspn($s, self::ascii, $i+1))
+				{
+					$t .= substr($s, $i, $j);
+					$i += $j;
+				}
+
+				$utf_chr = $s[$i];
+			}
+			else
+			{
+				$utf_len = self::$utf_len_mask[$s[$i] & "\xF0"];
+				$utf_chr = substr($s, $i, $utf_len);
+			}
+
+			if ($last_utf_chr < "\xe1\x84\x80" || "\xe1\x84\x92" < $last_utf_chr
+			    ||   $utf_chr < "\xe1\x85\xa1" || "\xe1\x85\xb5" < $utf_chr
+			    || $last_utf_cls)
+			{
+				// Table lookup and combining chars composition
 
 				$utf_cls = isset(self::$cC[$utf_chr]) ? self::$cC[$utf_chr] : 0;
 
@@ -169,92 +183,112 @@ class
 		return $t . $last_utf_chr . $tail;
 	}
 
-	protected static function decompose($s)
+	protected static function decompose($s, &$map)
 	{
-		$s = $s[0];
-
-
-		// Load decomposition tables
-
-		if (self::$K)
-		{
-			isset(self::$KD) || self::$KD = unserialize(file_get_contents(resolvePath('data/utf8/compatibilityDecomposition.ser')));
-			$map =& self::$KD;
-		}
-		else
-		{
-			isset(self::$D)  || self::$D  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalDecomposition.ser')));
-			$map =& self::$D;
-		}
-
-
-		// Decompose
-
 		$t = '';
+		$c = array();
 		$i = 0;
 		$len = strlen($s);
 
 		while ($i < $len)
 		{
-			$utf_len = self::$utf_len_mask[$s[$i] & "\xF0"];
-			$utf_chr = substr($s, $i, $utf_len);
-
-			if ($utf_chr < "\xEA\xB0\x80" || "\xED\x9E\xA3" < $utf_chr)
+			if ($s[$i] < "\x80")
 			{
-				// Table lookup
+				// ASCII chars
 
-				isset($map[$utf_chr]) && $utf_chr = $map[$utf_chr];
+				if ($c)
+				{
+					ksort($c);
+					$t .= implode('', $c);
+					$c = array();
+				}
+
+				$j = 1 + strspn($s, self::ascii, $i+1);
+				$t .= substr($s, $i, $j);
+				$i += $j;
 			}
 			else
 			{
-				// Hangul chars
+				$utf_len = self::$utf_len_mask[$s[$i] & "\xF0"];
+				$utf_chr = substr($s, $i, $utf_len);
+				$i += $utf_len;
 
-				$utf_chr = unpack('C*', $utf_chr);
-				$j = (($utf_chr[1]-224) << 12) + (($utf_chr[2]-128) << 6) + $utf_chr[3] - 0xac80;
-
-				$utf_chr = "\xe1\x84" . chr(0x80 + (int)  ($j / 588))
-				         . "\xe1\x85" . chr(0xa1 + (int) (($j % 588) / 28));
-
-				if ($j %= 28)
+				if (isset(self::$cC[$utf_chr]))
 				{
-					$utf_chr .= $j < 25
-						? ("\xe1\x86" . chr(0xa7 + $j))
-						: ("\xe1\x87" . chr(0x67 + $j));
-				}
-			}
+					// Combining chars, for sorting
 
-			$t .= $utf_chr;
-			$i += $utf_len;
+					isset($c[self::$cC[$utf_chr]]) || $c[self::$cC[$utf_chr]] = '';
+					$c[self::$cC[$utf_chr]] .= isset($map[$utf_chr]) ? $map[$utf_chr] : $utf_chr;
+
+					continue;
+				}
+
+				if ($c)
+				{
+					ksort($c);
+					$t .= implode('', $c);
+					$c = array();
+				}
+
+				if ($utf_chr < "\xEA\xB0\x80" || "\xED\x9E\xA3" < $utf_chr)
+				{
+					// Table lookup
+
+					if (isset($map[$utf_chr]))
+					{
+						$utf_chr = $map[$utf_chr];
+
+						$j = strlen($utf_chr);
+						$utf_len = $utf_chr[0] < "\x80" ? 1 : self::$utf_len_mask[$utf_chr[0] & "\xF0"];
+
+						if ($utf_len != $j)
+						{
+							// Put trailing chars in $s 
+
+							$j -= $utf_len;
+							$i -= $j;
+
+							if (0 > $i)
+							{
+								$s = str_repeat(' ', -$i) . $s;
+								$len -= $i;
+								$i = 0;
+							}
+
+							while ($j--) $s[$i+$j] = $utf_chr[$utf_len+$j];
+
+							$utf_chr = substr($utf_chr, 0, $utf_len);
+						}
+					}
+				}
+				else
+				{
+					// Hangul chars
+
+					$utf_chr = unpack('C*', $utf_chr);
+					$j = (($utf_chr[1]-224) << 12) + (($utf_chr[2]-128) << 6) + $utf_chr[3] - 0xac80;
+
+					$utf_chr = "\xe1\x84" . chr(0x80 + (int)  ($j / 588))
+					         . "\xe1\x85" . chr(0xa1 + (int) (($j % 588) / 28));
+
+					if ($j %= 28)
+					{
+						$utf_chr .= $j < 25
+							? ("\xe1\x86" . chr(0xa7 + $j))
+							: ("\xe1\x87" . chr(0x67 + $j));
+					}
+				}
+
+				$t .= $utf_chr;
+			}
 		}
 
-		// Sort combining chars
-		$t = preg_replace_callback('/[' . self::$combiningCheck . ']{2,}/u', array(__CLASS__, 'sortCombining'), $t);
+		if ($c)
+		{
+			ksort($c);
+			$t .= implode('', $c);
+		}
 
 		return $t;
-	}
-
-	protected static function sortCombining($s)
-	{
-		isset(self::$cC) || self::$cC = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
-
-		$s = $s[0];
-		$a = array();
-		$i = 0;
-		$len = strlen($s);
-
-		while ($i < $len)
-		{
-			$utf_len = self::$utf_len_mask[$s[$i] & "\xF0"];
-			$utf_chr = substr($s, $i, $utf_len);
-
-			isset($a[self::$cC[$utf_chr]]) || $a[self::$cC[$utf_chr]] = '';
-			$a[self::$cC[$utf_chr]] .= $utf_chr;
-
-			$i += $utf_len;
-		}
-
-		ksort($a);
-
-		return implode('', $a);
 	}
 }
