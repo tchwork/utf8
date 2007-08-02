@@ -37,21 +37,7 @@ class
 
 	protected static
 
-	$K,
-
-	$quickCheckNFC,
-	$quickCheckNFD,
-	$quickCheckNFKC,
-	$quickCheckNFKD,
-
-	$combiningCheck,
-
-	$C,
-	$D,
-	$KD,
-
-	$cC,
-
+	$C, $D, $KD, $cC, $K,
 	$utf_len_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
 
 
@@ -62,24 +48,16 @@ class
 
 	static function removeAccents($s)
 	{
-		$s = self::toNFKD($s, self::$KD);
+		$s = self::toNFKD($s);
 		$s = preg_replace('/\Mn+/u', '', $s);
 		$s = strtr($s, self::$lig);
 
-		return self::recompose($s);
+		return self::recompose($s, false);
 	}
 
 
 	static function __static_construct()
 	{
-		$a = file_get_contents(resolvePath('data/utf8/quickChecks.txt'));
-		$a = explode("\n", $a);
-		self::$quickCheckNFC  = $a[1];
-		self::$quickCheckNFD  = $a[3];
-		self::$quickCheckNFKC = $a[2];
-		self::$quickCheckNFKD = $a[4];
-		self::$combiningCheck = $a[5];
-
 		self::$C  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalComposition.ser')));
 		self::$D  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalDecomposition.ser')));
 		self::$cC = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
@@ -88,19 +66,15 @@ class
 
 	protected static function normalize($s, $C, $K)
 	{
-		if ($K)
-		{
-			isset(self::$KD) || self::$KD = unserialize(file_get_contents(resolvePath('data/utf8/compatibilityDecomposition.ser')));
-			$K =& self::$KD;
-		}
-		else    $K =& self::$D;
+		if ($K) isset(self::$KD) || self::$KD = unserialize(file_get_contents(resolvePath('data/utf8/compatibilityDecomposition.ser')));
+		self::$K = $K;
 
-		return $C ? self::recompose($s, $K) : self::decompose($s, $K);
+		return $C ? self::recompose($s) : self::decompose($s);
 	}
 
-	protected static function recompose($s, &$map = false)
+	protected static function recompose($s, $decompose = true)
 	{
-		$map && $s = self::decompose($s, $map);
+		$decompose && $s = self::decompose($s);
 
 
 		$t = $tail = '';
@@ -117,73 +91,84 @@ class
 			{
 				// ASCII chars
 
-				$utf_len = 1;
+				if ($tail)
+				{
+					$last_utf_chr .= $tail;
+					$tail = '';
+				}
 
 				if ($j = strspn($s, self::ascii, $i+1))
 				{
-					$t .= substr($s, $i, $j);
+					$last_utf_chr .= substr($s, $i, $j);
 					$i += $j;
 				}
 
-				$utf_chr = $s[$i];
+				$t .= $last_utf_chr;
+				$last_utf_chr = $s[$i];
+				++$i;
 			}
 			else
 			{
 				$utf_len = self::$utf_len_mask[$s[$i] & "\xF0"];
 				$utf_chr = substr($s, $i, $utf_len);
-			}
-
-			if ($last_utf_chr < "\xe1\x84\x80" || "\xe1\x84\x92" < $last_utf_chr
-			    ||   $utf_chr < "\xe1\x85\xa1" || "\xe1\x85\xb5" < $utf_chr
-			    || $last_utf_cls)
-			{
-				// Table lookup and combining chars composition
-
-				$utf_cls = isset(self::$cC[$utf_chr]) ? self::$cC[$utf_chr] : 0;
-
-				if (isset(self::$C[$last_utf_chr . $utf_chr]) && (!$last_utf_cls || $last_utf_cls < $utf_cls))
+	
+				if ($last_utf_chr < "\xe1\x84\x80" || "\xe1\x84\x92" < $last_utf_chr
+				    ||   $utf_chr < "\xe1\x85\xa1" || "\xe1\x85\xb5" < $utf_chr
+				    || $last_utf_cls)
 				{
-					$last_utf_chr = self::$C[$last_utf_chr . $utf_chr];
-				}
-				else if ($last_utf_cls = $utf_cls) $tail .= $utf_chr;
-				else
-				{
-					$t .= $last_utf_chr . $tail;
-					$tail = '';
-					$last_utf_chr = $utf_chr;
-				}
-			}
-			else
-			{
-				// Hangul chars
+					// Table lookup and combining chars composition
 
-				$L = ord($last_utf_chr[2]) - 0x80;
-				$V = ord($utf_chr[2]) - 0xa1;
-				$T = 0;
+					$utf_cls = isset(self::$cC[$utf_chr]) ? self::$cC[$utf_chr] : 0;
 
-				if ($i + $utf_len < $len && "\xe1" == $s[$i + $utf_len])
-				{
-					$utf_chr = substr($s, $i + $utf_len, 3);
-
-					if ("\xe1\x86\xa7" <= $utf_chr && $utf_chr <= "\xe1\x87\x82")
+					if (isset(self::$C[$last_utf_chr . $utf_chr]) && (!$last_utf_cls || $last_utf_cls < $utf_cls))
 					{
-						$T = ord($utf_chr[2]) - 0xa7;
-						0 > $T && $T += 0x40;
-						$utf_len += 3;
+						$last_utf_chr = self::$C[$last_utf_chr . $utf_chr];
+					}
+					else if ($last_utf_cls = $utf_cls) $tail .= $utf_chr;
+					else
+					{
+						if ($tail)
+						{
+							$last_utf_chr .= $tail;
+							$tail = '';
+						}
+
+						$t .= $last_utf_chr;
+						$last_utf_chr = $utf_chr;
 					}
 				}
+				else
+				{
+					// Hangul chars
 
-				$L = 0xac00 + ($L * 21 + $V) * 28 + $T;
-				$last_utf_chr = chr(0xe0 | $L>>12) . chr(0x80 | $L>>6 & 0x3f) . chr(0x80 | $L & 0x3f);
+					$L = ord($last_utf_chr[2]) - 0x80;
+					$V = ord($utf_chr[2]) - 0xa1;
+					$T = 0;
+
+					if ($i + $utf_len < $len && "\xe1" == $s[$i + $utf_len])
+					{
+						$utf_chr = substr($s, $i + $utf_len, 3);
+
+						if ("\xe1\x86\xa7" <= $utf_chr && $utf_chr <= "\xe1\x87\x82")
+						{
+							$T = ord($utf_chr[2]) - 0xa7;
+							0 > $T && $T += 0x40;
+							$utf_len += 3;
+						}
+					}
+
+					$L = 0xac00 + ($L * 21 + $V) * 28 + $T;
+					$last_utf_chr = chr(0xe0 | $L>>12) . chr(0x80 | $L>>6 & 0x3f) . chr(0x80 | $L & 0x3f);
+				}
+
+				$i += $utf_len;
 			}
-
-			$i += $utf_len;
 		}
 
 		return $t . $last_utf_chr . $tail;
 	}
 
-	protected static function decompose($s, &$map)
+	protected static function decompose($s)
 	{
 		$t = '';
 		$c = array();
@@ -218,68 +203,70 @@ class
 					// Combining chars, for sorting
 
 					isset($c[self::$cC[$utf_chr]]) || $c[self::$cC[$utf_chr]] = '';
-					$c[self::$cC[$utf_chr]] .= isset($map[$utf_chr]) ? $map[$utf_chr] : $utf_chr;
-
-					continue;
-				}
-
-				if ($c)
-				{
-					ksort($c);
-					$t .= implode('', $c);
-					$c = array();
-				}
-
-				if ($utf_chr < "\xEA\xB0\x80" || "\xED\x9E\xA3" < $utf_chr)
-				{
-					// Table lookup
-
-					if (isset($map[$utf_chr]))
-					{
-						$utf_chr = $map[$utf_chr];
-
-						$j = strlen($utf_chr);
-						$utf_len = $utf_chr[0] < "\x80" ? 1 : self::$utf_len_mask[$utf_chr[0] & "\xF0"];
-
-						if ($utf_len != $j)
-						{
-							// Put trailing chars in $s 
-
-							$j -= $utf_len;
-							$i -= $j;
-
-							if (0 > $i)
-							{
-								$s = str_repeat(' ', -$i) . $s;
-								$len -= $i;
-								$i = 0;
-							}
-
-							while ($j--) $s[$i+$j] = $utf_chr[$utf_len+$j];
-
-							$utf_chr = substr($utf_chr, 0, $utf_len);
-						}
-					}
+					$c[self::$cC[$utf_chr]] .= self::$K && isset(self::$KD[$utf_chr]) ? self::$KD[$utf_chr] : (isset(self::$D[$utf_chr]) ? self::$D[$utf_chr] : $utf_chr);
 				}
 				else
 				{
-					// Hangul chars
-
-					$utf_chr = unpack('C*', $utf_chr);
-					$j = (($utf_chr[1]-224) << 12) + (($utf_chr[2]-128) << 6) + $utf_chr[3] - 0xac80;
-
-					$utf_chr = "\xe1\x84" . chr(0x80 + (int)  ($j / 588))
-					         . "\xe1\x85" . chr(0xa1 + (int) (($j % 588) / 28));
-
-					if ($j %= 28)
+					if ($c)
 					{
-						$utf_chr .= $j < 25
-							? ("\xe1\x86" . chr(0xa7 + $j))
-							: ("\xe1\x87" . chr(0x67 + $j));
+						ksort($c);
+						$t .= implode('', $c);
+						$c = array();
 					}
-				}
 
-				$t .= $utf_chr;
+					if ($utf_chr < "\xEA\xB0\x80" || "\xED\x9E\xA3" < $utf_chr)
+					{
+						// Table lookup
+
+						$j = self::$K && isset(self::$KD[$utf_chr]) ? self::$KD[$utf_chr] : (isset(self::$D[$utf_chr]) ? self::$D[$utf_chr] : $utf_chr);
+
+						if ($utf_chr != $j)
+						{
+							$utf_chr = $j;
+
+							$j = strlen($utf_chr);
+							$utf_len = $utf_chr[0] < "\x80" ? 1 : self::$utf_len_mask[$utf_chr[0] & "\xF0"];
+
+							if ($utf_len != $j)
+							{
+								// Put trailing chars in $s 
+
+								$j -= $utf_len;
+								$i -= $j;
+
+								if (0 > $i)
+								{
+									$s = str_repeat(' ', -$i) . $s;
+									$len -= $i;
+									$i = 0;
+								}
+
+								while ($j--) $s[$i+$j] = $utf_chr[$utf_len+$j];
+
+								$utf_chr = substr($utf_chr, 0, $utf_len);
+							}
+						}
+					}
+					else
+					{
+						// Hangul chars
+
+						$utf_chr = unpack('C*', $utf_chr);
+						$j = (($utf_chr[1]-224) << 12) + (($utf_chr[2]-128) << 6) + $utf_chr[3] - 0xac80;
+
+						$utf_chr = "\xe1\x84" . chr(0x80 + (int)  ($j / 588))
+						         . "\xe1\x85" . chr(0xa1 + (int) (($j % 588) / 28));
+
+						if ($j %= 28)
+						{
+							$utf_chr .= $j < 25
+								? ("\xe1\x86" . chr(0xa7 + $j))
+								: ("\xe1\x87" . chr(0x67 + $j));
+						}
+					}
+
+					$t .= $utf_chr;
+				}
 			}
 		}
 

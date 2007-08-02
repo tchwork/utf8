@@ -201,6 +201,11 @@ class
 		}
 		while ($m);
 
+		foreach($compatibilityDecomposition as $k => $decomp)
+		{
+			if (isset($canonicalDecomposition[$k]) && $canonicalDecomposition[$k] == $decomp) unset($compatibilityDecomposition[$k]);
+		}
+
 		$upperCase                  = serialize($upperCase);
 		$lowerCase                  = serialize($lowerCase);
 		$combiningClass             = serialize($combiningClass);
