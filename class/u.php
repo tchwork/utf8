@@ -43,7 +43,7 @@ class
 	// Here is the complete set of native PHP string functions that need UTF-8 awareness,
 	// Input strings should be in Normalization Form C, Canonical Composition.
 
-	static function strlen($s)     {return strlen(utf8_decode($s));}
+	static function strlen($s)     {return mb_strlen($s, 'UTF-8'));}
 	static function strtolower($s) {return mb_strtolower($s, 'UTF-8');}
 	static function strtoupper($s) {return mb_strtoupper($s, 'UTF-8');}
 	static function substr  ($s, $start, $len = null) {return mb_substr($s, $start, $len, 'UTF-8');}
