@@ -12,7 +12,11 @@
  ***************************************************************************/
 
 
-class
+#>>> Add compatibility with non patchwork code
+utf8_generate::__static_construct();
+#<<<
+
+class utf8_generate
 {
 	static
 
@@ -35,7 +39,7 @@ class
 
 	// Generate regular expression from unicode database
 	// to check if an UTF-8 string needs normalization
-	// $type = NFC | NFD | NFKC | NFKD
+	// $type = 'NFC' | 'NFD' | 'NFKC' | 'NFKD'
 
 	static function quickCheck($type)
 	{
@@ -219,11 +223,6 @@ class
 		file_put_contents(self::$utf8Data . 'canonicalComposition.ser'      , $canonicalComposition);
 		file_put_contents(self::$utf8Data . 'canonicalDecomposition.ser'    , $canonicalDecomposition);
 		file_put_contents(self::$utf8Data . 'compatibilityDecomposition.ser', $compatibilityDecomposition);
-	}
-
-	static function cmpByLength($a, $b)
-	{
-		return strlen($b) - strlen($a);
 	}
 
 	static function optimizeRx($rx)

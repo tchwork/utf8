@@ -17,7 +17,7 @@
  * Functions introduced with PHP 5.2.0
  */
 
-class
+class utf8_mbstring_520
 {
 	static function stripos($haystack, $needle, $offset = 0, $encoding = null)
 	{
@@ -62,28 +62,30 @@ class
 		}
 		else if ($offset = (int) $offset) $haystack = mb_substr($haystack, $offset);
 
-		$pos = mb_strrpos($haystack, $needle, $encoding);
+		$pos = utf8_mbstring_500_strrpos($haystack, $needle, $encoding);
 
-		return false === $pos ? false : ($offset + $pos);
+		return false !== $pos ? $offset + $pos : false;
 	}
 }
 
-if (!function_exists('mb_strrpos'))
+#>>> Below is only for patchwork
+return ;
+#<<<
+	
+if (function_exists('mb_strrpos')) {}
+else if (function_exists('iconv_strrpos'))
 {
-	if (function_exists('iconv_strrpos'))
+	function mb_strrpos($haystack, $needle, $encoding)
 	{
-		function mb_strrpos($haystack, $needle, $encoding)
-		{
-			return iconv_strrpos($haystack, $needle, $encoding);
-		}
+		return iconv_strrpos($haystack, $needle, $encoding);
 	}
-	else
+}
+else
+{
+	function mb_strrpos($haystack, $needle, $encoding)
 	{
-		function mb_strrpos($haystack, $needle, $encoding)
-		{
-			$needle = mb_substr($needle, 0, 1);
-			$pos = strpos(strrev($haystack), strrev($needle));
-			return false === $pos ? false : mb_strlen($pos ? substr($haystack, 0, -$pos) : $haystack);
-		}
+		$needle = mb_substr($needle, 0, 1);
+		$pos = strpos(strrev($haystack), strrev($needle));
+		return false === $pos ? false : mb_strlen($pos ? substr($haystack, 0, -$pos) : $haystack);
 	}
 }

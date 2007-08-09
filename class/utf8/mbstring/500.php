@@ -63,19 +63,19 @@ mb_substitute_character       - Set/Get substitution character
 
  */
 
-class
+class utf8_mbstring_500
 {
 	static function convert_encoding($str, $to_encoding, $from_encoding = null)
 	{
 		if (function_exists('iconv')) return iconv($from_encoding ? $from_encoding : 'UTF-8', $to_encoding, $str);
-		W('mb_convert_encoding() not supported without mbstring or iconv');
+		trigger_error('mb_convert_encoding() not supported without mbstring or iconv');
 		return $str;
 	}
 
 	static function decode_mimeheader($str)
 	{
 		if (function_exists('iconv_mime_decode')) return iconv_mime_decode($str);
-		W('mb_decode_mimeheader() not supported without mbstring or iconv');
+		trigger_error('mb_decode_mimeheader() not supported without mbstring or iconv');
 		return $str;
 	}
 
@@ -88,7 +88,7 @@ class
 			'line-length' => 76,
 			'line-break-chars' => null === $linefeed ? "\r\n" : $linefeed,
 		));
-		W('mb_encode_mimeheader() not supported without mbstring or iconv');
+		trigger_error('mb_encode_mimeheader() not supported without mbstring or iconv');
 		return $str;
 	}
 
@@ -99,7 +99,7 @@ class
 
 		switch ($mode)
 		{
-		case MB_CASE_TITLE: return preg_replace('/\b./eu', 'self::strtoupper("$0",$encoding)', $str);
+		case MB_CASE_TITLE: return preg_replace_callback('/\b./u', array(__CLASS__, 'title_case_callback'), $str);
 		case MB_CASE_UPPER:
 			static $upper;
 			isset($upper) || $upper = self::loadCaseTable(1);
@@ -207,11 +207,11 @@ class
 
 		while ($offset > 65535)
 		{
-			$rx[] = '(?:.{65535})';
+			$rx[] = '.{65535}';
 			$offset -= 65535;
 		}
 
-		return implode('', $rx) . '(?:.{' . $offset . '})';
+		return implode('', $rx) . '.{' . $offset . '}';
 	}
 
 	protected static function loadCaseTable($upper)
@@ -221,5 +221,15 @@ class
 				? resolvePath('data/utf8/upperCase.ser')
 				: resolvePath('data/utf8/lowerCase.ser')
 		));
+	}
+
+	protected static function title_case_callback($s)
+	{
+		$str = self::convert_case($str[0], MB_CASE_UPPER, $encoding);
+
+		$len = strlen($str);
+		for ($i = 1; $i < $len && $str[$i] < "\x80"; ++$i) $str[$i] = strtolower($str[$i]);
+
+		return $str;
 	}
 }

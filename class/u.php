@@ -25,7 +25,7 @@
  */
 
 
-class
+class u
 {
 	static function isUTF8($s) {return preg_match('//u', $s) && preg_match('/^' . substr(UTF8_VALID_RX, 1, -2) . '*$/', $s);}
 
@@ -259,17 +259,12 @@ class
 
 	static function ucfirst($s)
 	{
-		return preg_replace_callback('/^./u', array(__CLASS__, 'uc_callback'), $s);
+		$c = mb_substr($s, 0, 1);
+		return self::ucwords($c) . substr($s, strlen($c));
 	}
 
 	static function ucwords($s)
 	{
-		return preg_replace_callback('/(?<=[\t-\r ])[^\t-\r ]/u', array(__CLASS__, 'uc_callback'), $s);
-	}
-
-
-	protected static function uc_callback($m)
-	{
-		return self::strtoupper($m[0]);
+		return mb_convert_case($s, MB_CASE_TITLE, 'UTF-8');
 	}
 }
