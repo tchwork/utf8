@@ -65,23 +65,23 @@ mb_substitute_character       - Set/Get substitution character
 
 class utf8_mbstring_500
 {
-	static function convert_encoding($str, $to_encoding, $from_encoding = null)
+	static function convert_encoding($s, $to_encoding, $from_encoding = null)
 	{
-		if (function_exists('iconv')) return iconv($from_encoding ? $from_encoding : 'UTF-8', $to_encoding, $str);
+		if (function_exists('iconv')) return iconv($from_encoding ? $from_encoding : 'UTF-8', $to_encoding, $s);
 		trigger_error('mb_convert_encoding() not supported without mbstring or iconv');
-		return $str;
+		return $s;
 	}
 
-	static function decode_mimeheader($str)
+	static function decode_mimeheader($s)
 	{
-		if (function_exists('iconv_mime_decode')) return iconv_mime_decode($str);
+		if (function_exists('iconv_mime_decode')) return iconv_mime_decode($s);
 		trigger_error('mb_decode_mimeheader() not supported without mbstring or iconv');
-		return $str;
+		return $s;
 	}
 
-	static function encode_mimeheader($str, $charset = null, $transfer_encoding = null, $linefeed = null, $indent = null)
+	static function encode_mimeheader($s, $charset = null, $transfer_encoding = null, $linefeed = null, $indent = null)
 	{
-		if (function_exists('iconv_mime_encode')) return iconv_mime_encode('', $str, array(
+		if (function_exists('iconv_mime_encode')) return iconv_mime_encode('', $s, array(
 			'scheme' => null === $transfer_encoding ? 'B' : $transfer_encoding,
 			'input-charset' => $charset ? $charset : 'UTF-8',
 			'output-charset' => $charset ? $charset : 'UTF-8',
@@ -89,17 +89,20 @@ class utf8_mbstring_500
 			'line-break-chars' => null === $linefeed ? "\r\n" : $linefeed,
 		));
 		trigger_error('mb_encode_mimeheader() not supported without mbstring or iconv');
-		return $str;
+		return $s;
 	}
 
 
-	static function convert_case($str, $mode, $encoding = null)
+	static function convert_case($s, $mode, $encoding = null)
 	{
-		if ('' === $str) return '';
+		if ('' === $s) return '';
 
 		switch ($mode)
 		{
-		case MB_CASE_TITLE: return preg_replace_callback('/\b./u', array(__CLASS__, 'title_case_callback'), $str);
+		case MB_CASE_TITLE:
+			self::$encoding = $encoding;
+			return preg_replace_callback('/\b\p{Ll}/u', array(__CLASS__, 'title_case_callback'), $s);
+
 		case MB_CASE_UPPER:
 			static $upper;
 			isset($upper) || $upper = self::loadCaseTable(1);
@@ -116,7 +119,7 @@ class utf8_mbstring_500
 		static $utf_len_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
 
 		$i = 0;
-		$len = strlen($str);
+		$len = strlen($s);
 
 		while ($i < $len)
 		{
@@ -131,7 +134,8 @@ class utf8_mbstring_500
 
 				if ($new_len == $utf_len)
 				{
-					do $s[$i - --$utf_len] = $utf_chr[$utf_len];
+					$new_len = $i;
+					do $s[--$new_len] = $utf_chr[--$utf_len];
 					while ($utf_len);
 				}
 				else
@@ -143,7 +147,7 @@ class utf8_mbstring_500
 			}
 		}
 
-		return $str;
+		return $s;
 	}
 
 	static function list_encodings()
@@ -151,13 +155,13 @@ class utf8_mbstring_500
 		return array('UTF-8');
 	}
 
-	static function strlen($str, $encoding = null)
+	static function strlen($s, $encoding = null)
 	{
-		return strlen(utf8_decode($str));
+		return strlen(utf8_decode($s));
 
 		// Quickest alternative if utf8_decode() is not available:
-		//preg_replace('/./u', '', $str, -1, $str);
-		//return $str;
+		//preg_replace('/./u', '', $s, -1, $s);
+		//return $s;
 
 	}
 
@@ -168,36 +172,36 @@ class utf8_mbstring_500
 		return false === $pos ? false : ($offset + ($pos ? self::strlen(substr($haystack, 0, $pos)) : 0));
 	}
 
-	static function strtolower($str, $encoding = null)
+	static function strtolower($s, $encoding = null)
 	{
-		return self::convert_case($str, MB_CASE_LOWER, $encoding);
+		return self::convert_case($s, MB_CASE_LOWER, $encoding);
 	}
 
-	static function strtoupper($str, $encoding = null)
+	static function strtoupper($s, $encoding = null)
 	{
-		return self::convert_case($str, MB_CASE_UPPER, $encoding);
+		return self::convert_case($s, MB_CASE_UPPER, $encoding);
 	}
 
-	static function substr($str, $start, $length = null, $encoding = null)
+	static function substr($s, $start, $length = null, $encoding = null)
 	{
-		$strlen = self::strlen($str);
+		$slen = self::strlen($s);
 		$start = (int) $start;
 
-		if (0 > $start) $start += $strlen;
+		if (0 > $start) $start += $slen;
 		if (0 > $start) $start = 0;
-		if ($start >= $strlen) return '';
+		if ($start >= $slen) return '';
 
-		$rx = $strlen - $start;
+		$rx = $slen - $start;
 
 		if (null === $length) $length  = $rx;
 		else if (0 > $length) $length += $rx;
 		if (0 >= $length) return '';
 
-		if ($length > $strlen - $start) $length = $rx;
+		if ($length > $slen - $start) $length = $rx;
 
 		$rx = '/^' . ($start ? self::preg_offset($start) : '') . '(' . self::preg_offset($length) . ')/u';
 
-		return preg_match($rx, $str, $str) ? $str[1] : '';
+		return preg_match($rx, $s, $s) ? $s[1] : '';
 	}
 
 	protected static function preg_offset($offset)
@@ -223,13 +227,14 @@ class utf8_mbstring_500
 		));
 	}
 
+	protected static $encoding;
 	protected static function title_case_callback($s)
 	{
-		$str = self::convert_case($str[0], MB_CASE_UPPER, $encoding);
+		$s = self::convert_case($s[0], MB_CASE_UPPER, self::$encoding);
 
-		$len = strlen($str);
-		for ($i = 1; $i < $len && $str[$i] < "\x80"; ++$i) $str[$i] = strtolower($str[$i]);
+		$len = strlen($s);
+		for ($i = 1; $i < $len && $s[$i] < "\x80"; ++$i) $s[$i] = strtolower($s[$i]);
 
-		return $str;
+		return $s;
 	}
 }

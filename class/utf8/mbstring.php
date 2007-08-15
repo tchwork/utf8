@@ -15,30 +15,38 @@
 // No class here, only functions to wrap our mbstring replacement for non patchwork code
 
 
-function mb_convert_encoding($str, $to_encoding, $from_encoding = null) {return utf8_mbstring_500::convert_encoding($str, $to_encoding, $from_encoding);}
-function mb_decode_mimeheader($str)                                     {return utf8_mbstring_500::decode_mimeheader($str);}
+if (function_exists('mb_stripos')) return;
 
-function mb_encode_mimeheader($str, $charset = null, $transfer_encoding = null, $linefeed = null, $indent = null)
-{
-	return utf8_mbstring_500::encode_mimeheader($str, $charset, $transfer_encoding, $linefeed, $indent);
-}
-
-function mb_convert_case($str, $mode, $encoding = null)               {return utf8_mbstring_500::convert_case($str, $mode, $encoding);}
-function mb_list_encodings()                                          {return utf8_mbstring_500::list_encodings();}
-function mb_strlen($str, $encoding = null)                            {return utf8_mbstring_500::strlen($str, $encoding);}
-function mb_strpos($haystack, $needle, $offset = 0, $encoding = null) {return utf8_mbstring_500::strpos($haystack, $needle, $offset, $encoding);}
-function mb_strtolower($str, $encoding = null)                        {return utf8_mbstring_500::strtolower($str, $encoding);}
-function mb_strtoupper($str, $encoding = null)                        {return utf8_mbstring_500::strtoupper($str, $encoding);}
-function mb_substr($str, $start, $length = null, $encoding = null)    {return utf8_mbstring_500::substr($str, $start, $length, $encoding);}
-
+{ // These functions were introduced in PHP 5.2.0
 function mb_stripos( $haystack, $needle, $offset = 0,   $encoding = null) {return utf8_mbstring_520::stripos( $haystack, $needle, $offset, $encoding);}
 function mb_stristr( $haystack, $needle, $part = false, $encoding = null) {return utf8_mbstring_520::stristr( $haystack, $needle, $part,   $encoding);}
 function mb_strrchr( $haystack, $needle, $part = false, $encoding = null) {return utf8_mbstring_520::strrchr( $haystack, $needle, $part,   $encoding);}
 function mb_strrichr($haystack, $needle, $part = false, $encoding = null) {return utf8_mbstring_520::strrichr($haystack, $needle, $part,   $encoding);}
 function mb_strripos($haystack, $needle, $offset = 0,   $encoding = null) {return utf8_mbstring_520::strripos($haystack, $needle, $offset, $encoding);}
 function mb_strstr(  $haystack, $needle, $part = false, $encoding = null) {return utf8_mbstring_520::strstr(  $haystack, $needle, $part,   $encoding);}
-function mb_strrpos( $haystack, $needle, $offset = 0,   $encoding = null) {return utf8_mbstring_520::strrpos( $haystack, $needle, $offset, $encoding);}
+}
 
+
+if (function_exists('mb_strpos')) return;
+
+{
+function mb_convert_case($str, $mode, $encoding = null)                   {return utf8_mbstring_500::convert_case($str, $mode, $encoding);}
+function mb_list_encodings()                                              {return utf8_mbstring_500::list_encodings();}
+function mb_strlen($str, $encoding = null)                                {return utf8_mbstring_500::strlen($str, $encoding);}
+function mb_strpos($haystack, $needle, $offset = 0, $encoding = null)     {return utf8_mbstring_500::strpos($haystack, $needle, $offset, $encoding);}
+function mb_strtolower($str, $encoding = null)                            {return utf8_mbstring_500::strtolower($str, $encoding);}
+function mb_strtoupper($str, $encoding = null)                            {return utf8_mbstring_500::strtoupper($str, $encoding);}
+function mb_substr($str, $start, $length = null, $encoding = null)        {return utf8_mbstring_500::substr($str, $start, $length, $encoding);}
+function mb_strrpos( $haystack, $needle, $offset = 0,   $encoding = null) {return utf8_mbstring_520::strrpos( $haystack, $needle, $offset, $encoding);}
+function mb_convert_encoding($str, $to_encoding, $from_encoding = null)   {return utf8_mbstring_500::convert_encoding($str, $to_encoding, $from_encoding);}
+function mb_decode_mimeheader($str)                                       {return utf8_mbstring_500::decode_mimeheader($str);}
+function mb_encode_mimeheader($str, $charset = null, $transfer_encoding = null, $linefeed = null, $indent = null)
+{
+	return utf8_mbstring_500::encode_mimeheader($str, $charset, $transfer_encoding, $linefeed, $indent);
+}
+}
+
+// utf8_mbstring_500_strrpos() is used internally by utf8_mbstring_520::strrpos()
 if (function_exists('iconv_strrpos'))
 {
 	function utf8_mbstring_500_strrpos($haystack, $needle, $encoding)
