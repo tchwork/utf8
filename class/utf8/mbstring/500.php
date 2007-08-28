@@ -1,8 +1,8 @@
 <?php /*********************************************************************
  *
  *   Copyright : (C) 2006 Nicolas Grekas. All rights reserved.
- *   Email     : nicolas.grekas+patchwork@espci.org
- *   License   : http://www.gnu.org/licenses/lgpl.txt GNU/LGPL, see LGPL
+ *   Email     : p@tchwork.org
+ *   License   : http://www.gnu.org/licenses/lgpl.txt GNU/LGPL
  *
  *   This library is free software; you can redistribute it and/or
  *   modify it under the terms of the GNU Lesser General Public
