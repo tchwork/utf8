@@ -27,7 +27,12 @@
 
 class u
 {
-	static function isUTF8($s) {return preg_match('//u', $s) && preg_match('/^' . substr(UTF8_VALID_RX, 1, -2) . '*$/', $s);}
+	static function isUTF8($s)
+	{
+		return extension_loaded('iconv')
+			? $s == iconv('UTF-8', 'UTF-8', $s)
+			: (preg_match('//u', $s) && preg_match('/^' . substr(UTF8_VALID_RX, 1, -2) . '*$/', $s));
+	}
 
 
 	// Unicode Normalization functions.
