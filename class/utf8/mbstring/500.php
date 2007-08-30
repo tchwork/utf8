@@ -46,7 +46,6 @@ mb_eregi                      - Regular expression match ignoring case with mult
 mb_get_info                   - Get internal settings of mbstring
 mb_http_input                 - Detect HTTP input character encoding
 mb_http_output                - Set/Get HTTP output character encoding
-mb_internal_encoding          - Set/Get internal character encoding
 mb_language                   - Set/Get current language
 mb_list_encodings_alias_names - Returns an array of all supported alias encodings
 mb_list_mime_names            - Returns an array or string of all supported mime names
@@ -59,7 +58,6 @@ mb_split                      - Split multibyte string using regular expression
 mb_strcut                     - Get part of string
 mb_strimwidth                 - Get truncated string with specified width
 mb_strwidth                   - Return width of string
-mb_substitute_character       - Set/Get substitution character
 
  */
 
@@ -67,7 +65,7 @@ class utf8_mbstring_500
 {
 	static function convert_encoding($s, $to_encoding, $from_encoding = null)
 	{
-		if (function_exists('iconv')) return iconv($from_encoding ? $from_encoding : 'UTF-8', $to_encoding, $s);
+		if (function_exists('iconv')) return iconv($from_encoding ? $from_encoding : 'UTF-8', $to_encoding . '//IGNORE', $s);
 		trigger_error('mb_convert_encoding() not supported without mbstring or iconv');
 		return $s;
 	}
@@ -150,6 +148,11 @@ class utf8_mbstring_500
 		return $s;
 	}
 
+	static function internal_encoding($encoding = null)
+	{
+		return null !== $encoding ? preg_match('/^utf-?8$/iD', $encoding) : 'UTF-8';
+	}
+
 	static function list_encodings()
 	{
 		return array('UTF-8');
@@ -180,6 +183,11 @@ class utf8_mbstring_500
 	static function strtoupper($s, $encoding = null)
 	{
 		return self::convert_case($s, MB_CASE_UPPER, $encoding);
+	}
+
+	static function substitute_character($c = null)
+	{
+		return null !== $c ? false : 'none';
 	}
 
 	static function substr($s, $start, $length = null, $encoding = null)

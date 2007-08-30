@@ -32,10 +32,12 @@ if (function_exists('mb_strpos')) return;
 {
 function mb_convert_case($str, $mode, $encoding = null)                   {return utf8_mbstring_500::convert_case($str, $mode, $encoding);}
 function mb_list_encodings()                                              {return utf8_mbstring_500::list_encodings();}
+function mb_internal_encoding($encoding = null)                           {return utf8_mbstring_500::internal_encoding($encoding);}
 function mb_strlen($str, $encoding = null)                                {return utf8_mbstring_500::strlen($str, $encoding);}
 function mb_strpos($haystack, $needle, $offset = 0, $encoding = null)     {return utf8_mbstring_500::strpos($haystack, $needle, $offset, $encoding);}
 function mb_strtolower($str, $encoding = null)                            {return utf8_mbstring_500::strtolower($str, $encoding);}
 function mb_strtoupper($str, $encoding = null)                            {return utf8_mbstring_500::strtoupper($str, $encoding);}
+function mb_substitute_character($char = null)                            {return utf8_mbstring_500::substitute_character($char);}
 function mb_substr($str, $start, $length = null, $encoding = null)        {return utf8_mbstring_500::substr($str, $start, $length, $encoding);}
 function mb_strrpos( $haystack, $needle, $offset = 0,   $encoding = null) {return utf8_mbstring_520::strrpos( $haystack, $needle, $offset, $encoding);}
 function mb_convert_encoding($str, $to_encoding, $from_encoding = null)   {return utf8_mbstring_500::convert_encoding($str, $to_encoding, $from_encoding);}
