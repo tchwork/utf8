@@ -227,7 +227,7 @@ class u
 			preg_match_all('/./us', $from, $from);
 			preg_match_all('/./us', $to  , $to  );
 
-			$from = $from[0]; $a = count($from); 
+			$from = $from[0]; $a = count($from);
 			$to   = $to[0]  ; $b = count($to);
 
 			     if ($a > $b) $from = array_slice($from, 0, $b);

@@ -26,7 +26,7 @@ class utf8_normalize
 
 
 	static
-	
+
 	// Some remaining chars for accents decomposition
 	// from http://www.unicode.org/cldr/
 	$lig = array(
@@ -116,7 +116,7 @@ class utf8_normalize
 			{
 				$utf_len = self::$utf_len_mask[$s[$i] & "\xF0"];
 				$utf_chr = substr($s, $i, $utf_len);
-	
+
 				if ($last_utf_chr < "\xe1\x84\x80" || "\xe1\x84\x92" < $last_utf_chr
 				    ||   $utf_chr < "\xe1\x85\xa1" || "\xe1\x85\xb5" < $utf_chr
 				    || $last_utf_cls)
@@ -231,7 +231,7 @@ class utf8_normalize
 
 							if ($utf_len != $j)
 							{
-								// Put trailing chars in $s 
+								// Put trailing chars in $s
 
 								$j -= $utf_len;
 								$i -= $j;

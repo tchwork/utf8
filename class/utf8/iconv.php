@@ -21,7 +21,7 @@
 class iconv
 {
 	static protected
-	
+
 	$input_encoding = 'UTF-8',
 	$output_encoding = 'UTF-8',
 	$internal_encoding = 'UTF-8';
@@ -115,7 +115,7 @@ class iconv
 
 	static function ob_handler($buffer, $mode)
 	{
-		// This quick implementation is not always safe for internal multibyte encodings 
+		// This quick implementation is not always safe for internal multibyte encodings
 		return self::iconv(self::$internal_encoding, self::$output_encoding, $buffer);
 	}
 }

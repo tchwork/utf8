@@ -71,7 +71,7 @@ class utf8_mbstring_520
 #>>> Below is only for patchwork
 return ;
 #<<<
-	
+
 if (function_exists('mb_strrpos')) {}
 else if (function_exists('iconv_strrpos'))
 {
