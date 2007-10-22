@@ -13,7 +13,7 @@
 
 
 #>>> Add compatibility with non patchwork code
-utf8_generate::__static_construct();
+utf8_generate::__constructStatic();
 #<<<
 
 class utf8_generate
@@ -26,7 +26,7 @@ class utf8_generate
 	$CompositionExclusions     = 'http://www.unicode.org/Public/UNIDATA/CompositionExclusions.txt';
 
 
-	static function __static_construct()
+	static function __constructStatic()
 	{
 		set_time_limit(0);
 

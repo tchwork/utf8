@@ -16,7 +16,7 @@
 
 
 #>>> Add compatibility with non patchwork code
-utf8_normalize::__static_construct();
+utf8_normalize::__constructStatic();
 #<<<
 
 class utf8_normalize
@@ -61,7 +61,7 @@ class utf8_normalize
 	}
 
 
-	static function __static_construct()
+	static function __constructStatic()
 	{
 		self::$C  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalComposition.ser')));
 		self::$D  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalDecomposition.ser')));
