@@ -45,10 +45,43 @@ class u
 	static function removeAccents($s) {return utf8_normalize::removeAccents($s);}
 
 
+	// Unicode transformation for caseless matching
+	// see http://unicode.org/reports/tr21/tr21-5.html
+
+	protected static $commonCaseFold  = array(
+		'µ' => 'μ', 'ſ' => 's', "\xcd\x85" => 'ι', 'ς' => 'σ',
+		"\xcf\x90" => 'β', "\xcf\x91" => 'θ', "\xcf\x95" => 'φ',
+		"\xcf\x96" => 'π', "\xcf\xb0" => 'κ', "\xcf\xb1" => 'ρ',
+		"\xcf\xb5" => 'ε', "\xe1\xba\x9b" => "\xe1\xb9\xa1",
+		"\xe1\xbe\xbe" => 'ι',
+	);
+
+	static function strtocasefold($s, $full = true, $turkish = false)
+	{
+		$s = strtr($s, self::$commonCaseFold);
+
+		if ($turkish)
+		{
+			false !== strpos($s, 'I') && $s = str_replace('I', 'ı', $s);
+			$full && false !== strpos($s, 'İ') && $s = str_replace('İ', 'i', $s);
+		}
+
+		if ($full)
+		{
+			static $fullCaseFold = false;
+			$fullCaseFold || $fullCaseFold = unserialize(file_get_contents(resolvePath('data/utf8/caseFold_full.txt')));
+
+			$s = strtr($s, $fullCaseFold);
+		}
+
+		return self::strtolower($s);
+	}
+
+
 	// Here is the complete set of native PHP string functions that need UTF-8 awareness,
 	// Input strings should be in Normalization Form C, Canonical Composition.
 
-	static function strlen($s)     {return mb_strlen($s, 'UTF-8'));}
+	static function strlen($s)     {return mb_strlen($s, 'UTF-8');}
 	static function strtolower($s) {return mb_strtolower($s, 'UTF-8');}
 	static function strtoupper($s) {return mb_strtoupper($s, 'UTF-8');}
 	static function substr  ($s, $start, $len = null) {return mb_substr($s, $start, $len, 'UTF-8');}
@@ -191,9 +224,9 @@ class u
 		return $charlist;
 	}
 
-	static function strcasecmp   ($a, $b) {return strcmp   (self::strtolower($a), self::strtolower($b));}
-	static function strnatcasecmp($a, $b) {return strnatcmp(self::strtolower($a), self::strtolower($b));}
-	static function strncasecmp  ($a, $b, $len) {return self::strncmp(self::strtolower($a), self::strtolower($b), $len);}
+	static function strcasecmp   ($a, $b) {return strcmp   (self::strtocasefold($a, true), self::strtocasefold($b, true));}
+	static function strnatcasecmp($a, $b) {return strnatcmp(self::strtocasefold($a, true), self::strtocasefold($b, true));}
+	static function strncasecmp  ($a, $b, $len) {return self::strncmp(self::strtocasefold($a), self::strtocasefold($b), $len);}
 	static function strncmp      ($a, $b, $len) {return strcmp(self::substr($a, 0, $len), self::substr($b, 0, $len));}
 
 	static function strcspn($s, $mask, $start = null, $len = null)

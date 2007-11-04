@@ -23,7 +23,8 @@ class utf8_generate
 	$utf8Data,
 	$DerivedNormalizationProps = 'http://www.unicode.org/Public/UNIDATA/DerivedNormalizationProps.txt',
 	$UnicodeData               = 'http://www.unicode.org/Public/UNIDATA/UnicodeData.txt',
-	$CompositionExclusions     = 'http://www.unicode.org/Public/UNIDATA/CompositionExclusions.txt';
+	$CompositionExclusions     = 'http://www.unicode.org/Public/UNIDATA/CompositionExclusions.txt',
+	$CaseFolding               = 'http://www.unicode.org/Public/UNIDATA/CaseFolding.txt';
 
 
 	static function __constructStatic()
@@ -31,9 +32,12 @@ class utf8_generate
 		set_time_limit(0);
 
 		self::$utf8Data = resolvePath('data/utf8/');
-//		self::$DerivedNormalizationProps = resolvePath('data/utf8/DerivedNormalizationProps.txt');
-//		self::$UnicodeData               = resolvePath('data/utf8/UnicodeData.txt');
-//		self::$CompositionExclusions     = resolvePath('data/utf8/CompositionExclusions.txt');
+/** /
+		self::$DerivedNormalizationProps = resolvePath('data/utf8/DerivedNormalizationProps.txt');
+		self::$UnicodeData               = resolvePath('data/utf8/UnicodeData.txt');
+		self::$CompositionExclusions     = resolvePath('data/utf8/CompositionExclusions.txt');
+		self::$CaseFolding               = resolvePath('data/utf8/CaseFolding.txt');
+/**/
 	}
 
 
@@ -54,7 +58,6 @@ class utf8_generate
 				$rx .= '\x{' . $m[0] . '}' . (isset($m[1]) ? (hexdec($m[0])+1 == hexdec($m[1]) ? '' : '-') . '\x{' . $m[1] . '}' : '');
 			}
 		}
-
 		fclose($h);
 
 		$rx = self::optimizeRx($rx . self::combiningCheck());
@@ -82,7 +85,6 @@ class utf8_generate
 				$rx .= '\x{' . $m[1] . '}';
 			}
 		}
-
 		fclose($h);
 
 		$rx = self::optimizeRx($rx);
@@ -114,6 +116,7 @@ class utf8_generate
 	{
 		$upperCase = array();
 		$lowerCase = array();
+		$caseFolding = array();
 		$combiningClass = array();
 		$canonicalComposition = array();
 		$canonicalDecomposition = array();
@@ -130,7 +133,6 @@ class utf8_generate
 				$exclusion[u::chr(hexdec($m[1]))] = 1;
 			}
 		}
-
 		fclose($h);
 
 
@@ -170,7 +172,6 @@ class utf8_generate
 				$compatibilityDecomposition[$k] = $decomp;
 			}
 		}
-
 		fclose($h);
 
 		do
@@ -210,8 +211,28 @@ class utf8_generate
 			if (isset($canonicalDecomposition[$k]) && $canonicalDecomposition[$k] == $decomp) unset($compatibilityDecomposition[$k]);
 		}
 
+
+		$h = fopen(self::$CaseFolding, 'rt');
+		while (false !== $m = fgets($h))
+		{
+			if (preg_match('/^([0-9A-F]+); ([CFST]); ([0-9A-F]+(?: [0-9A-F]+)*)/', $m, $m))
+			{
+				$k = u::chr(hexdec($m[1]));
+
+				$decomp = explode(' ', $m[3]);
+				$decomp = array_map('hexdec', $decomp);
+				$decomp = array_map(array('u','chr'), $decomp);
+				$decomp = implode('', $decomp);
+
+				@($lowerCase[$k] != $decomp && $caseFolding[$m[2]][$k] = $decomp);
+			}
+		}
+		fclose($h);
+
+	
 		$upperCase                  = serialize($upperCase);
 		$lowerCase                  = serialize($lowerCase);
+		$caseFolding                = serialize($caseFolding['F']); // Only full case folding is worth serializing
 		$combiningClass             = serialize($combiningClass);
 		$canonicalComposition       = serialize($canonicalComposition);
 		$canonicalDecomposition     = serialize($canonicalDecomposition);
@@ -219,6 +240,7 @@ class utf8_generate
 
 		file_put_contents(self::$utf8Data . 'upperCase.ser'                 , $upperCase);
 		file_put_contents(self::$utf8Data . 'lowerCase.ser'                 , $lowerCase);
+		file_put_contents(self::$utf8Data . 'caseFolding_full.ser'          , $caseFolding);
 		file_put_contents(self::$utf8Data . 'combiningClass.ser'            , $combiningClass);
 		file_put_contents(self::$utf8Data . 'canonicalComposition.ser'      , $canonicalComposition);
 		file_put_contents(self::$utf8Data . 'canonicalDecomposition.ser'    , $canonicalDecomposition);
