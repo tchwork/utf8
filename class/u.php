@@ -93,9 +93,8 @@ class u
 	static function strrchr ($s, $needle) {return mb_strrchr ($s, $needle, false, 'UTF-8');}
 	static function strrichr($s, $needle) {return mb_strrichr($s, $needle, false, 'UTF-8');}
 	static function strstr  ($s, $needle) {return mb_strstr  ($s, $needle, false, 'UTF-8');}
-	static function html_entity_decode($s, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {return html_entity_decode($s, $quote_style, $charset);}
-	static function htmlentities      ($s, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {return htmlentities      ($s, $quote_style, $charset);}
-	static function htmlspecialchars  ($s, $quote_style = ENT_COMPAT, $charset = 'UTF-8') {return htmlspecialchars  ($s, $quote_style, $charset);}
+	static function htmlentities    ($s, $quote_style = ENT_COMPAT) {return htmlentities    ($s, $quote_style, 'UTF-8');}
+	static function htmlspecialchars($s, $quote_style = ENT_COMPAT) {return htmlspecialchars($s, $quote_style, 'UTF-8');}
 	static function wordwrap($s, $width = 75, $break = "\n", $cut = false) {return pipe_wordwrap::php($s, $width, $break, $cut);}
 
 	static function chr($c)
@@ -142,11 +141,25 @@ class u
 
 	static function trim($s, $charlist = null) {return self::rtrim(self::ltrim($s, $charlist), $charlist);}
 
+	static function html_entity_decode($s, $quote_style = ENT_COMPAT)
+	{
+		$s = strtr($s, array(
+			'&QUOT;' => '&quot;', '&LT;' => '&lt;', '&AMP;' => '&amp;', '&TRADE;' => '&trade;',
+			'&COPY;' => '&copy;', '&GT;' => '&gt;', '&REG;' => '&reg;', '&apos;'  => '&#39;'
+		));
+
+		return html_entity_decode($s, $quote_style, 'UTF-8');
+	}
+
 	static function get_html_translation_table($table = HTML_SPECIALCHARS, $quote_style = ENT_COMPAT)
 	{
-		$quote_style = get_html_translation_table($table, $quote_style);
-		if (HTML_ENTITIES == $table) $quote_style = array_combine(array_map('utf8_encode', array_keys($quote_style)), $quote_style);
-		return $quote_style;
+		if (HTML_ENTITIES == $table)
+		{
+			static $entities = array();
+			$entities || $entities = unserialize(file_get_contents(resolvePath('data/utf8/htmlentities.ser')));
+			return $entities + get_html_translation_table(HTML_SPECIALCHARS, $quote_style);
+		}
+		else return get_html_translation_table($table, $quote_style);
 	}
 
 	static function str_ireplace($search, $replace, $subject, &$count = null)
