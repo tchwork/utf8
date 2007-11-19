@@ -166,7 +166,7 @@ class utf8_mbstring_500
 	static function strlen2($s, $encoding = null)
 	{
 		// Quickest alternative if utf8_decode() is not available:
-		preg_replace('/./u', '', $s, -1, $s);
+		preg_replace('/./us', '', $s, -1, $s);
 		return $s;
 	}
 
