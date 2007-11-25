@@ -15,13 +15,6 @@
 /*
  * Partial mbstring implementation in pure PHP
  *
- * Supported through iconv:
-
-mb_convert_encoding           - Convert character encoding
-mb_decode_mimeheader          - Decode string in MIME header field
-mb_encode_mimeheader          - Encode string for MIME header
-
-
  * Not implemented:
 
 mb_check_encoding             - Check if the string is valid for the specified encoding
@@ -30,6 +23,7 @@ mb_convert_variables          - Convert character code in variable(s)
 mb_decode_numericentity       - Decode HTML numeric string reference to character
 mb_detect_encoding            - Detect character encoding
 mb_detect_order               - Set/Get character encoding detection order
+mb_encode_mimeheader          - Encode string for MIME header XXX NATIVE IMPLEMENTATION IS BUGGED
 mb_encode_numericentity       - Encode character to HTML numeric string reference
 mb_ereg_match                 - Regular expression match for multibyte string
 mb_ereg_replace               - Replace regular expression with multibyte support
@@ -59,35 +53,38 @@ mb_strcut                     - Get part of string
 mb_strimwidth                 - Get truncated string with specified width
 mb_strwidth                   - Return width of string
 
+
+ * Implemented:
+
+mb_convert_encoding     - Convert character encoding
+mb_decode_mimeheader    - Decode string in MIME header field
+mb_convert_case         - Perform case folding on a string
+mb_internal_encoding    - Set/Get internal character encoding
+mb_list_encodings       - Returns an array of all supported encodings
+mb_strlen               - Get string length
+mb_strpos               - Find position of first occurrence of string in a string
+mb_strtolower           - Make a string lowercase
+mb_strtoupper           - Make a string uppercase
+mb_substitute_character - Set/Get substitution character
+mb_substr               - Get part of string
+
  */
 
 class utf8_mbstring_500
 {
 	static function convert_encoding($s, $to_encoding, $from_encoding = null)
 	{
-		if (function_exists('iconv')) return iconv($from_encoding ? $from_encoding : 'UTF-8', $to_encoding . '//IGNORE', $s);
-		trigger_error('mb_convert_encoding() not supported without mbstring or iconv');
-		return $s;
+		return iconv($from_encoding ? $from_encoding : 'UTF-8', $to_encoding . '//IGNORE', $s);
 	}
 
 	static function decode_mimeheader($s)
 	{
-		if (function_exists('iconv_mime_decode')) return iconv_mime_decode($s);
-		trigger_error('mb_decode_mimeheader() not supported without mbstring or iconv');
-		return $s;
+		return iconv_mime_decode($s);
 	}
 
 	static function encode_mimeheader($s, $charset = null, $transfer_encoding = null, $linefeed = null, $indent = null)
 	{
-		if (function_exists('iconv_mime_encode')) return iconv_mime_encode('', $s, array(
-			'scheme' => null === $transfer_encoding ? 'B' : $transfer_encoding,
-			'input-charset' => $charset ? $charset : 'UTF-8',
-			'output-charset' => $charset ? $charset : 'UTF-8',
-			'line-length' => 76,
-			'line-break-chars' => null === $linefeed ? "\r\n" : $linefeed,
-		));
-		trigger_error('mb_encode_mimeheader() not supported without mbstring or iconv');
-		return $s;
+		trigger_error('mb_encode_mimeheader() is bugged. Please use iconv_mime_encode() instead.');
 	}
 
 

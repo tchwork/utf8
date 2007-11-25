@@ -14,7 +14,17 @@
 
 /*
  * Partial mbstring implementation in pure PHP
- * Functions introduced with PHP 5.2.0
+ *
+ * All functions introduced in PHP 5.2.0:
+
+mb_stripos  - Finds position of first occurrence of a string within another, case insensitive
+mb_stristr  - Finds first occurrence of a string within another, case insensitive
+mb_strrchr  - Finds the last occurrence of a character in a string within another
+mb_strrichr - Finds the last occurrence of a character in a string within another, case insensitive
+mb_strripos - Finds position of last occurrence of a string within another, case insensitive
+mb_strstr   - Finds first occurrence of a string within another
+mb_strrpos  - Find position of last occurrence of a string in a string
+
  */
 
 class utf8_mbstring_520
