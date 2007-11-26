@@ -104,7 +104,7 @@ class utf8_generate
 			. "\n" . self::quickCheck('NFKD')
 			. "\n" . self::combiningCheck();
 
-		$a = preg_replace("'\\\\x\\{([0-9A-Fa-f]+)\\}'e", 'u::chr(hexdec("$1"))', $a);
+		$a = preg_replace_callback("'\\\\x\\{([0-9A-Fa-f]+)\\}'", array(__CLASS__, 'chr_callback'), $a);
 
 		file_put_contents(self::$utf8Data . 'quickChecks.txt', $a);
 	}
@@ -249,7 +249,7 @@ class utf8_generate
 
 	static function optimizeRx($rx)
 	{
-		$rx = preg_replace('/\\\\x\\{([0-9A-Fa-f]+)\\}-\\\\x\\{([0-9A-Fa-f]+)\\}/e', '"\x{".implode("}\x{",array_map("dechex",range(0x$1, 0x$2)))."}"', $rx);
+		$rx = preg_replace_callback('/\\\\x\\{([0-9A-Fa-f]+)\\}-\\\\x\\{([0-9A-Fa-f]+)\\}/', array(__CLASS__, 'chr_range_callback'), $rx);
 
 		preg_match_all('/[0-9A-Fa-f]+/', $rx, $rx);
 
@@ -283,4 +283,7 @@ class utf8_generate
 
 		return $a;
 	}
+
+	protected static function chr_callback($m) {return u::chr(hexdec($m[1]));}
+	protected static function chr_range_callback($m) {return '\x{' . implode('}\x{', array_map('dechex', range(hexdec($m[1]), hexdec($m[2])))) . '}';}
 }

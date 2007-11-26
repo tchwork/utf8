@@ -139,9 +139,9 @@ class iconv
 			if ('UTF-8' !== $out && false === $c = iconv('UTF-8', $out, $c)) return false;
 
 			$o = $Q
-				? $c = preg_replace(
-					'/[=_\?\x00-\x1F\x80-\xFF]/e',
-					'"=".strtoupper(dechex(ord("\0")))',
+				? $c = preg_replace_callback(
+					'/[=_\?\x00-\x1F\x80-\xFF]/',
+					array(__CLASS__, 'qp_byte_callback'),
 					$c
 				)
 				: base64_encode($line_data . $c);
@@ -176,4 +176,9 @@ class iconv
 	static function strpos ($haystack, $needle, $offset = 0, $encoding = null) {return mb_strpos ($haystack, $needle, $offset, $encoding);}
 	static function strrpos($haystack, $needle, $encoding = null) {return mb_strrpos($haystack, $needle, $encoding);}
 	static function substr($s, $start, $length = null, $encoding = null) {return mb_substr($s, $start, $length, $encoding);}
+
+	protected static function qp_byte_callback($m)
+	{
+		return '=' . strtoupper(dechex(ord($m[0])));
+	}
 }
