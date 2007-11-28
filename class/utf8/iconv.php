@@ -69,7 +69,10 @@ class utf8_iconv
 	$internal_encoding = 'UTF-8',
 
 	$translit_map = array(),
-	$convert_map = array();
+	$convert_map = array(),
+
+	$utf_len_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4),
+	$is_valid_utf8;
 
 
 	static function iconv($in_charset, $out_charset, $str)
@@ -121,12 +124,25 @@ class utf8_iconv
 				: self::map_to_utf8($in_map, $str, $IGNORE);
 
 			$str = false === $str && ob_end_clean() || 1 ? false : ob_get_clean();
-		}
-		else if ('utf-8' === $out_charset || 2 === count($out_map))
-		{
-			// UTF-8 validation
 
-			$str = self::utf8_to_utf8($str, $IGNORE);
+			self::$is_valid_utf8 = true;
+		}
+		else
+		{
+			self::$is_valid_utf8 = preg_match('//u', $str);
+
+			if (!self::$is_valid_utf8 && !$IGNORE)
+			{
+				trigger_error(self::ERROR_ILLEGAL_CHARACTER);
+				return false;
+			}
+
+			if ('utf-8' === $out_charset)
+			{
+				// UTF-8 validation
+
+				$str = self::utf8_to_utf8($str, $IGNORE);
+			}
 		}
 
 		if ('utf-8' !== $out_charset && false !== $str)
@@ -310,15 +326,8 @@ class utf8_iconv
 
 	protected static function utf8_to_utf8(&$str, $IGNORE)
 	{
-		static $utf_len_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
-
-		$valid = preg_match('//u', $str);
-
-		if (!$valid && !$IGNORE)
-		{
-			trigger_error(self::ERROR_ILLEGAL_CHARACTER);
-			return false;
-		}
+		$utf_len_mask = self::$utf_len_mask;
+		$valid        = self::$is_valid_utf8;
 
 		ob_start();
 
@@ -333,15 +342,19 @@ class utf8_iconv
 				$utf_len = $s[$i] & "\xF0";
 				$utf_len = isset($utf_len_mask[$utf_len]) ? $utf_len_mask[$utf_len] : 1;
 				$utf_chr = substr($str, $i, $utf_len);
-				$i += $utf_len;
 
 				if (1 === $utf_len || !($valid || preg_match('//u', $utf_chr)))
 				{
-					if ($IGNORE) continue;
+					if ($IGNORE)
+					{
+						++$i;
+						continue;
+					}
 
 					trigger_error(self::ERROR_ILLEGAL_CHARACTER);
 					return false;
 				}
+				else $i += $utf_len;
 
 				echo $utf_chr;
 			}
@@ -359,7 +372,8 @@ class utf8_iconv
 
 	protected static function map_from_utf8(&$map, &$str, $IGNORE, $TRANSLIT)
 	{
-		static $utf_len_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
+		$utf_len_mask = self::$utf_len_mask;
+		$valid        = self::$is_valid_utf8;
 
 		$TRANSLIT
 			&& self::$translit_map
@@ -374,21 +388,15 @@ class utf8_iconv
 			else
 			{
 				$utf_len = $s[$i] & "\xF0";
+				$utf_len = isset($utf_len_mask[$utf_len]) ? $utf_len_mask[$utf_len] : 1;
+				$utf_chr = substr($str, $i, $utf_len);
 
-				if (isset($utf_len_mask[$utf_len])) $utf_len = $utf_len_mask[$utf_len];
-				else if ($IGNORE)
+				if ($IGNORE && (1 === $utf_len || !($valid || preg_match('//u', $utf_chr))))
 				{
 					++$i;
 					continue;
 				}
-				else
-				{
-					trigger_error(self::ERROR_ILLEGAL_CHARACTER);
-					return false;
-				}
-
-				$utf_chr = substr($str, $i, $utf_len);
-				$i += $utf_len;
+				else $i += $utf_len;
 			}
 
 			do
