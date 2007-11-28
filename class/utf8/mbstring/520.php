@@ -23,79 +23,104 @@ mb_strrchr  - Finds the last occurrence of a character in a string within anothe
 mb_strrichr - Finds the last occurrence of a character in a string within another, case insensitive
 mb_strripos - Finds position of last occurrence of a string within another, case insensitive
 mb_strstr   - Finds first occurrence of a string within another
-mb_strrpos  - Find position of last occurrence of a string in a string
 
  */
 
+
+function mb_stripos( $haystack, $needle, $offset = 0,   $encoding = INF) {return utf8_mbstring_520::stripos( $haystack, $needle, $offset, $encoding);}
+function mb_stristr( $haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::stristr( $haystack, $needle, $part,   $encoding);}
+function mb_strrchr( $haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::strrchr( $haystack, $needle, $part,   $encoding);}
+function mb_strrichr($haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::strrichr($haystack, $needle, $part,   $encoding);}
+function mb_strripos($haystack, $needle, $offset = 0,   $encoding = INF) {return utf8_mbstring_520::strripos($haystack, $needle, $offset, $encoding);}
+function mb_strstr(  $haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::strstr(  $haystack, $needle, $part,   $encoding);}
+
+
 class utf8_mbstring_520
 {
-	static function stripos($haystack, $needle, $offset = 0, $encoding = null)
+	static function stripos($haystack, $needle, $offset = 0, $encoding = INF)
 	{
-		return mb_strpos(mb_strtolower($haystack, $encoding), mb_strtolower($needle, $encoding), $offset, $encoding);
+		return INF === $encoding
+			? mb_strpos(mb_strtolower($haystack           ), mb_strtolower($needle           ), $offset)
+			: mb_strpos(mb_strtolower($haystack, $encoding), mb_strtolower($needle, $encoding), $offset, $encoding);
 	}
 
-	static function stristr($haystack, $needle, $part = false, $encoding = null)
+	static function stristr($haystack, $needle, $part = false, $encoding = INF)
 	{
 		$pos = self::stripos($haystack, $needle, $encoding);
-		return false === $pos ? false : ($part ? mb_substr($haystack, 0, $pos, $encoding) : mb_substr($haystack, $pos, null, $encoding));
+		return self::getSubpart($pos, $part, $haystack, $encoding);
 	}
 
-	static function strrchr($haystack, $needle, $part = false, $encoding = null)
+	static function strrchr($haystack, $needle, $part = false, $encoding = INF)
 	{
 		$pos = self::strrpos($haystack, $needle, 0, $encoding);
-		return false === $pos ? false : ($part ? mb_substr($haystack, 0, $pos, $encoding) : mb_substr($haystack, $pos, null, $encoding));
+		return self::getSubpart($pos, $part, $haystack, $encoding);
 	}
 
-	static function strrichr($haystack, $needle, $part = false, $encoding = null)
+	static function strrichr($haystack, $needle, $part = false, $encoding = INF)
 	{
 		$pos = self::strripos($haystack, $needle, $encoding);
-		return false === $pos ? false : ($part ? mb_substr($haystack, 0, $pos, $encoding) : mb_substr($haystack, $pos, null, $encoding));
+		return self::getSubpart($pos, $part, $haystack, $encoding);
 	}
 
-	static function strripos($haystack, $needle, $offset = 0, $encoding = null)
+	static function strripos($haystack, $needle, $offset = 0, $encoding = INF)
 	{
-		return self::strrpos(mb_strtolower($haystack, $encoding), mb_strtolower($needle, $encoding), $offset, $encoding);
+		return INF === $encoding
+			? self::strrpos(mb_strtolower($haystack,          ), mb_strtolower($needle,          ), $offset)
+			: self::strrpos(mb_strtolower($haystack, $encoding), mb_strtolower($needle, $encoding), $offset, $encoding);
 	}
 
-	static function strstr($haystack, $needle, $part = false, $encoding = null)
+	static function strstr($haystack, $needle, $part = false, $encoding = INF)
 	{
 		$pos = strpos($haystack, $needle);
 		return false === $pos ? false : ($part ? substr($haystack, 0, $pos) : substr($haystack, $pos));
 	}
 
-	static function strrpos($haystack, $needle, $offset = 0, $encoding = null)
+	static function strrpos($haystack, $needle, $offset = 0, $encoding = INF)
 	{
-		if (null === $encoding && $offset != (int) $offset)
+		if (INF === $encoding && $offset != (int) $offset)
 		{
 			$encoding = $offset;
 			$offset = 0;
 		}
-		else if ($offset = (int) $offset) $haystack = mb_substr($haystack, $offset);
+		else if ($offset = (int) $offset)
+		{
+			$haystack = INF === $encoding
+				? mb_substr($haystack, $offset)
+				: mb_substr($haystack, $offset, PHP_INT_MAX, $encoding);
+		}
 
-		$pos = utf8_mbstring_500_strrpos($haystack, $needle, $encoding);
+		$pos = INF === $encoding
+			? mb_strrpos_500($haystack, $needle)
+			: mb_strrpos_500($haystack, $needle, $encoding);
 
 		return false !== $pos ? $offset + $pos : false;
 	}
+
+
+	protected static function getSubpart($pos, $part, $haystack, $encoding)
+	{
+		return false === $pos ? false : (INF === $encoding
+			? ($part ? mb_substr($haystack, 0, $pos           ) : mb_substr($haystack, $pos))
+			: ($part ? mb_substr($haystack, 0, $pos, $encoding) : mb_substr($haystack, $pos, PHP_INT_MAX, $encoding))
+		);
+	}
 }
 
-#>>> Below is only for patchwork
-return ;
-#<<<
-
-if (function_exists('mb_strrpos')) {}
-else if (function_exists('iconv_strrpos'))
+#>>> For non patchwork code
+if (extension_loaded('iconv'))
 {
-	function mb_strrpos($haystack, $needle, $encoding)
+	function mb_strrpos_500($haystack, $needle, $encoding = INF)
 	{
-		return iconv_strrpos($haystack, $needle, $encoding);
+		return INF === $encoding
+			? iconv_strrpos($haystack, $needle)
+			: iconv_strrpos($haystack, $needle, $encoding);
 	}
 }
 else
 {
-	function mb_strrpos($haystack, $needle, $encoding)
+	function mb_strrpos_500($haystack, $needle, $encoding = INF)
 	{
-		$needle = mb_substr($needle, 0, 1);
-		$pos = strpos(strrev($haystack), strrev($needle));
-		return false === $pos ? false : mb_strlen($pos ? substr($haystack, 0, -$pos) : $haystack);
+		return utf8_mbstring_500::strrpos($haystack, $needle, $encoding);
 	}
 }
+#<<<
