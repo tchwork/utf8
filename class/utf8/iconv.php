@@ -126,7 +126,7 @@ class utf8_iconv
 				? call_user_func_array($in_map, array(&$str, $IGNORE, $in_charset))
 				: self::map_to_utf8($in_map, $str, $IGNORE);
 
-			$str = false === $str && ob_end_clean() || 1 ? false : ob_get_clean();
+			$str = !$str && ob_end_clean() || 1 ? false : ob_get_clean();
 
 			self::$is_valid_utf8 = true;
 		}
@@ -158,7 +158,7 @@ class utf8_iconv
 				? call_user_func_array($out_map, array(&$str, $IGNORE, $TRANSLIT, $out_charset))
 				: self::map_from_utf8($out_map, $str, $IGNORE, $TRANSLIT);
 
-			$str = false === $str && ob_end_clean() || 1 ? false : ob_get_clean();
+			$str = !$str && ob_end_clean() || 1 ? false : ob_get_clean();
 		}
 
 		return $str;
@@ -412,6 +412,7 @@ class utf8_iconv
 						continue;
 					}
 
+					ob_end_clean();
 					trigger_error(self::ERROR_ILLEGAL_CHARACTER);
 					return false;
 				}
@@ -421,7 +422,7 @@ class utf8_iconv
 			}
 		}
 
-		$str = ob_get_clean();
+		return ob_get_clean();
 	}
 
 	protected static function map_to_utf8(&$map, &$str, $IGNORE)
