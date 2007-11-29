@@ -13,17 +13,13 @@
 
 
 /*
- * Partial iconv implementation in pure PHP
+ * iconv implementation in pure PHP
  *
- * Not implemented:
-
-iconv                     - Convert string to requested character encoding
-iconv_mime_decode_headers - Decodes multiple MIME header fields at once
-iconv_mime_decode         - Decodes a MIME header field
-
-
  * Implemented:
  
+iconv              - Convert string to requested character encoding
+iconv_mime_decode  - Decodes a MIME header field
+iconv_mime_decode_headers - Decodes multiple MIME header fields at once
 iconv_get_encoding - Retrieve internal configuration variables of iconv extension
 iconv_set_encoding - Set current setting for character encoding conversion
 iconv_mime_encode  - Composes a MIME header field
@@ -64,9 +60,9 @@ class utf8_iconv
 
 	static protected
 
-	$input_encoding = 'UTF-8',
-	$output_encoding = 'UTF-8',
-	$internal_encoding = 'UTF-8',
+	$input_encoding = 'UTF-8//IGNORE',
+	$output_encoding = 'UTF-8//IGNORE',
+	$internal_encoding = 'UTF-8//IGNORE',
 
 	$translit_map = array(),
 	$convert_map = array(),
@@ -77,7 +73,7 @@ class utf8_iconv
 
 	static function iconv($in_charset, $out_charset, $str)
 	{
-		if ('' === $str) return '';
+		if ('' === (string) $str) return '';
 
 
 		// Prepare for //IGNORE and //TRANSLIT
@@ -161,22 +157,66 @@ class utf8_iconv
 		return $str;
 	}
 
-	static function mime_decode_headers($encoded_headers, $mode = ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset = INF)
+	static function mime_decode_headers($str, $mode = ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset = INF)
 	{
 		INF === $charset && $charset = self::$internal_encoding;
 
-		trigger_error('utf8_iconv::mime_decode_headers() not implemented'); // TODO
+		false !== strpos($str, "\r") && $str = strtr(str_replace("\r\n", "\n", $str), "\r", "\n");
+		$str = explode("\n\n", $str, 2);
 
-		return false;
+		$headers = array();
+
+		$str = preg_split('/\n(?![ \t])/', $str[0]);
+		foreach ($str as $str)
+		{
+			$str = self::mime_decode($str, $mode, $charset);
+			$str = explode(':', $str, 2);
+
+			if (2 === count($str))
+			{
+				if (isset($headers[$str[0]]))
+				{
+					is_array($headers[$str[0]]) || $headers[$str[0]] = array($headers[$str[0]]);
+					$headers[$str[0]][] = ltrim($str[1]);
+				}
+				else $headers[$str[0]] = ltrim($str[1]);
+			}
+		}
+
+		return $headers;
 	}
 
-	static function mime_decode($encoded_headers, $mode = ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset = INF)
+	static function mime_decode($str, $mode = ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset = INF)
 	{
 		INF === $charset && $charset = self::$internal_encoding;
 
-		trigger_error('utf8_iconv::mime_decode() not implemented'); // TODO
+		false !== strpos($str, "\r") && $str = strtr(str_replace("\r\n", "\n", $str), "\r", "\n");
+		$str = preg_split('/\n(?![ \t])/', rtrim($str), 2);
+		$str = preg_replace('/[ \t]*\n[ \t]+/', ' ', rtrim($str[0]));
+		$str = preg_split('/=\?([^?]+)\?([bqBQ])\?(.*)\?=/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-		return false;
+		ob_start();
+
+		echo self::iconv('UTF-8', $charset, $str[0]);
+
+		$i = 1;
+		$len = count($str);
+
+		while ($i < $len)
+		{
+			$str[$i+2] = 'Q' === strtoupper($str[$i+1])
+				? rawurldecode(strtr(str_replace('%', '%25', $str[$i+2]), '=_', '% '))
+				: base64_decode($str[$i+2]);
+
+			$str[$i+2] = self::iconv($str[$i], $charset, $str[$i+2]);
+			$str[$i+3] = self::iconv('UTF-8' , $charset, $str[$i+3]);
+
+			echo $str[$i+2], '' === trim($str[$i+3]) ? '' : $str[$i+3];
+
+			$i += 4;
+		}
+
+		return ob_get_clean();
 	}
 
 	static function get_encoding($type = 'all')
@@ -316,9 +356,23 @@ class utf8_iconv
 
 		if (INF === $map)
 		{
-			$map = resolvePath('data/utf8/charset/' . $type . $charset . '.ser');
-			if (false === $map) return false;
-			$map = unserialize($map);
+			$map = resolvePath('data/utf8/iconv/' . $type . $charset . '.ser');
+
+			if (false === $map)
+			{
+				$rev_type = 'to.' === $type ? 'from.' : 'to.';
+				$rev_map = resolvePath('data/utf8/iconv/' . $rev_type . $charset . '.ser');
+
+				if (false !== $rev_map)
+				{
+					$rev_map = unserialize(file_get_contents($rev_map));
+					self::$convert_map[$rev_type . $charset] =& $rev_map;
+					if (2 === count($rev_map)) return false;
+					else $map = array_reverse($rev_map);
+				}
+				else return false;
+			}
+			else $map = unserialize(file_get_contents($map));
 		}
 
 		return true;
@@ -365,9 +419,19 @@ class utf8_iconv
 
 	protected static function map_to_utf8(&$map, &$str, $IGNORE)
 	{
-		trigger_error('utf8_iconv::map_to_utf8() not implemented');  // TODO
+		$len = strlen($str);
+		for ($i = 0; $i < $len; ++$i)
+		{
+			if (isset($map[$str[$i]])) echo $map[$str[$i]];
+			else if (isset($map[$str[$i] . $str[$i+1]])) echo $map[$str[$i] . $str[++$i]];
+			else if (!$IGNORE)
+			{
+				trigger_error(self::ERROR_ILLEGAL_CHARACTER);
+				return false;
+			}
+		}
 
-		return false;
+		return true;
 	}
 
 	protected static function map_from_utf8(&$map, &$str, $IGNORE, $TRANSLIT)
@@ -377,7 +441,7 @@ class utf8_iconv
 
 		$TRANSLIT
 			&& self::$translit_map
-			|| self::$translit_map = unserialize(file_get_contents(resolvePath('data/utf8/translit.ser')));
+			|| self::$translit_map = unserialize(file_get_contents(resolvePath('data/utf8/iconv/translit.ser')));
 
 		$i = 0;
 		$len = strlen($str);
