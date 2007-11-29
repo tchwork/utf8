@@ -14,6 +14,8 @@
 
 class utf8_iconv_generate
 {
+	// See http://unicode.org/Public/MAPPINGS/ for conversion maps
+
 	static function charsetMaps()
 	{
 		$map_dir = resolvePath('data/unicode/charset/');
@@ -40,6 +42,9 @@ class utf8_iconv_generate
 		}
 		closedir($h);
 	}
+
+
+	// See http://www.gnu.org/software/libiconv/ for translit.def
 
 	static function translitMap()
 	{
