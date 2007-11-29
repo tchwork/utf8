@@ -64,6 +64,10 @@ class utf8_iconv
 	$output_encoding = 'UTF-8//IGNORE',
 	$internal_encoding = 'UTF-8//IGNORE',
 
+	$alias = array(
+		'tis-620' => 'iso-8859-11',
+	),
+
 	$translit_map = array(),
 	$convert_map = array(),
 
@@ -97,6 +101,9 @@ class utf8_iconv
 
 		'//translit' === substr($in_charset, -10) && $in_charset = substr($in_charset, 0, -10);
 		'//ignore'   === substr($in_charset,  -8) && $in_charset = substr($in_charset, 0,  -8);
+
+		isset(self::$alias[ $in_charset]) &&  $in_charset = self::$alias[ $in_charset];
+		isset(self::$alias[$out_charset]) && $out_charset = self::$alias[$out_charset];
 
 
 		// Load charset maps
