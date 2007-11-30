@@ -36,11 +36,11 @@ class u
 	// Unicode Normalization functions.
 	// Input strings have to be valid UTF-8.
 
-	static function toNFC($s)  {return utf8_normalize::toNFC($s);}
-	static function toNFD($s)  {return utf8_normalize::toNFD($s);}
-	static function toNFKC($s) {return utf8_normalize::toNFC($s, true);}
-	static function toNFKD($s) {return utf8_normalize::toNFD($s, true);}
-	static function removeAccents($s) {return utf8_normalize::removeAccents($s);}
+	static function toNFC($s)  {return utf8_normalizer::toNFC($s);}
+	static function toNFD($s)  {return utf8_normalizer::toNFD($s);}
+	static function toNFKC($s) {return utf8_normalizer::toNFC($s, true);}
+	static function toNFKD($s) {return utf8_normalizer::toNFD($s, true);}
+	static function removeAccents($s) {return utf8_normalizer::removeAccents($s);}
 
 
 	// Unicode transformation for caseless matching

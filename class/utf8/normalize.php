@@ -16,13 +16,13 @@
 
 
 #>>> Add compatibility with non patchwork code
-utf8_normalize::__constructStatic();
+utf8_normalizer::__constructStatic();
 #<<<
 
-class utf8_normalize
+class utf8_normalizer
 {
 	// ASCII characters, by frequency
-	const ascii = "\x20\x65\x69\x61\x73\x6e\x74\x72\x6f\x6c\x75\x64\x5d\x5b\x63\x6d\x70\x27\x0a\x67\x7c\x68\x76\x2e\x66\x62\x2c\x3a\x3d\x2d\x71\x31\x30\x43\x32\x2a\x79\x78\x29\x28\x4c\x39\x41\x53\x2f\x50\x22\x45\x6a\x4d\x49\x6b\x33\x3e\x35\x54\x3c\x44\x34\x7d\x42\x7b\x38\x46\x77\x52\x36\x37\x55\x47\x4e\x3b\x4a\x7a\x56\x23\x48\x4f\x57\x5f\x26\x21\x4b\x3f\x58\x51\x25\x59\x5c\x09\x5a\x2b\x7e\x5e\x24\x40\x60\x7f\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
+	const ASCII = "\x20\x65\x69\x61\x73\x6e\x74\x72\x6f\x6c\x75\x64\x5d\x5b\x63\x6d\x70\x27\x0a\x67\x7c\x68\x76\x2e\x66\x62\x2c\x3a\x3d\x2d\x71\x31\x30\x43\x32\x2a\x79\x78\x29\x28\x4c\x39\x41\x53\x2f\x50\x22\x45\x6a\x4d\x49\x6b\x33\x3e\x35\x54\x3c\x44\x34\x7d\x42\x7b\x38\x46\x77\x52\x36\x37\x55\x47\x4e\x3b\x4a\x7a\x56\x23\x48\x4f\x57\x5f\x26\x21\x4b\x3f\x58\x51\x25\x59\x5c\x09\x5a\x2b\x7e\x5e\x24\x40\x60\x7f\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
 
 
 	static
@@ -81,8 +81,9 @@ class utf8_normalize
 	{
 		$decompose && $s = self::decompose($s);
 
+		ob_start();
 
-		$t = $tail = '';
+		$tail = '';
 
 		$i = $s[0] < "\x80" ? 1 : self::$utf_len_mask[$s[0] & "\xF0"];
 		$len = strlen($s);
@@ -102,13 +103,13 @@ class utf8_normalize
 					$tail = '';
 				}
 
-				if ($j = strspn($s, self::ascii, $i+1))
+				if ($j = strspn($s, self::ASCII, $i+1))
 				{
 					$last_utf_chr .= substr($s, $i, $j);
 					$i += $j;
 				}
 
-				$t .= $last_utf_chr;
+				echo $last_utf_chr;
 				$last_utf_chr = $s[$i];
 				++$i;
 			}
@@ -138,7 +139,7 @@ class utf8_normalize
 							$tail = '';
 						}
 
-						$t .= $last_utf_chr;
+						echo $last_utf_chr;
 						$last_utf_chr = $utf_chr;
 					}
 				}
@@ -167,12 +168,15 @@ class utf8_normalize
 			}
 		}
 
-		return $t . $last_utf_chr . $tail;
+		echo $last_utf_chr, $tail;
+
+		return ob_get_clean();
 	}
 
 	protected static function decompose($s)
 	{
-		$t = '';
+		ob_start();
+
 		$c = array();
 		$i = 0;
 		$len = strlen($s);
@@ -186,17 +190,17 @@ class utf8_normalize
 				if ($c)
 				{
 					ksort($c);
-					$t .= implode('', $c);
+					echo implode('', $c);
 					$c = array();
 				}
 
-				$j = 1 + strspn($s, self::ascii, $i+1);
-				$t .= substr($s, $i, $j);
+				$j = 1 + strspn($s, self::ASCII, $i+1);
+				echo substr($s, $i, $j);
 				$i += $j;
 			}
 			else
 			{
-				$utf_len = self::$utf_len_mask[$s[$i] & "\xF0"];
+				$utf_len = self::$utf_len_mask[$s[$i] & "\xf0"];
 				$utf_chr = substr($s, $i, $utf_len);
 				$i += $utf_len;
 
@@ -212,11 +216,11 @@ class utf8_normalize
 					if ($c)
 					{
 						ksort($c);
-						$t .= implode('', $c);
+						echo implode('', $c);
 						$c = array();
 					}
 
-					if ($utf_chr < "\xEA\xB0\x80" || "\xED\x9E\xA3" < $utf_chr)
+					if ($utf_chr < "\xea\xb0\x80" || "\xed\x9e\xa3" < $utf_chr)
 					{
 						// Table lookup
 
@@ -227,7 +231,7 @@ class utf8_normalize
 							$utf_chr = $j;
 
 							$j = strlen($utf_chr);
-							$utf_len = $utf_chr[0] < "\x80" ? 1 : self::$utf_len_mask[$utf_chr[0] & "\xF0"];
+							$utf_len = $utf_chr[0] < "\x80" ? 1 : self::$utf_len_mask[$utf_chr[0] & "\xf0"];
 
 							if ($utf_len != $j)
 							{
@@ -267,7 +271,7 @@ class utf8_normalize
 						}
 					}
 
-					$t .= $utf_chr;
+					echo $utf_chr;
 				}
 			}
 		}
@@ -275,9 +279,9 @@ class utf8_normalize
 		if ($c)
 		{
 			ksort($c);
-			$t .= implode('', $c);
+			echo implode('', $c);
 		}
 
-		return $t;
+		return ob_get_clean();
 	}
 }

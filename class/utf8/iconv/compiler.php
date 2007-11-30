@@ -12,7 +12,7 @@
  ***************************************************************************/
 
 
-class utf8_iconv_generate
+class utf8_iconv_compiler
 {
 	// See http://unicode.org/Public/MAPPINGS/ for conversion maps
 
