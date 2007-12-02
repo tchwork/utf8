@@ -12,16 +12,13 @@
  ***************************************************************************/
 
 
-/* UTF-8 aware string manipulations.
- *
- * TODO:
- * - handle grapheme clusters & co. (http://unicode.org/reports/tr29/)
- * - add support for security mechanisms (http://unicode.org/reports/tr39/)
+/* UTF-8 Grapheme Cluster aware string manipulations.
  *
  * See also:
  * - http://phputf8.sf.net/ and its "see also" section
  * - http://annevankesteren.nl/2005/05/unicode
-
+ * - http://www.unicode.org/reports/tr29/
+ *
  */
 
 
@@ -76,17 +73,64 @@ class u
 	}
 
 
-	// Here is the complete set of native PHP string functions that need UTF-8 awareness,
-	// Input strings should be in Normalization Form C, Canonical Composition.
+	// Here is the complete set of native PHP string functions that need UTF-8 awareness
 
-	static function strlen($s)     {return mb_strlen($s, 'UTF-8');}
+	static function strlen($s)
+	{
+		$s = self::getGraphemeClusterArray($s);
+		return count($s);
+	}
+
 	static function strtolower($s) {return mb_strtolower($s, 'UTF-8');}
 	static function strtoupper($s) {return mb_strtoupper($s, 'UTF-8');}
-	static function substr  ($s, $start, $len = null) {return mb_substr($s, $start, $len, 'UTF-8');}
-	static function strpos  ($s, $needle, $offset = 0) {return ''===$s ? false : mb_strpos  ($s, $needle, $offset, 'UTF-8');}
-	static function strrpos ($s, $needle, $offset = 0) {return ''===$s ? false : mb_strrpos ($s, $needle, $offset, 'UTF-8');}
-	static function stripos ($s, $needle, $offset = 0) {return mb_stripos ($s, $needle, $offset, 'UTF-8');}
-	static function strripos($s, $needle, $offset = 0) {return mb_strripos($s, $needle, $offset, 'UTF-8');}
+
+	static function substr($s, $start, $len = INF)
+	{
+		$s = self::getGraphemeClusterArray($s);
+		$s = array_slice($s, $start, INF === $len ? PHP_INT_MAX : $len);
+		return implode('', $s);
+	}
+
+	static function strpos($s, $needle, $offset = 0)
+	{
+		if ('' !== (string) $s)
+		{
+			$needle = mb_strpos($s, $needle, $offset, 'UTF-8');
+			return $needle ? self::strlen(mb_substr($s, 0, $needle)) : $needle;
+		}
+		else return false;
+	}
+
+	static function stripos($s, $needle, $offset = 0)
+	{
+		if ('' !== (string) $s)
+		{
+			$needle = mb_stripos($s, $needle, $offset, 'UTF-8');
+			return $needle ? self::strlen(mb_substr($s, 0, $needle)) : $needle;
+		}
+		else return false;
+	}
+
+	static function strrpos($s, $needle, $offset = 0)
+	{
+		if ('' !== (string) $s)
+		{
+			$needle = mb_strrpos($s, $needle, $offset, 'UTF-8');
+			return $needle ? self::strlen(mb_substr($s, 0, $needle)) : $needle;
+		}
+		else return false;
+	}
+
+	static function strripos($s, $needle, $offset = 0)
+	{
+		if ('' !== (string) $s)
+		{
+			$needle = mb_strripos($s, $needle, $offset, 'UTF-8');
+			return $needle ? self::strlen(mb_substr($s, 0, $needle)) : $needle;
+		}
+		else return false;
+	}
+
 	static function stristr ($s, $needle) {return mb_stristr ($s, $needle, false, 'UTF-8');}
 	static function strrchr ($s, $needle) {return mb_strrchr ($s, $needle, false, 'UTF-8');}
 	static function strrichr($s, $needle) {return mb_strrichr($s, $needle, false, 'UTF-8');}
@@ -109,14 +153,14 @@ class u
 	static function count_chars($s, $mode = 1)
 	{
 		if (1 != $mode && 3 != $mode) trigger_error('u::count_chars(): allowed $mode are 1 or 3', E_USER_ERROR);
-		preg_match_all('/./us', $s, $s);
-		$s = array_count_values($s[0]);
+		$s = self::getGraphemeClusterArray($s);
+		$s = array_count_values($s);
 		return 1 == $mode ? $s[0] : implode('', $s[0]);
 	}
 
-	static function ltrim($s, $charlist = null)
+	static function ltrim($s, $charlist = INF)
 	{
-		$charlist = null === $charlist ? '\s' : preg_quote($charlist, '/');
+		$charlist = INF === $charlist ? '\s' : preg_quote($charlist, '/');
 		return preg_replace("/^[{$charlist}]+/u", '', $s);
 	}
 
@@ -131,13 +175,13 @@ class u
 		       $a)));
 	}
 
-	static function rtrim($s, $charlist = null)
+	static function rtrim($s, $charlist = INF)
 	{
-		$charlist = null === $charlist ? '\s' : preg_quote($charlist, '/');
+		$charlist = INF === $charlist ? '\s' : preg_quote($charlist, '/');
 		return preg_replace("/[{$charlist}]+$/u", '', $s);
 	}
 
-	static function trim($s, $charlist = null) {return self::rtrim(self::ltrim($s, $charlist), $charlist);}
+	static function trim($s, $charlist = INF) {return self::rtrim(self::ltrim($s, $charlist), $charlist);}
 
 	static function html_entity_decode($s, $quote_style = ENT_COMPAT)
 	{
@@ -195,21 +239,29 @@ class u
 
 	static function str_shuffle($s)
 	{
-		preg_match_all('/./us', $s, $s);
-		shuffle($s[0]);
-		return implode('', $s[0]);
+		$s = self::getGraphemeClusterArray($s);
+		shuffle($s);
+		return implode('', $s);
 	}
 
 	static function str_split($s, $len = 1)
 	{
 		$len = (int) $len;
+		if ($len < 1) return str_split($s, $len);
 
-		if ($len < 1) return false;
-		if (self::strlen($s) <= $len) return array(&$s);
+		$s = self::getGraphemeClusterArray($s);
+		if (1 === $len) return $s;
 
-		preg_match_all('/.{' . $len . '}|.+?$/us', $s, $s);
+		$a = array();
+		$j = -1;
 
-		return $s[0];
+		foreach ($s as $i => $s)
+		{
+			if ($i % $len) $a[$j] .= $s;
+			else $a[++$j] = $s;
+		}
+
+		return $a;
 	}
 
 	static function str_word_count($s, $format = 0, $charlist = '')
@@ -240,11 +292,11 @@ class u
 	static function strncasecmp  ($a, $b, $len) {return self::strncmp(self::strtocasefold($a), self::strtocasefold($b), $len);}
 	static function strncmp      ($a, $b, $len) {return strcmp(self::substr($a, 0, $len), self::substr($b, 0, $len));}
 
-	static function strcspn($s, $mask, $start = null, $len = null)
+	static function strcspn($s, $mask, $start = INF, $len = INF)
 	{
 		if ('' === (string) $mask) return null;
-		if (null !== $start || null !== $len) $s = self::substr($s, $start, $len);
-		return preg_match('/^[^' . preg_quote($mask) . ']+/u', $s, $s) ? self::strlen($s[0]) : 0;
+		if (INF !== $start || INF !== $len) $s = self::substr($s, $start, $len);
+		return preg_match('/^[^' . preg_quote($mask, '/') . ']+/u', $s, $s) ? self::strlen($s[0]) : 0;
 	}
 
 	static function strpbrk($s, $charlist)
@@ -254,25 +306,25 @@ class u
 
 	static function strrev($s)
 	{
-		preg_match_all('/./us', $s, $s);
-		return implode('', array_reverse($s[0]));
+		$s = self::getGraphemeClusterArray($s);
+		return implode('', array_reverse($s));
 	}
 
-	static function strspn($s, $mask, $start = null, $len = null)
+	static function strspn($s, $mask, $start = INF, $len = INF)
 	{
-		if (null !== $start || null !== $len) $s = self::substr($s, $start, $len);
-		return preg_match('/^['  . preg_quote($mask) . ']+/u', $s, $s) ? self::strlen($s[0]) : 0;
+		if (INF !== $start || INF !== $len) $s = self::substr($s, $start, $len);
+		return preg_match('/^['  . preg_quote($mask, '/') . ']+/u', $s, $s) ? self::strlen($s[0]) : 0;
 	}
 
-	static function strtr($s, $from, $to = null)
+	static function strtr($s, $from, $to = INF)
 	{
-		if (null !== $to)
+		if (INF !== $to)
 		{
-			preg_match_all('/./us', $from, $from);
-			preg_match_all('/./us', $to  , $to  );
+			$from = self::getGraphemeClusterArray($from);
+			$to   = self::getGraphemeClusterArray($to);
 
-			$from = $from[0]; $a = count($from);
-			$to   = $to[0]  ; $b = count($to);
+			$a = count($from);
+			$b = count($to);
 
 			     if ($a > $b) $from = array_slice($from, 0, $b);
 			else if ($a < $b) $to   = array_slice($to  , 0, $a);
@@ -283,27 +335,27 @@ class u
 		return strtr($s, $from);
 	}
 
-	static function substr_compare($a, $b, $offset, $len = null, $i = 0)
+	static function substr_compare($a, $b, $offset, $len = INF, $i = 0)
 	{
-		$a = self::substr($offset, $len);
+		$a = self::substr($a, $offset, $len);
 		return $i ? self::strcasecmp($a, $b) : strcmp($a, $b);
 	}
 
-	static function substr_count($s, $needle, $offset = 0, $len = null)
+	static function substr_count($s, $needle, $offset = 0, $len = INF)
 	{
 		return substr_count(self::substr($s, $offset, $len), $needle);
 	}
 
-	static function substr_replace($s, $replace, $start, $len = null)
+	static function substr_replace($s, $replace, $start, $len = INF)
 	{
-		preg_match_all('/./us', $s      , $s);
-		preg_match_all('/./us', $replace, $replace);
+		$s       = self::getGraphemeClusterArray($s);
+		$replace = self::getGraphemeClusterArray($replace);
 
-		if (null === $len) $len = count($s[0]);
+		if (INF === $len) $len = count($s);
 
-		array_splice($s[0], $start, $len, $replace[0]);
+		array_splice($s, $start, $len, $replace);
 
-		return implode('', $s[0]);
+		return implode('', $s);
 	}
 
 	static function ucfirst($s)
@@ -315,5 +367,35 @@ class u
 	static function ucwords($s)
 	{
 		return mb_convert_case($s, MB_CASE_TITLE, 'UTF-8');
+	}
+
+
+	// This regexp does not fully handle LV Hangul syllables
+	const GRAPHEME_CLUSTER_RX = '/(?:\r\n|(?:[\x{11A8}-\x{11F9}]+|[\x{1100}-\x{115F}]*(?:[\x{1160}-\x{11A2}]+|[\x{AC00}-\x{D7A3}])[\x{11A8}-\x{11F9}]*|[\x{1100}-\x{115F}]+|[\x{200C}\x{200D}]|[^\p{Cc}\p{Cf}\p{Zl}\p{Zp}])[\p{Mn}\p{Me}\x{09BE}\x{09D7}\x{0B3E}\x{0B57}\x{0BBE}\x{0BD7}\x{0CC2}\x{0CD5}\x{0CD6}\x{0D3E}\x{0D57}\x{0DCF}\x{0DDF}\x{200C}\x{200D}\x{1D165}\x{1D16E}-\x{1D172}]*|[\p{Cc}\p{Cf}\p{Zl}\p{Zp}])/u';
+
+	protected static function getGraphemeClusterArray($s)
+	{
+		if (preg_match('/[\x{1160}-\x{11A2}]/u', $s) && preg_match('/[\x{AC00}-\x{D788}]/u', $s))
+		{
+			// Special case when $s may contain LV Hangul syllables
+
+			static $FULL_GRAPHEME_CLUSTER_RX;
+
+			if (!isset($FULL_GRAPHEME_CLUSTER_RX))
+			{
+				$V = '[\x{1160}-\x{11A2}]+';
+				$FULL_GRAPHEME_CLUSTER_RX = explode("\n", file_get_contents(resolvePath('data/utf8/HangulLV.txt')));
+				$FULL_GRAPHEME_CLUSTER_RX = str_replace(
+					$V, // V+
+					$FULL_GRAPHEME_CLUSTER_RX[1] . '?' . $V, // LV? V+
+					self::GRAPHEME_CLUSTER_RX
+				);
+			}
+
+			preg_match_all($FULL_GRAPHEME_CLUSTER_RX, $s, $s);
+		}
+		else preg_match_all(self::GRAPHEME_CLUSTER_RX, $s, $s);
+
+		return $s[0];
 	}
 }

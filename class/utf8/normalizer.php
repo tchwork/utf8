@@ -54,7 +54,7 @@ class utf8_normalizer
 	static function removeAccents($s)
 	{
 		$s = self::toNFKD($s);
-		$s = preg_replace('/\Mn+/u', '', $s);
+		$s = preg_replace('/\p{Mn}+/u', '', $s);
 		$s = strtr($s, self::$lig);
 
 		return self::recompose($s, false);

@@ -39,9 +39,8 @@ class utf8_mbstring_520
 {
 	static function stripos($haystack, $needle, $offset = 0, $encoding = INF)
 	{
-		return INF === $encoding
-			? mb_strpos(mb_strtolower($haystack           ), mb_strtolower($needle           ), $offset)
-			: mb_strpos(mb_strtolower($haystack, $encoding), mb_strtolower($needle, $encoding), $offset, $encoding);
+		INF === $encoding && $encoding = mb_internal_encoding();
+		return mb_strpos(mb_strtolower($haystack, $encoding), mb_strtolower($needle, $encoding), $offset, $encoding);
 	}
 
 	static function stristr($haystack, $needle, $part = false, $encoding = INF)
@@ -64,9 +63,8 @@ class utf8_mbstring_520
 
 	static function strripos($haystack, $needle, $offset = 0, $encoding = INF)
 	{
-		return INF === $encoding
-			? self::strrpos(mb_strtolower($haystack,          ), mb_strtolower($needle,          ), $offset)
-			: self::strrpos(mb_strtolower($haystack, $encoding), mb_strtolower($needle, $encoding), $offset, $encoding);
+		INF === $encoding && $encoding = mb_internal_encoding();
+		return self::strrpos(mb_strtolower($haystack, $encoding), mb_strtolower($needle, $encoding), $offset, $encoding);
 	}
 
 	static function strstr($haystack, $needle, $part = false, $encoding = INF)
@@ -77,21 +75,18 @@ class utf8_mbstring_520
 
 	static function strrpos($haystack, $needle, $offset = 0, $encoding = INF)
 	{
-		if (INF === $encoding && $offset != (int) $offset)
+		INF === $encoding && $encoding = mb_internal_encoding();
+
+		if ($offset != (int) $offset)
 		{
-			$encoding = $offset;
 			$offset = 0;
 		}
 		else if ($offset = (int) $offset)
 		{
-			$haystack = INF === $encoding
-				? mb_substr($haystack, $offset)
-				: mb_substr($haystack, $offset, PHP_INT_MAX, $encoding);
+			$haystack = mb_substr($haystack, $offset, PHP_INT_MAX, $encoding);
 		}
 
-		$pos = INF === $encoding
-			? mb_strrpos_500($haystack, $needle)
-			: mb_strrpos_500($haystack, $needle, $encoding);
+		$pos = mb_strrpos_500($haystack, $needle, $encoding);
 
 		return false !== $pos ? $offset + $pos : false;
 	}
@@ -99,9 +94,12 @@ class utf8_mbstring_520
 
 	protected static function getSubpart($pos, $part, $haystack, $encoding)
 	{
-		return false === $pos ? false : (INF === $encoding
-			? ($part ? mb_substr($haystack, 0, $pos           ) : mb_substr($haystack, $pos))
-			: ($part ? mb_substr($haystack, 0, $pos, $encoding) : mb_substr($haystack, $pos, PHP_INT_MAX, $encoding))
+		INF === $encoding && $encoding = mb_internal_encoding();
+
+		return false === $pos ? false : (
+			  $part
+			? mb_substr($haystack,    0,        $pos, $encoding)
+			: mb_substr($haystack, $pos, PHP_INT_MAX, $encoding)
 		);
 	}
 }
@@ -111,9 +109,8 @@ if (extension_loaded('iconv'))
 {
 	function mb_strrpos_500($haystack, $needle, $encoding = INF)
 	{
-		return INF === $encoding
-			? iconv_strrpos($haystack, $needle)
-			: iconv_strrpos($haystack, $needle, $encoding);
+		INF === $encoding && $encoding = mb_internal_encoding();
+		return iconv_strrpos($haystack, $needle, $encoding);
 	}
 }
 else
