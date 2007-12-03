@@ -65,6 +65,7 @@ class utf8_iconv
 	$internal_encoding = 'UTF-8//IGNORE',
 
 	$alias = array(
+		'ascii'   => 'us-ascii',
 		'tis-620' => 'iso-8859-11',
 	),
 
