@@ -90,16 +90,7 @@ function mb_encode_mimeheader($str, $charset = INF, $transfer_encoding = INF, $l
 function mb_convert_case($str, $mode, $encoding = INF) {return utf8_mbstring_500::convert_case($str, $mode, $encoding);}
 function mb_internal_encoding($encoding = INF)         {return utf8_mbstring_500::internal_encoding($encoding);}
 function mb_list_encodings()                           {return utf8_mbstring_500::list_encodings();}
-
-if (extension_loaded('xml'))
-{
-	function mb_strlen($str, $encoding = INF) {return utf8_mbstring_500::strlen ($str, $encoding);}
-}
-else
-{
-	function mb_strlen($str, $encoding = INF) {return utf8_mbstring_500::strlen2($str, $encoding);}
-}
-
+function mb_strlen($str, $encoding = INF)              {return utf8_mbstring_500::strlen($str, $encoding);}
 function mb_strpos ($haystack, $needle, $offset = 0, $encoding = INF)    {return utf8_mbstring_500::strpos ($haystack, $needle, $offset, $encoding);}
 function mb_strrpos($haystack, $needle, $offset = 0, $encoding = INF)    {return utf8_mbstring_520::strrpos($haystack, $needle, $offset, $encoding);}
 function mb_strtolower($str, $encoding = INF)                            {return utf8_mbstring_500::strtolower($str, $encoding);}
@@ -111,14 +102,40 @@ function mb_substr($str, $start, $length = PHP_INT_MAX, $encoding = INF) {return
 
 class utf8_mbstring_500
 {
+	protected static $internal_encoding = 'UTF-8';
+
+
 	static function convert_encoding($s, $to_encoding, $from_encoding = INF)
 	{
-		return iconv(INF !== $from_encoding ? $from_encoding : 'UTF-8', $to_encoding . '//IGNORE', $s);
+		INF === $from_encoding && $from_encoding = self::$internal_encoding;
+
+		if ('base64' === $to_encoding) return 'base64' === $from_encoding ? $s : base64_encode($s);
+
+		if ('base64' === $from_encoding)
+		{
+			$s = base64_decode($s);
+			$from_encoding = $to_encoding;
+		}
+
+		if ('html-entities' === $to_encoding)
+		{
+			'html-entities' === $from_encoding && $from_encoding = 'ISO-8859-1';
+			'utf-8' === $from_encoding || $s = iconv($from_encoding, 'UTF-8//IGNORE', $s);
+			return preg_replace_callback('/[\x80-\xFF]+/', array(__CLASS__, 'html_encoding_callback'), $s);
+		}
+
+		if ('html-entities' === $from_encoding)
+		{
+			$s = html_entity_decode($s, ENT_COMPAT, 'UTF-8');
+			$from_encoding = 'UTF-8';
+		}
+
+		return iconv($from_encoding, $to_encoding . '//IGNORE', $s);
 	}
 
 	static function decode_mimeheader($s)
 	{
-		return iconv_mime_decode($s);
+		return iconv_mime_decode($s, 2, self::$internal_encoding . '//IGNORE');
 	}
 
 	static function encode_mimeheader($s, $charset = INF, $transfer_encoding = INF, $linefeed = INF, $indent = INF)
@@ -131,11 +148,15 @@ class utf8_mbstring_500
 	{
 		if ('' === $s) return '';
 
+		INF === $encoding && $encoding = self::$internal_encoding;
+		if ('UTF-8' === strtoupper($encoding)) $encoding = INF;
+		else $s = iconv($encoding, 'UTF-8//IGNORE', $s);
+
 		switch ($mode)
 		{
 		case MB_CASE_TITLE:
-			self::$encoding = $encoding;
-			return preg_replace_callback('/\b\p{Ll}/u', array(__CLASS__, 'title_case_callback'), $s);
+			$s = preg_replace_callback('/\b\p{Ll}/u', array(__CLASS__, 'title_case_callback'), $s);
+			return INF === $encoding ? $s : iconv('UTF-8', $encoding, $s);
 
 		case MB_CASE_UPPER:
 			static $upper;
@@ -181,12 +202,20 @@ class utf8_mbstring_500
 			}
 		}
 
-		return $s;
+		return INF === $encoding ? $s : iconv('UTF-8', $encoding, $s);
 	}
 
 	static function internal_encoding($encoding = INF)
 	{
-		return INF !== $encoding ? 'UTF-8' === strtoupper($encoding) : 'UTF-8';
+		if (INF === $encoding) return self::$internal_encoding;
+
+		if ('UTF-8' === strtoupper($encoding) || false !== @iconv($encoding, $encoding, ' '))
+		{
+			self::$internal_encoding = $encoding;
+			return true;
+		}
+
+		return false;
 	}
 
 	static function list_encodings()
@@ -196,28 +225,20 @@ class utf8_mbstring_500
 
 	static function strlen($s, $encoding = INF)
 	{
-		return strlen(utf8_decode($s));
+		INF === $encoding && $encoding = self::$internal_encoding;
+		return iconv_strlen($s, $encoding . '//IGNORE');
 	}
 
-	static function strlen2($s, $encoding = INF)
+	static function strpos ($haystack, $needle, $offset = 0, $encoding = INF)
 	{
-		// Quickest alternative if utf8_decode() is not available:
-		preg_replace('/./us', '', $s, -1, $s);
-		return $s;
-	}
-
-	static function strpos($haystack, $needle, $offset = 0, $encoding = INF)
-	{
-		if ($offset = (int) $offset) $haystack = self::substr($haystack, $offset);
-		$pos = strpos($haystack, $needle);
-		return false === $pos ? false : ($offset + ($pos ? self::strlen(substr($haystack, 0, $pos)) : 0));
+		INF === $encoding && $encoding = self::$internal_encoding;
+		return iconv_strpos($haystack, $needle, $offset, $encoding . '//IGNORE');
 	}
 
 	static function strrpos($haystack, $needle, $encoding = INF)
 	{
-		$needle = self::substr($needle, 0, 1, $encoding);
-		$pos = strpos(strrev($haystack), strrev($needle));
-		return false === $pos ? false : self::strlen($pos ? substr($haystack, 0, -$pos) : $haystack, $encoding);
+		INF === $encoding && $encoding = self::$internal_encoding;
+		return iconv_strrpos($haystack, $needle, $encoding . '//IGNORE');
 	}
 
 	static function strtolower($s, $encoding = INF)
@@ -237,38 +258,10 @@ class utf8_mbstring_500
 
 	static function substr($s, $start, $length = PHP_INT_MAX, $encoding = INF)
 	{
-		$slen = self::strlen($s);
-		$start = (int) $start;
-
-		if (0 > $start) $start += $slen;
-		if (0 > $start) $start = 0;
-		if ($start >= $slen) return '';
-
-		$rx = $slen - $start;
-
-		else if (0 > $length) $length += $rx;
-		if (0 >= $length) return '';
-
-		if ($length > $slen - $start) $length = $rx;
-
-		$rx = '/^' . ($start ? self::preg_offset($start) : '') . '(' . self::preg_offset($length) . ')/u';
-
-		return preg_match($rx, $s, $s) ? $s[1] : '';
+		INF === $encoding && $encoding = self::$internal_encoding;
+		return iconv_substr($s, $start, $length, $encoding . '//IGNORE');
 	}
 
-	protected static function preg_offset($offset)
-	{
-		$rx = array();
-		$offset = (int) $offset;
-
-		while ($offset > 65535)
-		{
-			$rx[] = '.{65535}';
-			$offset -= 65535;
-		}
-
-		return implode('', $rx) . '.{' . $offset . '}';
-	}
 
 	protected static function loadCaseTable($upper)
 	{
@@ -279,10 +272,14 @@ class utf8_mbstring_500
 		));
 	}
 
-	protected static $encoding;
+	protected static function html_encoding_callback($m)
+	{
+		return htmlentities($m, ENT_COMPAT, 'UTF-8');
+	}
+
 	protected static function title_case_callback($s)
 	{
-		$s = self::convert_case($s[0], MB_CASE_UPPER, self::$encoding);
+		$s = self::convert_case($s[0], MB_CASE_UPPER, 'UTF-8');
 
 		$len = strlen($s);
 		for ($i = 1; $i < $len && $s[$i] < "\x80"; ++$i) $s[$i] = strtolower($s[$i]);

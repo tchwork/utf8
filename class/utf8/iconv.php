@@ -44,10 +44,18 @@ function iconv_get_encoding($type = 'all')   {return utf8_iconv::get_encoding($t
 function iconv_set_encoding($type, $charset) {return utf8_iconv::set_encoding($type, $charset);}
 function iconv_mime_encode($field_name, $field_value, $pref = INF) {return utf8_iconv::mime_encode($field_name, $field_value, $pref);}
 function ob_iconv_handler($buffer, $mode)  {return utf8_iconv::ob_handler($buffer, $mode);}
-function iconv_strlen($s, $encoding = INF) {return utf8_iconv::strlen($s, $encoding = INF);}
 function iconv_strpos ($haystack, $needle, $offset = 0, $encoding = INF) {return utf8_iconv::strpos ($haystack, $needle, $offset, $encoding);}
 function iconv_strrpos($haystack, $needle,              $encoding = INF) {return utf8_iconv::strrpos($haystack, $needle,          $encoding);}
 function iconv_substr($s, $start, $length = PHP_INT_MAX, $encoding = INF) {return utf8_iconv::substr($s, $start, $length, $encoding);}
+
+if (extension_loaded('xml'))
+{
+	function iconv_strlen($s, $encoding = INF) {return utf8_iconv::strlen1($s, $encoding);}
+}
+else
+{
+	function iconv_strlen($s, $encoding = INF) {return utf8_iconv::strlen2($s, $encoding);}
+}
 
 
 class utf8_iconv
@@ -331,30 +339,75 @@ class utf8_iconv
 
 	static function strlen($s, $encoding = INF)
 	{
-		return INF === $encoding
-			? mb_strlen($s)
-			: mb_strlen($s, $encoding);
+		static $xml = null; null === $xml && $xml = extension_loaded('xml');
+		return $xml
+			? self::strlen1($s, $encoding)
+			: self::strlen2($s, $encoding);
 	}
 
-	static function strpos ($haystack, $needle, $offset = 0, $encoding = INF)
+	static function strlen1($s, $encoding = INF)
 	{
-		return INF === $encoding
-			? mb_strpos($haystack, $needle, $offset)
-			: mb_strpos($haystack, $needle, $offset, $encoding);
+		INF === $encoding && $encoding = self::$internal_encoding;
+		'UTF-8' === strtoupper(substr($encoding, 0, 5)) || $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
+
+		return strlen(utf8_decode($s));
+	}
+
+	static function strlen2($s, $encoding = INF)
+	{
+		INF === $encoding && $encoding = self::$internal_encoding;
+		'UTF-8' === strtoupper(substr($encoding, 0, 5)) || $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
+
+		// Quickest alternative when utf8_decode() is not available
+		preg_replace('/./us', '', $s, -1, $s);
+		return $s;
+	}
+
+	static function strpos($haystack, $needle, $offset = 0, $encoding = INF)
+	{
+		INF === $encoding && $encoding = self::$internal_encoding;
+		'UTF-8' === strtoupper(substr($encoding, 0, 5)) || $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
+
+		if ($offset = (int) $offset) $haystack = self::substr($haystack, $offset, PHP_INT_MAX, 'UTF-8');
+		$pos = strpos($haystack, $needle);
+		return false === $pos ? false : ($offset + ($pos ? iconv_strlen(substr($haystack, 0, $pos), 'UTF-8') : 0));
 	}
 
 	static function strrpos($haystack, $needle, $encoding = INF)
 	{
-		return INF === $encoding
-			? mb_strrpos($haystack, $needle)
-			: mb_strrpos($haystack, $needle, $encoding);
+		INF === $encoding && $encoding = self::$internal_encoding;
+		'UTF-8' === strtoupper(substr($encoding, 0, 5)) || $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
+
+		$needle = self::substr($needle, 0, 1, 'UTF-8');
+		$pos = strpos(strrev($haystack), strrev($needle));
+		return false === $pos ? false : iconv_strlen($pos ? substr($haystack, 0, -$pos) : $haystack, , 'UTF-8');
 	}
 
 	static function substr($s, $start, $length = PHP_INT_MAX, $encoding = INF)
 	{
-		return INF === $encoding
-			? mb_substr($s, $start, $length)
-			: mb_substr($s, $start, $length, $encoding);
+		INF === $encoding && $encoding = self::$internal_encoding;
+		if ('UTF-8' === strtoupper(substr($encoding, 0, 5))) $encoding = INF;
+		else $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
+
+		$slen = iconv_strlen($s, 'UTF-8');
+		$start = (int) $start;
+
+		if (0 > $start) $start += $slen;
+		if (0 > $start) $start = 0;
+		if ($start >= $slen) return '';
+
+		$rx = $slen - $start;
+
+		else if (0 > $length) $length += $rx;
+		if (0 >= $length) return '';
+
+		if ($length > $slen - $start) $length = $rx;
+
+		$rx = '/^' . ($start ? self::preg_offset($start) : '') . '(' . self::preg_offset($length) . ')/u';
+
+		$s = preg_match($rx, $s, $s) ? $s[1] : '';
+
+		return INF === $encoding ? $s : self::iconv('UTF-8', $encoding, $s);
 	}
 
 
@@ -501,5 +554,19 @@ class utf8_iconv
 	protected static function qp_byte_callback($m)
 	{
 		return '=' . strtoupper(dechex(ord($m[0])));
+	}
+
+	protected static function preg_offset($offset)
+	{
+		$rx = array();
+		$offset = (int) $offset;
+
+		while ($offset > 65535)
+		{
+			$rx[] = '.{65535}';
+			$offset -= 65535;
+		}
+
+		return implode('', $rx) . '.{' . $offset . '}';
 	}
 }
