@@ -77,8 +77,8 @@ class u
 
 	static function strlen($s)
 	{
-		$s = self::getGraphemeClusterArray($s);
-		return count($s);
+		preg_replace(self::GRAPHEME_CLUSTER_RX, '', $s, -1, $s);
+		return $s;
 	}
 
 	static function strtolower($s) {return mb_strtolower($s, 'UTF-8');}
@@ -91,50 +91,16 @@ class u
 		return implode('', $s);
 	}
 
-	static function strpos($s, $needle, $offset = 0)
-	{
-		if ('' !== (string) $s)
-		{
-			$needle = mb_strpos($s, $needle, $offset, 'UTF-8');
-			return $needle ? self::strlen(mb_substr($s, 0, $needle)) : $needle;
-		}
-		else return false;
-	}
-
-	static function stripos($s, $needle, $offset = 0)
-	{
-		if ('' !== (string) $s)
-		{
-			$needle = mb_stripos($s, $needle, $offset, 'UTF-8');
-			return $needle ? self::strlen(mb_substr($s, 0, $needle)) : $needle;
-		}
-		else return false;
-	}
-
-	static function strrpos($s, $needle, $offset = 0)
-	{
-		if ('' !== (string) $s)
-		{
-			$needle = mb_strrpos($s, $needle, $offset, 'UTF-8');
-			return $needle ? self::strlen(mb_substr($s, 0, $needle)) : $needle;
-		}
-		else return false;
-	}
-
-	static function strripos($s, $needle, $offset = 0)
-	{
-		if ('' !== (string) $s)
-		{
-			$needle = mb_strripos($s, $needle, $offset, 'UTF-8');
-			return $needle ? self::strlen(mb_substr($s, 0, $needle)) : $needle;
-		}
-		else return false;
-	}
+	static function strpos  ($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 0);}
+	static function stripos ($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 1);}
+	static function strrpos ($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 2);}
+	static function strripos($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 3);}
 
 	static function stristr ($s, $needle) {return mb_stristr ($s, $needle, false, 'UTF-8');}
 	static function strrchr ($s, $needle) {return mb_strrchr ($s, $needle, false, 'UTF-8');}
 	static function strrichr($s, $needle) {return mb_strrichr($s, $needle, false, 'UTF-8');}
 	static function strstr  ($s, $needle) {return mb_strstr  ($s, $needle, false, 'UTF-8');}
+
 	static function htmlentities    ($s, $quote_style = ENT_COMPAT) {return htmlentities    ($s, $quote_style, 'UTF-8');}
 	static function htmlspecialchars($s, $quote_style = ENT_COMPAT) {return htmlspecialchars($s, $quote_style, 'UTF-8');}
 	static function wordwrap($s, $width = 75, $break = "\n", $cut = false) {return pipe_wordwrap::php($s, $width, $break, $cut);}
@@ -160,8 +126,8 @@ class u
 
 	static function ltrim($s, $charlist = INF)
 	{
-		$charlist = INF === $charlist ? '\s' : preg_quote($charlist, '/');
-		return preg_replace("/^[{$charlist}]+/u", '', $s);
+		$charlist = INF === $charlist ? '\s' : self::rxClass($charlist);
+		return preg_replace("/^{$charlist}+/u", '', $s);
 	}
 
 	static function ord($s)
@@ -177,8 +143,8 @@ class u
 
 	static function rtrim($s, $charlist = INF)
 	{
-		$charlist = INF === $charlist ? '\s' : preg_quote($charlist, '/');
-		return preg_replace("/[{$charlist}]+$/u", '', $s);
+		$charlist = INF === $charlist ? '\s' : self::rxClass($charlist);
+		return preg_replace("/{$charlist}+$/u", '', $s);
 	}
 
 	static function trim($s, $charlist = INF) {return self::rtrim(self::ltrim($s, $charlist), $charlist);}
@@ -206,7 +172,9 @@ class u
 
 	static function str_ireplace($search, $replace, $subject, &$count = null)
 	{
-		return preg_replace('/' . preg_quote($search, '/') . '/ui', $replace, $subject, -1, $count);
+		$subject = preg_replace('/' . preg_quote($search, '/') . '/ui', $replace, $subject, -1, $replace);
+		$count = $replace;
+		return $subject;
 	}
 
 	static function str_pad($s, $len, $pad = ' ', $type = STR_PAD_RIGHT)
@@ -266,8 +234,8 @@ class u
 
 	static function str_word_count($s, $format = 0, $charlist = '')
 	{
-		$charlist = '[\pL' . preg_quote($charlist, '/') . ']';
-		$s = preg_split("/({$charlist}+(?:[\pPd’']{$charlist}+)*)/u", $s, -1, PREG_SPLIT_DELIM_CAPTURE);
+		$charlist = self::rxClass($charlist, '\pL');
+		$s = preg_split("/({$charlist}+(?:[\p{Pd}’']{$charlist}+)*)/u", $s, -1, PREG_SPLIT_DELIM_CAPTURE);
 
 		$charlist = array();
 		$len = count($s);
@@ -287,21 +255,24 @@ class u
 		return $charlist;
 	}
 
-	static function strcasecmp   ($a, $b) {return strcmp   (self::strtocasefold($a, true), self::strtocasefold($b, true));}
-	static function strnatcasecmp($a, $b) {return strnatcmp(self::strtocasefold($a, true), self::strtocasefold($b, true));}
+	static function strcmp       ($a, $b) {return $a == $b ? 0 : strcmp   (self::toNFD  ($a), self::toNFD  ($b));}
+	static function strnatcmp    ($a, $b) {return $a == $b ? 0 : strnatcmp(self::natFold($a), self::natFold($b));}
+	static function strcasecmp   ($a, $b) {return self::strcmp   (self::strtocasefold($a), self::strtocasefold($b));}
+	static function strnatcasecmp($a, $b) {return self::strnatcmp(self::strtocasefold($a), self::strtocasefold($b));}
 	static function strncasecmp  ($a, $b, $len) {return self::strncmp(self::strtocasefold($a), self::strtocasefold($b), $len);}
-	static function strncmp      ($a, $b, $len) {return strcmp(self::substr($a, 0, $len), self::substr($b, 0, $len));}
+	static function strncmp      ($a, $b, $len) {return self::strcmp(self::substr($a, 0, $len), self::substr($b, 0, $len));}
 
-	static function strcspn($s, $mask, $start = INF, $len = INF)
+	static function strcspn($s, $charlist, $start = 0, $len = INF)
 	{
 		if ('' === (string) $mask) return null;
-		if (INF !== $start || INF !== $len) $s = self::substr($s, $start, $len);
-		return preg_match('/^[^' . preg_quote($mask, '/') . ']+/u', $s, $s) ? self::strlen($s[0]) : 0;
+		if ($start || INF !== $len) $s = self::substr($s, $start, $len);
+
+		return preg_match('/^(.*?)' . self::rxClass($mask) . '/us', $s, $len) ? self::strlen($len[1]) : self::strlen($s);
 	}
 
 	static function strpbrk($s, $charlist)
 	{
-		return preg_match('/[' . preg_quote($charlist, '/') . '].*/us', $s, $s) ? $s[0] : false;
+		return preg_match('/' . self::rxClass($charlist) . '.*/us', $s, $s) ? $s[0] : false;
 	}
 
 	static function strrev($s)
@@ -313,7 +284,7 @@ class u
 	static function strspn($s, $mask, $start = INF, $len = INF)
 	{
 		if (INF !== $start || INF !== $len) $s = self::substr($s, $start, $len);
-		return preg_match('/^['  . preg_quote($mask, '/') . ']+/u', $s, $s) ? self::strlen($s[0]) : 0;
+		return preg_match('/^'  . self::rxClass($mask) . '+/u', $s, $s) ? self::strlen($s[0]) : 0;
 	}
 
 	static function strtr($s, $from, $to = INF)
@@ -338,7 +309,7 @@ class u
 	static function substr_compare($a, $b, $offset, $len = INF, $i = 0)
 	{
 		$a = self::substr($a, $offset, $len);
-		return $i ? self::strcasecmp($a, $b) : strcmp($a, $b);
+		return $i ? self::strcasecmp($a, $b) : self::strcmp($a, $b);
 	}
 
 	static function substr_count($s, $needle, $offset = 0, $len = INF)
@@ -360,7 +331,7 @@ class u
 
 	static function ucfirst($s)
 	{
-		$c = mb_substr($s, 0, 1);
+		$c = iconv_substr($s, 0, 1, 'UTF-8');
 		return self::ucwords($c) . substr($s, strlen($c));
 	}
 
@@ -371,11 +342,63 @@ class u
 
 
 	// (CRLF|([ZWNJ-ZWJ]|T+|L*(LV?V+|LV|LVT)T*|L+|[^Control])[Extend]*|[Control])
-	const GRAPHEME_CLUSTER_RX = '/(?:\r\n|(?:[\x{200C}\x{200D}]|[ᆨ-ᇹ]+|[ᄀ-ᅟ]*(?:[가개갸걔거게겨계고과괘괴교구궈궤귀규그긔기까깨꺄꺠꺼께껴꼐꼬꽈꽤꾀꾜꾸꿔꿰뀌뀨끄끠끼나내냐냬너네녀녜노놔놰뇌뇨누눠눼뉘뉴느늬니다대댜댸더데뎌뎨도돠돼되됴두둬뒈뒤듀드듸디따때땨떄떠떼뗘뗴또똬뙈뙤뚀뚜뚸뛔뛰뜌뜨띄띠라래랴럐러레려례로롸뢔뢰료루뤄뤠뤼류르릐리마매먀먜머메며몌모뫄뫠뫼묘무뭐뭬뮈뮤므믜미바배뱌뱨버베벼볘보봐봬뵈뵤부붜붸뷔뷰브븨비빠빼뺘뺴뻐뻬뼈뼤뽀뽜뽸뾔뾰뿌뿨쀄쀠쀼쁘쁴삐사새샤섀서세셔셰소솨쇄쇠쇼수숴쉐쉬슈스싀시싸쌔쌰썌써쎄쎠쎼쏘쏴쐐쐬쑈쑤쒀쒜쒸쓔쓰씌씨아애야얘어에여예오와왜외요우워웨위유으의이자재쟈쟤저제져졔조좌좨죄죠주줘줴쥐쥬즈즤지짜째쨔쨰쩌쩨쪄쪠쪼쫘쫴쬐쬬쭈쭤쮀쮜쮸쯔쯰찌차채챠챼처체쳐쳬초촤쵀최쵸추춰췌취츄츠츼치카캐캬컈커케켜켸코콰쾌쾨쿄쿠쿼퀘퀴큐크킈키타태탸턔터테텨톄토톼퇘퇴툐투퉈퉤튀튜트틔티파패퍄퍠퍼페펴폐포퐈퐤푀표푸풔풰퓌퓨프픠피하해햐햬허헤혀혜호화홰회효후훠훼휘휴흐희히]?[ᅠ-ᆢ]+|[가-힣])[ᆨ-ᇹ]*|[ᄀ-ᅟ]+|[^\p{Cc}\p{Cf}\p{Zl}\p{Zp}])[\p{Mn}\p{Me}\x{09BE}\x{09D7}\x{0B3E}\x{0B57}\x{0BBE}\x{0BD7}\x{0CC2}\x{0CD5}\x{0CD6}\x{0D3E}\x{0D57}\x{0DCF}\x{0DDF}\x{200C}\x{200D}\x{1D165}\x{1D16E}-\x{1D172}]*|[\p{Cc}\p{Cf}\p{Zl}\p{Zp}])/u';
+	const GRAPHEME_CLUSTER_RX = '/(?:\r\n|(?:[ -~\x{200C}\x{200D}]|[ᆨ-ᇹ]+|[ᄀ-ᅟ]*(?:[가개갸걔거게겨계고과괘괴교구궈궤귀규그긔기까깨꺄꺠꺼께껴꼐꼬꽈꽤꾀꾜꾸꿔꿰뀌뀨끄끠끼나내냐냬너네녀녜노놔놰뇌뇨누눠눼뉘뉴느늬니다대댜댸더데뎌뎨도돠돼되됴두둬뒈뒤듀드듸디따때땨떄떠떼뗘뗴또똬뙈뙤뚀뚜뚸뛔뛰뜌뜨띄띠라래랴럐러레려례로롸뢔뢰료루뤄뤠뤼류르릐리마매먀먜머메며몌모뫄뫠뫼묘무뭐뭬뮈뮤므믜미바배뱌뱨버베벼볘보봐봬뵈뵤부붜붸뷔뷰브븨비빠빼뺘뺴뻐뻬뼈뼤뽀뽜뽸뾔뾰뿌뿨쀄쀠쀼쁘쁴삐사새샤섀서세셔셰소솨쇄쇠쇼수숴쉐쉬슈스싀시싸쌔쌰썌써쎄쎠쎼쏘쏴쐐쐬쑈쑤쒀쒜쒸쓔쓰씌씨아애야얘어에여예오와왜외요우워웨위유으의이자재쟈쟤저제져졔조좌좨죄죠주줘줴쥐쥬즈즤지짜째쨔쨰쩌쩨쪄쪠쪼쫘쫴쬐쬬쭈쭤쮀쮜쮸쯔쯰찌차채챠챼처체쳐쳬초촤쵀최쵸추춰췌취츄츠츼치카캐캬컈커케켜켸코콰쾌쾨쿄쿠쿼퀘퀴큐크킈키타태탸턔터테텨톄토톼퇘퇴툐투퉈퉤튀튜트틔티파패퍄퍠퍼페펴폐포퐈퐤푀표푸풔풰퓌퓨프픠피하해햐햬허헤혀혜호화홰회효후훠훼휘휴흐희히]?[ᅠ-ᆢ]+|[가-힣])[ᆨ-ᇹ]*|[ᄀ-ᅟ]+|[^\p{Cc}\p{Cf}\p{Zl}\p{Zp}])[\p{Mn}\p{Me}\x{09BE}\x{09D7}\x{0B3E}\x{0B57}\x{0BBE}\x{0BD7}\x{0CC2}\x{0CD5}\x{0CD6}\x{0D3E}\x{0D57}\x{0DCF}\x{0DDF}\x{200C}\x{200D}\x{1D165}\x{1D16E}-\x{1D172}]*|[\p{Cc}\p{Cf}\p{Zl}\p{Zp}])/u';
 
 	static function getGraphemeClusterArray($s)
 	{
 		preg_match_all(self::GRAPHEME_CLUSTER_RX, $s, $s);
 		return $s[0];
+	}
+
+
+	protected static function position($s, $needle, $offset, $mode)
+	{
+		if (0 > $offset || ($offset && ('' === (string) $s || '' === $s = self::substr($s, $offset))))
+		{
+			trigger_error('Offset not contained in string.', E_USER_ERROR);
+			return false;
+		}
+
+		if ('' !== (string) $needle)
+		{
+			trigger_error('Empty delimiter.', E_USER_ERROR);
+			return false;
+		}
+
+		if ('' === (string) $s) return false;
+
+		switch ($mode)
+		{
+		case 0: $needle = iconv_strpos ($s, $needle, 0, 'UTF-8'); break;
+		case 1: $needle = mb_stripos   ($s, $needle, 0, 'UTF-8'); break;
+		case 2: $needle = iconv_strrpos($s, $needle,    'UTF-8'); break;
+		case 3: $needle = mb_strripos  ($s, $needle, 0, 'UTF-8'); break;
+		}
+
+		return $needle ? self::strlen(iconv_substr($s, 0, $needle, 'UTF-8')) + $offset : $needle;
+	}
+
+	protected static function natFold($s)
+	{
+		// This enables a minimalist collation support for u::strnatcmp() and u::strnatcasecmp()
+		$s = self::toNFD($s);
+		return preg_replace('/\p{Mn}+/u', '', $s);
+	}
+
+	protected static function rxClass($s, $class = '')
+	{
+		$class = array($class);
+
+		foreach (self::getGraphemeClusterArray($s) as $s)
+		{
+			if ('-' === $s) $class[0] = '-' . $class[0];
+			else if (strlen($s) <= 2) $class[0] .= preg_quote($s, '/');
+			else if (1 === iconv_strlen($s, 'UTF-8')) $class[0] .= $s;
+			else $class[] = $s;
+		}
+
+		$class[0] = '[' . $class[0] . ']';
+
+		return 1 === count($class) ? $class[0] : ('(?:' . implode('|', $class) . ')');
 	}
 }
