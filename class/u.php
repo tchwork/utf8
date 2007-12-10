@@ -103,7 +103,72 @@ class u
 
 	static function htmlentities    ($s, $quote_style = ENT_COMPAT) {return htmlentities    ($s, $quote_style, 'UTF-8');}
 	static function htmlspecialchars($s, $quote_style = ENT_COMPAT) {return htmlspecialchars($s, $quote_style, 'UTF-8');}
-	static function wordwrap($s, $width = 75, $break = "\n", $cut = false) {return pipe_wordwrap::php($s, $width, $break, $cut);}
+
+	static function wordwrap($s, $width = 75, $break = "\n", $cut = false)
+	{
+		// This implementation could be extended
+		// to handle unicode word boundaries,
+		// but that's enough work for today.
+
+		$width = (int) $width;
+		$s = explode($break, $s);
+
+		$iLen = count($s);
+		$result = array();
+		$line = '';
+		$lineLen = 0;
+
+		for ($i = 0; $i < $iLen; ++$i)
+		{
+			$words = explode(' ', $s[$i]);
+			$line && $result[] = $line;
+			$line = $words[0];
+			$jLen = count($words);
+
+			for ($j = 1; $j < $jLen; ++$j)
+			{
+				$w = $words[$j];
+				$wLen = self::strlen($w);
+
+				if ($lineLen + $wLen < $width)
+				{
+					$line .= ' ' . $w;
+					$lineLen += $wLen + 1;
+				}
+				else
+				{
+					$result[] = $line;
+					$line = '';
+					$lineLen = 0;
+
+					if ($cut && $wLen > $width)
+					{
+						$w = self::getGraphemeClusterArray($w);
+
+						do
+						{
+							$result[] = implode('', array_slice($w, 0, $width));
+							$line = implode('', $w = array_slice($w, $width));
+							$lineLen = $wLen -= $width;
+						}
+						while ($wLen > $width);
+
+						$w = implode('', $w);
+					}
+
+					if ($wLen)
+					{
+						$line = $w;
+						$lineLen = $wLen;
+					}
+				}
+			}
+		}
+
+		$line && $result[] = $line;
+
+		return implode($break, $result);
+	}
 
 	static function chr($c)
 	{
