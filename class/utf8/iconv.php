@@ -33,7 +33,9 @@ iconv_substr       - Cut out part of a string
  */
 
 
-define('ICONV_MIME_DECODE_STRICT',            1);
+define('ICONV_IMPL', '"patchworkiconv"');
+define('ICONV_VERSION', '1.0');
+define('ICONV_MIME_DECODE_STRICT', 1);
 define('ICONV_MIME_DECODE_CONTINUE_ON_ERROR', 2);
 
 
@@ -93,8 +95,11 @@ class utf8_iconv
 
 		$TRANSLIT = $IGNORE = '';
 
-		$out_charset = strtr(strtolower($out_charset), '_', '-');
-		$in_charset  = strtr(strtolower($in_charset ), '_', '-');
+		$out_charset = strtolower($out_charset);
+		$in_charset  = strtolower($in_charset );
+
+		'' === $out_charset && $out_charset = 'iso-8859-1';
+		'' ===  $in_charset &&  $in_charset = 'iso-8859-1';
 
 		if ('//translit' === substr($out_charset, -10))
 		{
