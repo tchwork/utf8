@@ -48,7 +48,7 @@ class utf8_iconv_compiler
 
 	static function translitMap()
 	{
-		$data     = resolvePath('data/unicode/charset/translit.def');
+		$data    = resolvePath('data/unicode/charset/translit.def');
 		$out_dir = resolvePath('data/utf8/iconv/');
 
 		$data = file_get_contents($data);

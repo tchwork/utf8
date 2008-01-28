@@ -21,10 +21,6 @@ utf8_normalizer::__constructStatic();
 
 class utf8_normalizer
 {
-	// ASCII characters, by frequency
-	const ASCII = "\x20\x65\x69\x61\x73\x6e\x74\x72\x6f\x6c\x75\x64\x5d\x5b\x63\x6d\x70\x27\x0a\x67\x7c\x68\x76\x2e\x66\x62\x2c\x3a\x3d\x2d\x71\x31\x30\x43\x32\x2a\x79\x78\x29\x28\x4c\x39\x41\x53\x2f\x50\x22\x45\x6a\x4d\x49\x6b\x33\x3e\x35\x54\x3c\x44\x34\x7d\x42\x7b\x38\x46\x77\x52\x36\x37\x55\x47\x4e\x3b\x4a\x7a\x56\x23\x48\x4f\x57\x5f\x26\x21\x4b\x3f\x58\x51\x25\x59\x5c\x09\x5a\x2b\x7e\x5e\x24\x40\x60\x7f\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
-
-
 	static
 
 	// Some remaining chars for accents decomposition
@@ -43,7 +39,8 @@ class utf8_normalizer
 	protected static
 
 	$C, $D, $KD, $cC, $K,
-	$utf_len_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
+	$utf_len_mask = array("\xc0" => 2, "\xd0" => 2, "\xe0" => 3, "\xf0" => 4),
+	$ASCII = "\x20\x65\x69\x61\x73\x6e\x74\x72\x6f\x6c\x75\x64\x5d\x5b\x63\x6d\x70\x27\x0a\x67\x7c\x68\x76\x2e\x66\x62\x2c\x3a\x3d\x2d\x71\x31\x30\x43\x32\x2a\x79\x78\x29\x28\x4c\x39\x41\x53\x2f\x50\x22\x45\x6a\x4d\x49\x6b\x33\x3e\x35\x54\x3c\x44\x34\x7d\x42\x7b\x38\x46\x77\x52\x36\x37\x55\x47\x4e\x3b\x4a\x7a\x56\x23\x48\x4f\x57\x5f\x26\x21\x4b\x3f\x58\x51\x25\x59\x5c\x09\x5a\x2b\x7e\x5e\x24\x40\x60\x7f\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
 
 
 	static function toNFC($s)  {return self::normalize($s, true , false);}
@@ -81,15 +78,20 @@ class utf8_normalizer
 	{
 		$decompose && $s = self::decompose($s);
 
+		$utf_len_mask = self::$utf_len_mask;
+		$ASCII     =& self::$ASCII;
+		$compMap   =& self::$C;
+		$combClass =& self::$cC;
+
 		ob_start();
 
 		$tail = '';
 
-		$i = $s[0] < "\x80" ? 1 : self::$utf_len_mask[$s[0] & "\xF0"];
+		$i = $s[0] < "\x80" ? 1 : $utf_len_mask[$s[0] & "\xf0"];
 		$len = strlen($s);
 
 		$last_utf_chr = substr($s, 0, $i);
-		$last_utf_cls = isset(self::$cC[$last_utf_chr]) ? 256 : 0;
+		$last_utf_cls = isset($combClass[$last_utf_chr]) ? 256 : 0;
 
 		while ($i < $len)
 		{
@@ -103,7 +105,7 @@ class utf8_normalizer
 					$tail = '';
 				}
 
-				if ($j = strspn($s, self::ASCII, $i+1))
+				if ($j = strspn($s, $ASCII, $i+1))
 				{
 					$last_utf_chr .= substr($s, $i, $j);
 					$i += $j;
@@ -115,7 +117,7 @@ class utf8_normalizer
 			}
 			else
 			{
-				$utf_len = self::$utf_len_mask[$s[$i] & "\xF0"];
+				$utf_len = $utf_len_mask[$s[$i] & "\xf0"];
 				$utf_chr = substr($s, $i, $utf_len);
 
 				if ($last_utf_chr < "\xe1\x84\x80" || "\xe1\x84\x92" < $last_utf_chr
@@ -124,11 +126,11 @@ class utf8_normalizer
 				{
 					// Table lookup and combining chars composition
 
-					$utf_cls = isset(self::$cC[$utf_chr]) ? self::$cC[$utf_chr] : 0;
+					$utf_cls = isset($combClass[$utf_chr]) ? $combClass[$utf_chr] : 0;
 
-					if (isset(self::$C[$last_utf_chr . $utf_chr]) && (!$last_utf_cls || $last_utf_cls < $utf_cls))
+					if (isset($compMap[$last_utf_chr . $utf_chr]) && (!$last_utf_cls || $last_utf_cls < $utf_cls))
 					{
-						$last_utf_chr = self::$C[$last_utf_chr . $utf_chr];
+						$last_utf_chr = $compMap[$last_utf_chr . $utf_chr];
 					}
 					else if ($last_utf_cls = $utf_cls) $tail .= $utf_chr;
 					else
@@ -177,6 +179,12 @@ class utf8_normalizer
 	{
 		ob_start();
 
+		$utf_len_mask = self::$utf_len_mask;
+		$ASCII     =& self::$ASCII;
+		$decompMap =& self::$D;
+		$combClass =& self::$cC;
+		if (self::$K) $compatMap =& self::$KD;
+
 		$c = array();
 		$i = 0;
 		$len = strlen($s);
@@ -194,22 +202,22 @@ class utf8_normalizer
 					$c = array();
 				}
 
-				$j = 1 + strspn($s, self::ASCII, $i+1);
+				$j = 1 + strspn($s, $ASCII, $i+1);
 				echo substr($s, $i, $j);
 				$i += $j;
 			}
 			else
 			{
-				$utf_len = self::$utf_len_mask[$s[$i] & "\xf0"];
+				$utf_len = $utf_len_mask[$s[$i] & "\xf0"];
 				$utf_chr = substr($s, $i, $utf_len);
 				$i += $utf_len;
 
-				if (isset(self::$cC[$utf_chr]))
+				if (isset($combClass[$utf_chr]))
 				{
 					// Combining chars, for sorting
 
-					isset($c[self::$cC[$utf_chr]]) || $c[self::$cC[$utf_chr]] = '';
-					$c[self::$cC[$utf_chr]] .= self::$K && isset(self::$KD[$utf_chr]) ? self::$KD[$utf_chr] : (isset(self::$D[$utf_chr]) ? self::$D[$utf_chr] : $utf_chr);
+					isset($c[$combClass[$utf_chr]]) || $c[$combClass[$utf_chr]] = '';
+					$c[$combClass[$utf_chr]] .= isset($compatMap[$utf_chr]) ? $compatMap[$utf_chr] : (isset($decompMap[$utf_chr]) ? $decompMap[$utf_chr] : $utf_chr);
 				}
 				else
 				{
@@ -224,14 +232,14 @@ class utf8_normalizer
 					{
 						// Table lookup
 
-						$j = self::$K && isset(self::$KD[$utf_chr]) ? self::$KD[$utf_chr] : (isset(self::$D[$utf_chr]) ? self::$D[$utf_chr] : $utf_chr);
+						$j = isset($compatMap[$utf_chr]) ? $compatMap[$utf_chr] : (isset($decompMap[$utf_chr]) ? $decompMap[$utf_chr] : $utf_chr);
 
 						if ($utf_chr != $j)
 						{
 							$utf_chr = $j;
 
 							$j = strlen($utf_chr);
-							$utf_len = $utf_chr[0] < "\x80" ? 1 : self::$utf_len_mask[$utf_chr[0] & "\xf0"];
+							$utf_len = $utf_chr[0] < "\x80" ? 1 : $utf_len_mask[$utf_chr[0] & "\xf0"];
 
 							if ($utf_len != $j)
 							{
