@@ -218,7 +218,7 @@ class u
 	{
 		$s = strtr($s, array(
 			'&QUOT;' => '&quot;', '&LT;' => '&lt;', '&AMP;' => '&amp;', '&TRADE;' => '&trade;',
-			'&COPY;' => '&copy;', '&GT;' => '&gt;', '&REG;' => '&reg;', '&apos;'  => '&#39;'
+			'&COPY;' => '&copy;', '&GT;' => '&gt;', '&REG;' => '&reg;', '&apos;'  => '&#039;'
 		));
 
 		return html_entity_decode($s, $quote_style, 'UTF-8');
