@@ -33,30 +33,33 @@ iconv_substr       - Cut out part of a string
  */
 
 
-define('ICONV_IMPL', '"patchworkiconv"');
-define('ICONV_VERSION', '1.0');
-define('ICONV_MIME_DECODE_STRICT', 1);
-define('ICONV_MIME_DECODE_CONTINUE_ON_ERROR', 2);
-
-
-function iconv($in_charset, $out_charset, $str) {return utf8_iconv::iconv($in_charset, $out_charset, $str);}
-function iconv_mime_decode_headers($encoded_headers, $mode = 2, $charset = INF) {return utf8_iconv::mime_decode_headers($encoded_headers, $mode, $charset);}
-function iconv_mime_decode($encoded_headers, $mode = 2, $charset = INF)         {return utf8_iconv::mime_decode        ($encoded_headers, $mode, $charset);}
-function iconv_get_encoding($type = 'all')   {return utf8_iconv::get_encoding($type);}
-function iconv_set_encoding($type, $charset) {return utf8_iconv::set_encoding($type, $charset);}
-function iconv_mime_encode($field_name, $field_value, $pref = INF) {return utf8_iconv::mime_encode($field_name, $field_value, $pref);}
-function ob_iconv_handler($buffer, $mode)  {return utf8_iconv::ob_handler($buffer, $mode);}
-function iconv_strpos ($haystack, $needle, $offset = 0, $encoding = INF) {return utf8_iconv::strpos ($haystack, $needle, $offset, $encoding);}
-function iconv_strrpos($haystack, $needle,              $encoding = INF) {return utf8_iconv::strrpos($haystack, $needle,          $encoding);}
-function iconv_substr($s, $start, $length = PHP_INT_MAX, $encoding = INF) {return utf8_iconv::substr($s, $start, $length, $encoding);}
-
-if (extension_loaded('xml'))
+if (!extension_loaded('iconv'))
 {
-	function iconv_strlen($s, $encoding = INF) {return utf8_iconv::strlen1($s, $encoding);}
-}
-else
-{
-	function iconv_strlen($s, $encoding = INF) {return utf8_iconv::strlen2($s, $encoding);}
+	define('ICONV_IMPL', '"patchworkiconv"');
+	define('ICONV_VERSION', '1.0');
+	define('ICONV_MIME_DECODE_STRICT', 1);
+	define('ICONV_MIME_DECODE_CONTINUE_ON_ERROR', 2);
+
+
+	function iconv($in_charset, $out_charset, $str) {return utf8_iconv::iconv($in_charset, $out_charset, $str);}
+	function iconv_mime_decode_headers($encoded_headers, $mode = 2, $charset = INF) {return utf8_iconv::mime_decode_headers($encoded_headers, $mode, $charset);}
+	function iconv_mime_decode($encoded_headers, $mode = 2, $charset = INF)         {return utf8_iconv::mime_decode        ($encoded_headers, $mode, $charset);}
+	function iconv_get_encoding($type = 'all')   {return utf8_iconv::get_encoding($type);}
+	function iconv_set_encoding($type, $charset) {return utf8_iconv::set_encoding($type, $charset);}
+	function iconv_mime_encode($field_name, $field_value, $pref = INF) {return utf8_iconv::mime_encode($field_name, $field_value, $pref);}
+	function ob_iconv_handler($buffer, $mode)  {return utf8_iconv::ob_handler($buffer, $mode);}
+	function iconv_strpos ($haystack, $needle, $offset = 0, $encoding = INF) {return utf8_iconv::strpos ($haystack, $needle, $offset, $encoding);}
+	function iconv_strrpos($haystack, $needle,              $encoding = INF) {return utf8_iconv::strrpos($haystack, $needle,          $encoding);}
+	function iconv_substr($s, $start, $length = PHP_INT_MAX, $encoding = INF) {return utf8_iconv::substr($s, $start, $length, $encoding);}
+
+	if (extension_loaded('xml'))
+	{
+		function iconv_strlen($s, $encoding = INF) {return utf8_iconv::strlen1($s, $encoding);}
+	}
+	else
+	{
+		function iconv_strlen($s, $encoding = INF) {return utf8_iconv::strlen2($s, $encoding);}
+	}
 }
 
 
