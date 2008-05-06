@@ -27,12 +27,15 @@ mb_strstr   - Finds first occurrence of a string within another
  */
 
 
-function mb_stripos( $haystack, $needle, $offset = 0,   $encoding = INF) {return utf8_mbstring_520::stripos( $haystack, $needle, $offset, $encoding);}
-function mb_stristr( $haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::stristr( $haystack, $needle, $part,   $encoding);}
-function mb_strrchr( $haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::strrchr( $haystack, $needle, $part,   $encoding);}
-function mb_strrichr($haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::strrichr($haystack, $needle, $part,   $encoding);}
-function mb_strripos($haystack, $needle, $offset = 0,   $encoding = INF) {return utf8_mbstring_520::strripos($haystack, $needle, $offset, $encoding);}
-function mb_strstr(  $haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::strstr(  $haystack, $needle, $part,   $encoding);}
+if (!function_exists('mb_stripos'))
+{
+	function mb_stripos( $haystack, $needle, $offset = 0,   $encoding = INF) {return utf8_mbstring_520::stripos( $haystack, $needle, $offset, $encoding);}
+	function mb_stristr( $haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::stristr( $haystack, $needle, $part,   $encoding);}
+	function mb_strrchr( $haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::strrchr( $haystack, $needle, $part,   $encoding);}
+	function mb_strrichr($haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::strrichr($haystack, $needle, $part,   $encoding);}
+	function mb_strripos($haystack, $needle, $offset = 0,   $encoding = INF) {return utf8_mbstring_520::strripos($haystack, $needle, $offset, $encoding);}
+	function mb_strstr(  $haystack, $needle, $part = false, $encoding = INF) {return utf8_mbstring_520::strstr(  $haystack, $needle, $part,   $encoding);}
+}
 
 
 class utf8_mbstring_520

@@ -33,7 +33,7 @@ iconv_substr       - Cut out part of a string
  */
 
 
-if (!extension_loaded('iconv'))
+if (!function_exists('iconv'))
 {
 	define('ICONV_IMPL', '"patchworkiconv"');
 	define('ICONV_VERSION', '1.0');

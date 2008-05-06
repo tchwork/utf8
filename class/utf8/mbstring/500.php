@@ -72,32 +72,34 @@ mb_substr               - Get part of string
  */
 
 
-define('MB_OVERLOAD_MAIL',   1);
-define('MB_OVERLOAD_STRING', 2);
-define('MB_OVERLOAD_REGEX',  4);
-define('MB_CASE_UPPER', 0);
-define('MB_CASE_LOWER', 1);
-define('MB_CASE_TITLE', 2);
-
-
-function mb_convert_encoding($str, $to_encoding, $from_encoding = INF) {return utf8_mbstring_500::convert_encoding($str, $to_encoding, $from_encoding);}
-function mb_decode_mimeheader($str) {return utf8_mbstring_500::decode_mimeheader($str);}
-function mb_encode_mimeheader($str, $charset = INF, $transfer_encoding = INF, $linefeed = INF, $indent = INF)
+if (!function_exists('mb_strlen'))
 {
-	return utf8_mbstring_500::encode_mimeheader($str, $charset, $transfer_encoding, $linefeed, $indent);
+	define('MB_OVERLOAD_MAIL',   1);
+	define('MB_OVERLOAD_STRING', 2);
+	define('MB_OVERLOAD_REGEX',  4);
+	define('MB_CASE_UPPER', 0);
+	define('MB_CASE_LOWER', 1);
+	define('MB_CASE_TITLE', 2);
+
+
+	function mb_convert_encoding($str, $to_encoding, $from_encoding = INF) {return utf8_mbstring_500::convert_encoding($str, $to_encoding, $from_encoding);}
+	function mb_decode_mimeheader($str) {return utf8_mbstring_500::decode_mimeheader($str);}
+	function mb_encode_mimeheader($str, $charset = INF, $transfer_encoding = INF, $linefeed = INF, $indent = INF)
+	{
+		return utf8_mbstring_500::encode_mimeheader($str, $charset, $transfer_encoding, $linefeed, $indent);
+	}
+
+	function mb_convert_case($str, $mode, $encoding = INF) {return utf8_mbstring_500::convert_case($str, $mode, $encoding);}
+	function mb_internal_encoding($encoding = INF)         {return utf8_mbstring_500::internal_encoding($encoding);}
+	function mb_list_encodings()                           {return utf8_mbstring_500::list_encodings();}
+	function mb_strlen($str, $encoding = INF)              {return utf8_mbstring_500::strlen($str, $encoding);}
+	function mb_strpos ($haystack, $needle, $offset = 0, $encoding = INF)    {return utf8_mbstring_500::strpos ($haystack, $needle, $offset, $encoding);}
+	function mb_strrpos($haystack, $needle, $offset = 0, $encoding = INF)    {return utf8_mbstring_520::strrpos($haystack, $needle, $offset, $encoding);}
+	function mb_strtolower($str, $encoding = INF)                            {return utf8_mbstring_500::strtolower($str, $encoding);}
+	function mb_strtoupper($str, $encoding = INF)                            {return utf8_mbstring_500::strtoupper($str, $encoding);}
+	function mb_substitute_character($char = INF)                            {return utf8_mbstring_500::substitute_character($char);}
+	function mb_substr($str, $start, $length = PHP_INT_MAX, $encoding = INF) {return utf8_mbstring_500::substr($str, $start, $length, $encoding);}
 }
-
-function mb_convert_case($str, $mode, $encoding = INF) {return utf8_mbstring_500::convert_case($str, $mode, $encoding);}
-function mb_internal_encoding($encoding = INF)         {return utf8_mbstring_500::internal_encoding($encoding);}
-function mb_list_encodings()                           {return utf8_mbstring_500::list_encodings();}
-function mb_strlen($str, $encoding = INF)              {return utf8_mbstring_500::strlen($str, $encoding);}
-function mb_strpos ($haystack, $needle, $offset = 0, $encoding = INF)    {return utf8_mbstring_500::strpos ($haystack, $needle, $offset, $encoding);}
-function mb_strrpos($haystack, $needle, $offset = 0, $encoding = INF)    {return utf8_mbstring_520::strrpos($haystack, $needle, $offset, $encoding);}
-function mb_strtolower($str, $encoding = INF)                            {return utf8_mbstring_500::strtolower($str, $encoding);}
-function mb_strtoupper($str, $encoding = INF)                            {return utf8_mbstring_500::strtoupper($str, $encoding);}
-function mb_substitute_character($char = INF)                            {return utf8_mbstring_500::substitute_character($char);}
-function mb_substr($str, $start, $length = PHP_INT_MAX, $encoding = INF) {return utf8_mbstring_500::substr($str, $start, $length, $encoding);}
-
 
 
 class utf8_mbstring_500
