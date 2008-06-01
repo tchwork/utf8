@@ -21,21 +21,6 @@ utf8_normalizer::__constructStatic();
 
 class utf8_normalizer
 {
-	static
-
-	// Some remaining chars for accents decomposition
-	// from http://www.unicode.org/cldr/
-	$lig = array(
-		'Æ' => 'AE', 'æ' => 'ae', 'ß' => 'ss', 'Œ' => 'OE', 'œ' => 'oe', 'ʤ' => 'dz',
-		'ʣ' => 'dz', 'ʥ' => 'dz', 'ƕ' => 'hv', 'Ƣ' => 'OI', 'ƣ' => 'oi', 'ʨ' => 'tc',
-		'ʦ' => 'ts', 'ƻ' => '2' , 'Ŋ' => 'NG', 'ŋ' => 'ng', 'Ð' => 'D' , 'ð' => 'd' ,
-		'Ø' => 'O' , 'ø' => 'o' , 'Þ' => 'TH', 'þ' => 'th', 'Θ' => 'T' , 'θ' => 'T' ,
-		'Ʃ' => 'SH', 'ʃ' => 'sh', 'Ʒ' => 'ZH', 'ʒ' => 'zh', 'Ʊ' => 'U' , 'ʊ' => 'u' ,
-		'Ə' => 'A' , 'ə' => 'a' , 'Ɔ' => 'O' , 'ɔ' => 'o' , 'Ɛ' => 'E' , 'ɛ' => 'e' ,
-		'ʔ' => '?' , 'ɪ' => 'i' , 'ʌ' => 'v',
-	);
-
-
 	protected static
 
 	$C, $D, $KD, $cC, $K,
@@ -48,13 +33,19 @@ class utf8_normalizer
 	static function toNFKC($s) {return self::normalize($s, true , true );}
 	static function toNFKD($s) {return self::normalize($s, false, true );}
 
-	static function removeAccents($s)
-	{
-		$s = self::toNFKD($s);
-		$s = preg_replace('/\p{Mn}+/u', '', $s);
-		$s = strtr($s, self::$lig);
 
-		return self::recompose($s, false);
+	// Basic UTF-8 to ASCII transliteration
+
+	static function toASCII($s)
+	{
+		if (strcspn($s, self::$ASCII))
+		{
+			$s = self::toNFKD($s);
+			$s = preg_replace('/\p{Mn}+/u', '', $s);
+			$s = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $s);
+		}
+
+		return $s
 	}
 
 
