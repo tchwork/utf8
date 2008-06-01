@@ -35,7 +35,7 @@ iconv_substr       - Cut out part of a string
 
 if (!function_exists('iconv'))
 {
-	define('ICONV_IMPL', '"patchworkiconv"');
+	define('ICONV_IMPL', 'patchwork');
 	define('ICONV_VERSION', '1.0');
 	define('ICONV_MIME_DECODE_STRICT', 1);
 	define('ICONV_MIME_DECODE_CONTINUE_ON_ERROR', 2);

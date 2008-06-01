@@ -42,7 +42,7 @@ class utf8_normalizer
 		{
 			$s = self::toNFKD($s);
 			$s = preg_replace('/\p{Mn}+/u', '', $s);
-			$s = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $s);
+			$s = iconv('UTF-8', 'ASCII' . ('glibc' !== ICONV_IMPL ? '//IGNORE' : '') . '//TRANSLIT', $s);
 		}
 
 		return $s
