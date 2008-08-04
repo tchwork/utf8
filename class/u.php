@@ -96,10 +96,10 @@ class u
 	static function strrpos ($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 2);}
 	static function strripos($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 3);}
 
-	static function stristr ($s, $needle) {return mb_stristr ($s, $needle, false, 'UTF-8');}
-	static function strrchr ($s, $needle) {return mb_strrchr ($s, $needle, false, 'UTF-8');}
-	static function strrichr($s, $needle) {return mb_strrichr($s, $needle, false, 'UTF-8');}
-	static function strstr  ($s, $needle) {return mb_strstr  ($s, $needle, false, 'UTF-8');}
+	static function stristr ($s, $needle, $before_needle = false) {return mb_stristr ($s, $needle, $before_needle, 'UTF-8');}
+	static function strrchr ($s, $needle, $before_needle = false) {return mb_strrchr ($s, $needle, $before_needle, 'UTF-8');}
+	static function strrichr($s, $needle, $before_needle = false) {return mb_strrichr($s, $needle, $before_needle, 'UTF-8');}
+	static function strstr  ($s, $needle, $before_needle = false) {return mb_strstr  ($s, $needle, $before_needle, 'UTF-8');}
 
 	static function htmlentities    ($s, $quote_style = ENT_COMPAT) {return htmlentities    ($s, $quote_style, 'UTF-8');}
 	static function htmlspecialchars($s, $quote_style = ENT_COMPAT) {return htmlspecialchars($s, $quote_style, 'UTF-8');}
