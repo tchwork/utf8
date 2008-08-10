@@ -16,11 +16,21 @@
 
 
 #>>> Add compatibility with non patchwork code
-utf8_normalizer::__constructStatic();
+Normalizer::__constructStatic();
 #<<<
 
-class utf8_normalizer
+class Normalizer
 {
+	const
+
+	NONE    = '',
+	FORM_C  = 'NFC',
+	FORM_D  = 'NFD',
+	FORM_KC = 'NFKC',
+	FORM_KD = 'NFKD',
+	OPTION_DEFAULT = 'NFC';
+
+
 	protected static
 
 	$C, $D, $KD, $cC, $K,
@@ -28,24 +38,29 @@ class utf8_normalizer
 	$ASCII = "\x20\x65\x69\x61\x73\x6e\x74\x72\x6f\x6c\x75\x64\x5d\x5b\x63\x6d\x70\x27\x0a\x67\x7c\x68\x76\x2e\x66\x62\x2c\x3a\x3d\x2d\x71\x31\x30\x43\x32\x2a\x79\x78\x29\x28\x4c\x39\x41\x53\x2f\x50\x22\x45\x6a\x4d\x49\x6b\x33\x3e\x35\x54\x3c\x44\x34\x7d\x42\x7b\x38\x46\x77\x52\x36\x37\x55\x47\x4e\x3b\x4a\x7a\x56\x23\x48\x4f\x57\x5f\x26\x21\x4b\x3f\x58\x51\x25\x59\x5c\x09\x5a\x2b\x7e\x5e\x24\x40\x60\x7f\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
 
 
-	static function toNFC($s)  {return self::normalize($s, true , false);}
-	static function toNFD($s)  {return self::normalize($s, false, false);}
-	static function toNFKC($s) {return self::normalize($s, true , true );}
-	static function toNFKD($s) {return self::normalize($s, false, true );}
-
-
-	// Basic UTF-8 to ASCII transliteration
-
-	static function toASCII($s)
+	static function isNormalized($s, $form = self::FORM_C)
 	{
-		if (strcspn($s, self::$ASCII))
+		return false;
+	}
+
+	static function normalize($s, $form = self::FORM_C)
+	{
+		switch ($form)
 		{
-			$s = self::toNFKD($s);
-			$s = preg_replace('/\p{Mn}+/u', '', $s);
-			$s = iconv('UTF-8', 'ASCII' . ('glibc' !== ICONV_IMPL ? '//IGNORE' : '') . '//TRANSLIT', $s);
+		case self::NONE   : return $s;
+
+		case self::FORM_C : $C = true ; $K = false; break;
+		case self::FORM_D : $C = false; $K = false; break;
+		case self::FORM_KC: $C = true ; $K = true ; break;
+		case self::FORM_KD: $C = false; $K = true ; break;
+
+		default: throw new Exception('Unknown normalization form');
 		}
 
-		return $s
+		if ($K) isset(self::$KD) || self::$KD = unserialize(file_get_contents(resolvePath('data/utf8/compatibilityDecomposition.ser')));
+		self::$K = $K;
+
+		return $C ? self::recompose($s) : self::decompose($s);
 	}
 
 
@@ -54,15 +69,6 @@ class utf8_normalizer
 		self::$C  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalComposition.ser')));
 		self::$D  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalDecomposition.ser')));
 		self::$cC = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
-	}
-
-
-	protected static function normalize($s, $C, $K)
-	{
-		if ($K) isset(self::$KD) || self::$KD = unserialize(file_get_contents(resolvePath('data/utf8/compatibilityDecomposition.ser')));
-		self::$K = $K;
-
-		return $C ? self::recompose($s) : self::decompose($s);
 	}
 
 	protected static function recompose($s, $decompose = true)

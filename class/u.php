@@ -33,11 +33,15 @@ class u
 	// Unicode Normalization functions.
 	// Input strings have to be valid UTF-8.
 
-	static function toNFC($s)   {return utf8_normalizer::toNFC($s);}
-	static function toNFD($s)   {return utf8_normalizer::toNFD($s);}
-	static function toNFKC($s)  {return utf8_normalizer::toNFC($s, true);}
-	static function toNFKD($s)  {return utf8_normalizer::toNFD($s, true);}
-	static function toASCII($s) {return utf8_normalizer::toASCII($s);}
+	static function isNFC($s)   {return Normalizer::isNormalized($s, Normalizer::FORM_C );}
+	static function isNFD($s)   {return Normalizer::isNormalized($s, Normalizer::FORM_D );}
+	static function isNFKC($s)  {return Normalizer::isNormalized($s, Normalizer::FORM_KC);}
+	static function isNFKD($s)  {return Normalizer::isNormalized($s, Normalizer::FORM_KD);}
+
+	static function toNFC($s)   {return Normalizer::normalize($s, Normalizer::FORM_C );}
+	static function toNFD($s)   {return Normalizer::normalize($s, Normalizer::FORM_D );}
+	static function toNFKC($s)  {return Normalizer::normalize($s, Normalizer::FORM_KC);}
+	static function toNFKD($s)  {return Normalizer::normalize($s, Normalizer::FORM_KD);}
 
 
 	// Unicode transformation for caseless matching
