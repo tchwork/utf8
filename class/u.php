@@ -68,7 +68,7 @@ class u
 		if ($full)
 		{
 			static $fullCaseFold = false;
-			$fullCaseFold || $fullCaseFold = unserialize(file_get_contents(resolvePath('data/utf8/caseFold_full.txt')));
+			$fullCaseFold || $fullCaseFold = unserialize(file_get_contents(patchworkPath('data/utf8/caseFold_full.txt')));
 
 			$s = strtr($s, $fullCaseFold);
 		}
@@ -233,7 +233,7 @@ class u
 		if (HTML_ENTITIES == $table)
 		{
 			static $entities = array();
-			$entities || $entities = unserialize(file_get_contents(resolvePath('data/utf8/htmlentities.ser')));
+			$entities || $entities = unserialize(file_get_contents(patchworkPath('data/utf8/htmlentities.ser')));
 			return $entities + get_html_translation_table(HTML_SPECIALCHARS, $quote_style);
 		}
 		else return get_html_translation_table($table, $quote_style);

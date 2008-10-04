@@ -269,8 +269,8 @@ class utf8_mbstring_500
 	{
 		return unserialize(file_get_contents(
 			$upper
-				? resolvePath('data/utf8/upperCase.ser')
-				: resolvePath('data/utf8/lowerCase.ser')
+				? patchworkPath('data/utf8/upperCase.ser')
+				: patchworkPath('data/utf8/lowerCase.ser')
 		));
 	}
 

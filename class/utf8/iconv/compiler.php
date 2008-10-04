@@ -18,8 +18,8 @@ class utf8_iconv_compiler
 
 	static function charsetMaps()
 	{
-		$map_dir = resolvePath('data/unicode/charset/');
-		$out_dir = resolvePath('data/utf8/iconv/');
+		$map_dir = patchworkPath('data/unicode/charset/');
+		$out_dir = patchworkPath('data/utf8/iconv/');
 
 		$h = opendir($map_dir);
 		while (false !== $f = readdir($h)) if (false === strpos($f, '.') && is_file($map_dir . $f))
@@ -48,8 +48,8 @@ class utf8_iconv_compiler
 
 	static function translitMap()
 	{
-		$data    = resolvePath('data/unicode/charset/translit.def');
-		$out_dir = resolvePath('data/utf8/iconv/');
+		$data    = patchworkPath('data/unicode/charset/translit.def');
+		$out_dir = patchworkPath('data/utf8/iconv/');
 
 		$data = file_get_contents($data);
 		preg_match_all('/^([0-9a-f]+)\t([^\t]+)\t/mi', $data, $data, PREG_SET_ORDER);

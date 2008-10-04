@@ -57,7 +57,7 @@ class Normalizer
 		default: throw new Exception('Unknown normalization form');
 		}
 
-		if ($K) isset(self::$KD) || self::$KD = unserialize(file_get_contents(resolvePath('data/utf8/compatibilityDecomposition.ser')));
+		if ($K) isset(self::$KD) || self::$KD = unserialize(file_get_contents(patchworkPath('data/utf8/compatibilityDecomposition.ser')));
 		self::$K = $K;
 
 		return $C ? self::recompose($s) : self::decompose($s);
@@ -66,9 +66,9 @@ class Normalizer
 
 	static function __constructStatic()
 	{
-		self::$C  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalComposition.ser')));
-		self::$D  = unserialize(file_get_contents(resolvePath('data/utf8/canonicalDecomposition.ser')));
-		self::$cC = unserialize(file_get_contents(resolvePath('data/utf8/combiningClass.ser')));
+		self::$C  = unserialize(file_get_contents(patchworkPath('data/utf8/canonicalComposition.ser')));
+		self::$D  = unserialize(file_get_contents(patchworkPath('data/utf8/canonicalDecomposition.ser')));
+		self::$cC = unserialize(file_get_contents(patchworkPath('data/utf8/combiningClass.ser')));
 	}
 
 	protected static function recompose($s, $decompose = true)

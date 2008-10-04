@@ -31,12 +31,12 @@ class utf8_normalizer_compiler
 	{
 		set_time_limit(0);
 
-		self::$utf8Data = resolvePath('data/utf8/');
+		self::$utf8Data = patchworkPath('data/utf8/');
 /** /
-		self::$DerivedNormalizationProps = resolvePath('data/utf8/DerivedNormalizationProps.txt');
-		self::$UnicodeData               = resolvePath('data/utf8/UnicodeData.txt');
-		self::$CompositionExclusions     = resolvePath('data/utf8/CompositionExclusions.txt');
-		self::$CaseFolding               = resolvePath('data/utf8/CaseFolding.txt');
+		self::$DerivedNormalizationProps = patchworkPath('data/utf8/DerivedNormalizationProps.txt');
+		self::$UnicodeData               = patchworkPath('data/utf8/UnicodeData.txt');
+		self::$CompositionExclusions     = patchworkPath('data/utf8/CompositionExclusions.txt');
+		self::$CaseFolding               = patchworkPath('data/utf8/CaseFolding.txt');
 /**/
 	}
 
