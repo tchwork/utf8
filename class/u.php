@@ -462,7 +462,7 @@ class u
 		foreach ($s as $s)
 		{
 			if ('-' === $s) $class[0] = '-' . $class[0];
-			else if (strlen($s) <= 2) $class[0] .= preg_quote($s, '/');
+			else if (!isset($s[2])) $class[0] .= preg_quote($s, '/');
 			else if (1 === iconv_strlen($s, 'UTF-8')) $class[0] .= $s;
 			else $class[] = $s;
 		}

@@ -319,7 +319,7 @@ class utf8_iconv
 				)
 				: base64_encode($line_data . $c);
 
-			if ($line_length + strlen($o) > $line_break)
+			if (isset($o[$line_break - $line_length]))
 			{
 				$Q || $line_data = base64_encode($line_data);
 				$field_value[] = $line_start . $line_data . '?=';
