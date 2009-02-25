@@ -366,9 +366,19 @@ class utf8_iconv
 		INF === $encoding && $encoding = self::$internal_encoding;
 		'UTF-8' === strtoupper(substr($encoding, 0, 5)) || $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
 
-		// Quickest alternative when utf8_decode() is not available
-		preg_replace('/./us', '', $s, -1, $s);
-		return $s;
+		$utf_len_mask = self::$utf_len_mask;
+
+		$i = 0; $j = 0;
+		$len = strlen($s);
+
+		while ($i < $len)
+		{
+			$u = $s[$i] & "\xF0";
+			$i += isset($utf_len_mask[$u]) ? $utf_len_mask[$u] : 1;
+			++$j;
+		}
+
+		return $j;
 	}
 
 	static function strpos($haystack, $needle, $offset = 0, $encoding = INF)
@@ -521,7 +531,7 @@ class utf8_iconv
 			if ($str[$i] < "\x80") $utf_chr = $str[$i++];
 			else
 			{
-				$utf_len = $s[$i] & "\xF0";
+				$utf_len = $str[$i] & "\xF0";
 				$utf_len = isset($utf_len_mask[$utf_len]) ? $utf_len_mask[$utf_len] : 1;
 				$utf_chr = substr($str, $i, $utf_len);
 
