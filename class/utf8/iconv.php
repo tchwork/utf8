@@ -125,8 +125,8 @@ class utf8_iconv
 
 		// Load charset maps
 
-		if (   ('utf-8' !==  $in_charset && !self::loadMap('from.',  $in_charset,  $in_map)
-		    || ('utf-8' !== $out_charset && !self::loadMap(  'to.', $out_charset, $out_map) )
+		if (   ('utf-8' !==  $in_charset && !self::loadMap('from.',  $in_charset,  $in_map))
+		    || ('utf-8' !== $out_charset && !self::loadMap(  'to.', $out_charset, $out_map)) )
 		{
 			trigger_error(sprintf(self::ERROR_WRONG_CHARSET, $in_charset, $out_charset));
 			return false;
@@ -398,7 +398,7 @@ class utf8_iconv
 
 		$needle = self::substr($needle, 0, 1, 'UTF-8');
 		$pos = strpos(strrev($haystack), strrev($needle));
-		return false === $pos ? false : iconv_strlen($pos ? substr($haystack, 0, -$pos) : $haystack, , 'UTF-8');
+		return false === $pos ? false : iconv_strlen($pos ? substr($haystack, 0, -$pos) : $haystack, 'UTF-8');
 	}
 
 	static function substr($s, $start, $length = PHP_INT_MAX, $encoding = INF)
@@ -416,7 +416,7 @@ class utf8_iconv
 
 		$rx = $slen - $start;
 
-		else if (0 > $length) $length += $rx;
+		if (0 > $length) $length += $rx;
 		if (0 >= $length) return '';
 
 		if ($length > $slen - $start) $length = $rx;
