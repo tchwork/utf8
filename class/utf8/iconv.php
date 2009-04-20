@@ -291,7 +291,7 @@ class utf8_iconv
 		$in  = strtoupper($pref['input-charset']);
 		$out = strtoupper($pref['output-charset']);
 
-		if ('UTF-8' !== $in && false === $field_value = iconv($in, 'UTF-8', $field_value)) return false;
+		if ('UTF-8' !== $in && false === $field_value = self::iconv($in, 'UTF-8', $field_value)) return false;
 
 		preg_match_all('/./us', $field_value, $chars);
 
@@ -309,7 +309,7 @@ class utf8_iconv
 
 		foreach ($chars as &$c)
 		{
-			if ('UTF-8' !== $out && false === $c = iconv('UTF-8', $out, $c)) return false;
+			if ('UTF-8' !== $out && false === $c = self::iconv('UTF-8', $out, $c)) return false;
 
 			$o = $Q
 				? $c = preg_replace_callback(
@@ -543,23 +543,24 @@ class utf8_iconv
 				else $i += $utf_len;
 			}
 
-			do
+			if (isset($map[$utf_chr]))
 			{
+				echo $map[$utf_chr];
+			}
+			else if ($TRANSLIT && isset($translit_map[$utf_chr]))
+			{
+				$utf_chr = $translit_map[$utf_chr];
+
 				if (isset($map[$utf_chr]))
 				{
 					echo $map[$utf_chr];
-					continue 2;
 				}
-
-				if ($TRANSLIT && isset($translit_map[$utf_chr]))
+				else if (!self::map_from_utf8($map, $utf_chr, $IGNORE, true))
 				{
-					$utf_chr = $translit_map[$utf_chr];
-					continue;
+					return false;
 				}
 			}
-			while (0);
-
-			if (!$IGNORE)
+			else if (!$IGNORE)
 			{
 				trigger_error(self::ERROR_ILLEGAL_CHARACTER);
 				return false;
