@@ -435,12 +435,12 @@ class utf8_iconv
 
 		if (INF === $map)
 		{
-			$map = patchworkPath('data/utf8/iconv/' . $type . $charset . '.ser');
+			$map = patchworkPath('data/utf8/charset/' . $type . $charset . '.ser');
 
 			if (false === $map)
 			{
 				$rev_type = 'to.' === $type ? 'from.' : 'to.';
-				$rev_map = patchworkPath('data/utf8/iconv/' . $rev_type . $charset . '.ser');
+				$rev_map = patchworkPath('data/utf8/charset/' . $rev_type . $charset . '.ser');
 
 				if (false !== $rev_map)
 				{
@@ -521,7 +521,7 @@ class utf8_iconv
 
 		$TRANSLIT
 			&& self::$translit_map
-			|| self::$translit_map = unserialize(file_get_contents(patchworkPath('data/utf8/iconv/translit.ser')));
+			|| self::$translit_map = unserialize(file_get_contents(patchworkPath('data/utf8/charset/translit.ser')));
 
 		$i = 0;
 		$len = strlen($str);

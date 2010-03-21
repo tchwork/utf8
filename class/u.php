@@ -44,6 +44,53 @@ class u
 	static function toNFKD($s)  {return Normalizer::normalize($s, Normalizer::FORM_KD);}
 
 
+	// Unicode to Code Page conversion using best fit mappings
+	// See http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/
+
+	static function bestFit($cp, $s, $placeholder = '')
+	{
+		if ('' === $s) return '';
+
+		static $map = array();
+		static $utf_len_mask = array("\xc0" => 2, "\xd0" => 2, "\xe0" => 3, "\xf0" => 4);
+
+		$cp = (string) (int) $cp;
+
+		if (isset($map[$cp])) $cp =& $map[$cp];
+		else if (file_exists($i = patchworkPath('data/utf8/bestfit' . $cp . '.ser')))
+		{
+			$map[$cp] = unserialize(file_get_contents($i));
+			$cp =& $map[$cp];
+		}
+		else
+		{
+			trigger_error('No "Best Fit" mapping found for given Code Page (' . $cp . ').');
+
+			$cp = array();
+		}
+
+		$i = 0;
+		$len = strlen($s);
+
+		ob_start();
+
+		while ($i < $len)
+		{
+			if ($s[$i] < "\x80") $utf_chr = $s[$i++];
+			else
+			{
+				$utf_len = $utf_len_mask[$s[$i] & "\xf0"];
+				$utf_chr = substr($s, $i, $utf_len);
+				$i += $utf_len;
+			}
+
+			echo isset($cp[$utf_chr]) ? $cp[$utf_chr] : $placeholder;
+		}
+
+		return ob_get_clean();
+	}
+
+
 	// Unicode transformation for caseless matching
 	// see http://unicode.org/reports/tr21/tr21-5.html
 
@@ -68,7 +115,7 @@ class u
 		if ($full)
 		{
 			static $fullCaseFold = false;
-			$fullCaseFold || $fullCaseFold = unserialize(file_get_contents(patchworkPath('data/utf8/caseFold_full.txt')));
+			$fullCaseFold || $fullCaseFold = unserialize(file_get_contents(patchworkPath('data/utf8/caseFold_full.ser')));
 
 			$s = strtr($s, $fullCaseFold);
 		}
@@ -220,12 +267,12 @@ class u
 
 	static function html_entity_decode($s, $quote_style = ENT_COMPAT)
 	{
-		$s = strtr($s, array(
+		static $map = array(
 			'&QUOT;' => '&quot;', '&LT;' => '&lt;', '&AMP;' => '&amp;', '&TRADE;' => '&trade;',
 			'&COPY;' => '&copy;', '&GT;' => '&gt;', '&REG;' => '&reg;', '&apos;'  => '&#039;'
-		));
+		);
 
-		return html_entity_decode($s, $quote_style, 'UTF-8');
+		return html_entity_decode(strtr($s, $map), $quote_style, 'UTF-8');
 	}
 
 	static function get_html_translation_table($table = HTML_SPECIALCHARS, $quote_style = ENT_COMPAT)
