@@ -82,7 +82,7 @@ class utf8_charset_compiler
 				{
 					if (0 === strpos($s, 'ENDCODEPAGE')) break;
 
-					$s = explode("\t", $s);
+					$s = explode("\t", rtrim($s));
 
 					if (isset($s[1]))
 					{
