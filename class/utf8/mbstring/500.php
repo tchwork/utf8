@@ -173,33 +173,33 @@ class utf8_mbstring_500
 			$map =& $lower;
 		}
 
-		static $utf_len_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
+		static $ulen_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
 
 		$i = 0;
 		$len = strlen($s);
 
 		while ($i < $len)
 		{
-			$utf_len = $s[$i] < "\x80" ? 1 : $utf_len_mask[$s[$i] & "\xF0"];
-			$utf_chr = substr($s, $i, $utf_len);
-			$i += $utf_len;
+			$ulen = $s[$i] < "\x80" ? 1 : $ulen_mask[$s[$i] & "\xF0"];
+			$uchr = substr($s, $i, $ulen);
+			$i += $ulen;
 
-			if (isset($map[$utf_chr]))
+			if (isset($map[$uchr]))
 			{
-				$utf_chr = $map[$utf_chr];
-				$new_len = strlen($utf_chr);
+				$uchr = $map[$uchr];
+				$nlen = strlen($uchr);
 
-				if ($new_len == $utf_len)
+				if ($nlen == $ulen)
 				{
-					$new_len = $i;
-					do $s[--$new_len] = $utf_chr[--$utf_len];
-					while ($utf_len);
+					$nlen = $i;
+					do $s[--$nlen] = $uchr[--$ulen];
+					while ($ulen);
 				}
 				else
 				{
-					$s = substr_replace($s, $utf_chr, $i, $utf_len);
-					$len += $new_len - $utf_len;
-					$i   += $new_len - $utf_len;
+					$s = substr_replace($s, $uchr, $i, $ulen);
+					$len += $nlen - $ulen;
+					$i   += $nlen - $ulen;
 				}
 			}
 		}

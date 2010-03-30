@@ -52,7 +52,7 @@ class u
 		if ('' === $s) return '';
 
 		static $map = array();
-		static $utf_len_mask = array("\xc0" => 2, "\xd0" => 2, "\xe0" => 3, "\xf0" => 4);
+		static $ulen_mask = array("\xc0" => 2, "\xd0" => 2, "\xe0" => 3, "\xf0" => 4);
 
 		$cp = (string) (int) $cp;
 
@@ -76,15 +76,15 @@ class u
 
 		while ($i < $len)
 		{
-			if ($s[$i] < "\x80") $utf_chr = $s[$i++];
+			if ($s[$i] < "\x80") $uchr = $s[$i++];
 			else
 			{
-				$utf_len = $utf_len_mask[$s[$i] & "\xf0"];
-				$utf_chr = substr($s, $i, $utf_len);
-				$i += $utf_len;
+				$ulen = $ulen_mask[$s[$i] & "\xf0"];
+				$uchr = substr($s, $i, $ulen);
+				$i += $ulen;
 			}
 
-			echo isset($cp[$utf_chr]) ? $cp[$utf_chr] : $placeholder;
+			echo isset($cp[$uchr]) ? $cp[$uchr] : $placeholder;
 		}
 
 		return ob_get_clean();
