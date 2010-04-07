@@ -1,6 +1,6 @@
 <?php /*********************************************************************
  *
- *   Copyright : (C) 2006 Nicolas Grekas. All rights reserved.
+ *   Copyright : (C) 2010 Nicolas Grekas. All rights reserved.
  *   Email     : p@tchwork.org
  *   License   : http://www.gnu.org/licenses/lgpl.txt GNU/LGPL
  *
@@ -32,18 +32,18 @@ grapheme_substr   - Return part of a string
 
 if (!function_exists('grapheme_strlen'))
 {
-	function grapheme_strlen  ($s) {return utf8_intl::strlen($s);}
-	function grapheme_strpos  ($s, $needle, $offset = 0) {return utf8_intl::strpos  ($s, $needle, $offset);}
-	function grapheme_stripos ($s, $needle, $offset = 0) {return utf8_intl::stripos ($s, $needle, $offset);}
-	function grapheme_strrpos ($s, $needle, $offset = 0) {return utf8_intl::strrpos ($s, $needle, $offset);}
-	function grapheme_strripos($s, $needle, $offset = 0) {return utf8_intl::strripos($s, $needle, $offset);}
-	function grapheme_stristr ($s, $needle, $before_needle = false) {return utf8_intl::stristr($s, $needle, $before_needle);}
-	function grapheme_strstr  ($s, $needle, $before_needle = false) {return utf8_intl::strstr ($s, $needle, $before_needle);}
-	function grapheme_substr  ($s, $start, $len = INF) {return utf8_intl::substr($s, $start, $len);}
+	function grapheme_strlen  ($s) {return patchwork_alias_intl::strlen($s);}
+	function grapheme_strpos  ($s, $needle, $offset = 0) {return patchwork_alias_intl::strpos  ($s, $needle, $offset);}
+	function grapheme_stripos ($s, $needle, $offset = 0) {return patchwork_alias_intl::stripos ($s, $needle, $offset);}
+	function grapheme_strrpos ($s, $needle, $offset = 0) {return patchwork_alias_intl::strrpos ($s, $needle, $offset);}
+	function grapheme_strripos($s, $needle, $offset = 0) {return patchwork_alias_intl::strripos($s, $needle, $offset);}
+	function grapheme_stristr ($s, $needle, $before_needle = false) {return patchwork_alias_intl::stristr($s, $needle, $before_needle);}
+	function grapheme_strstr  ($s, $needle, $before_needle = false) {return patchwork_alias_intl::strstr ($s, $needle, $before_needle);}
+	function grapheme_substr  ($s, $start, $len = INF) {return patchwork_alias_intl::substr($s, $start, $len);}
 }
 
 
-class utf8_intl
+class patchwork_alias_intl
 {
 	static function strlen($s)
 	{

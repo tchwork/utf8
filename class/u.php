@@ -22,7 +22,7 @@
  */
 
 
-class u extends utf8_intl
+class u extends patchwork_alias_intl
 {
 	static function isUTF8($s)
 	{
