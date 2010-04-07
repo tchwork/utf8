@@ -32,38 +32,38 @@ grapheme_substr   - Return part of a string
 
 if (!function_exists('grapheme_strlen'))
 {
-	function grapheme_strlen  ($s) {return utf8_intl::grapheme_strlen($s);}
-	function grapheme_strpos  ($s, $needle, $offset = 0) {return utf8_intl::grapheme_strpos  ($s, $needle, $offset);}
-	function grapheme_stripos ($s, $needle, $offset = 0) {return utf8_intl::grapheme_stripos ($s, $needle, $offset);}
-	function grapheme_strrpos ($s, $needle, $offset = 0) {return utf8_intl::grapheme_strrpos ($s, $needle, $offset);}
-	function grapheme_strripos($s, $needle, $offset = 0) {return utf8_intl::grapheme_strripos($s, $needle, $offset);}
-	function grapheme_stristr ($s, $needle, $before_needle = false) {return utf8_intl::grapheme_stristr($s, $needle, $before_needle);}
-	function grapheme_strstr  ($s, $needle, $before_needle = false) {return utf8_intl::grapheme_strstr ($s, $needle, $before_needle);}
-	function grapheme_substr  ($s, $start, $len = INF) {return utf8_intl::grapheme_substr($s, $start, $len);}
+	function grapheme_strlen  ($s) {return utf8_intl::strlen($s);}
+	function grapheme_strpos  ($s, $needle, $offset = 0) {return utf8_intl::strpos  ($s, $needle, $offset);}
+	function grapheme_stripos ($s, $needle, $offset = 0) {return utf8_intl::stripos ($s, $needle, $offset);}
+	function grapheme_strrpos ($s, $needle, $offset = 0) {return utf8_intl::strrpos ($s, $needle, $offset);}
+	function grapheme_strripos($s, $needle, $offset = 0) {return utf8_intl::strripos($s, $needle, $offset);}
+	function grapheme_stristr ($s, $needle, $before_needle = false) {return utf8_intl::stristr($s, $needle, $before_needle);}
+	function grapheme_strstr  ($s, $needle, $before_needle = false) {return utf8_intl::strstr ($s, $needle, $before_needle);}
+	function grapheme_substr  ($s, $start, $len = INF) {return utf8_intl::substr($s, $start, $len);}
 }
 
 
 class utf8_intl
 {
-	static function grapheme_strlen($s)
+	static function strlen($s)
 	{
 		preg_replace(self::GRAPHEME_CLUSTER_RX, '', $s, -1, $s);
 		return $s;
 	}
 
-	static function grapheme_substr($s, $start, $len = INF)
+	static function substr($s, $start, $len = INF)
 	{
 		$s =& self::getGraphemeClusterArray($s);
 		$s = array_slice($s, $start, INF === $len ? PHP_INT_MAX : $len);
 		return implode('', $s);
 	}
 
-	static function grapheme_strpos  ($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 0);}
-	static function grapheme_stripos ($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 1);}
-	static function grapheme_strrpos ($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 2);}
-	static function grapheme_strripos($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 3);}
-	static function grapheme_stristr ($s, $needle, $before_needle = false) {return mb_stristr($s, $needle, $before_needle, 'UTF-8');}
-	static function grapheme_strstr  ($s, $needle, $before_needle = false) {return mb_strstr ($s, $needle, $before_needle, 'UTF-8');}
+	static function strpos  ($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 0);}
+	static function stripos ($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 1);}
+	static function strrpos ($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 2);}
+	static function strripos($s, $needle, $offset = 0) {return self::position($s, $needle, $offset, 3);}
+	static function stristr ($s, $needle, $before_needle = false) {return mb_stristr($s, $needle, $before_needle, 'UTF-8');}
+	static function strstr  ($s, $needle, $before_needle = false) {return mb_strstr ($s, $needle, $before_needle, 'UTF-8');}
 
 
 	// (CRLF|([ZWNJ-ZWJ]|T+|L*(LV?V+|LV|LVT)T*|L+|[^Control])[Extend]*|[Control])
@@ -78,7 +78,7 @@ class utf8_intl
 
 	protected static function position($s, $needle, $offset, $mode)
 	{
-		if (0 > $offset || ($offset && ('' === (string) $s || '' === $s = self::grapheme_substr($s, $offset))))
+		if (0 > $offset || ($offset && ('' === (string) $s || '' === $s = self::substr($s, $offset))))
 		{
 			trigger_error('Offset not contained in string.', E_USER_ERROR);
 			return false;
@@ -100,6 +100,6 @@ class utf8_intl
 		case 3: $needle = mb_strripos  ($s, $needle, 0, 'UTF-8'); break;
 		}
 
-		return $needle ? self::grapheme_strlen(iconv_substr($s, 0, $needle, 'UTF-8')) + $offset : $needle;
+		return $needle ? self::strlen(iconv_substr($s, 0, $needle, 'UTF-8')) + $offset : $needle;
 	}
 }
