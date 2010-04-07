@@ -43,6 +43,7 @@ mb_language                   - Set/Get current language
 mb_list_encodings_alias_names - Returns an array of all supported alias encodings
 mb_list_mime_names            - Returns an array or string of all supported mime names
 mb_output_handler             - Callback function converts character encoding in output buffer
+mb_parse_str                  - Parse GET/POST/COOKIE data and set global variable
 mb_preferred_mime_name        - Get MIME charset string
 mb_regex_encoding             - Returns current encoding for multibyte regex as string
 mb_regex_set_options          - Set/Get the default options for mbregex functions
@@ -51,6 +52,7 @@ mb_split                      - Split multibyte string using regular expression
 mb_strcut                     - Get part of string
 mb_strimwidth                 - Get truncated string with specified width
 mb_strwidth                   - Return width of string
+mb_substr_count               - Count the number of substring occurrences
 
 
  * Implemented:
