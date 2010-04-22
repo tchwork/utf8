@@ -95,16 +95,13 @@ class u extends patchwork_alias_intl
 	// see http://unicode.org/reports/tr21/tr21-5.html
 
 	protected static $commonCaseFold = array(
-		'µ' => 'μ', 'ſ' => 's', "\xcd\x85" => 'ι', 'ς' => 'σ',
-		"\xcf\x90" => 'β', "\xcf\x91" => 'θ', "\xcf\x95" => 'φ',
-		"\xcf\x96" => 'π', "\xcf\xb0" => 'κ', "\xcf\xb1" => 'ρ',
-		"\xcf\xb5" => 'ε', "\xe1\xba\x9b" => "\xe1\xb9\xa1",
-		"\xe1\xbe\xbe" => 'ι',
+		array('µ','ſ',"\xcd\x85",'ς',"\xcf\x90","\xcf\x91","\xcf\x95","\xcf\x96","\xcf\xb0","\xcf\xb1","\xcf\xb5","\xe1\xba\x9b","\xe1\xbe\xbe"),
+		array('μ','s','ι',       'σ','β',       'θ',       'φ',       'π',       'κ',       'ρ',       'ε',       "\xe1\xb9\xa1",'ι'           )
 	);
 
 	static function strtocasefold($s, $full = true, $turkish = false)
 	{
-		$s = strtr($s, self::$commonCaseFold);
+		$s = str_replace(self::$commonCaseFold[0], self::$commonCaseFold[1], $s);
 
 		if ($turkish)
 		{
@@ -115,9 +112,9 @@ class u extends patchwork_alias_intl
 		if ($full)
 		{
 			static $fullCaseFold = false;
-			$fullCaseFold || $fullCaseFold = unserialize(file_get_contents(patchworkPath('data/utf8/caseFold_full.ser')));
+			$fullCaseFold || $fullCaseFold = unserialize(file_get_contents(patchworkPath('data/utf8/caseFolding_full.ser')));
 
-			$s = strtr($s, $fullCaseFold);
+			$s = str_replace($fullCaseFold[0], $fullCaseFold[1], $s);
 		}
 
 		return self::strtolower($s);
@@ -256,11 +253,11 @@ class u extends patchwork_alias_intl
 	static function html_entity_decode($s, $quote_style = ENT_COMPAT)
 	{
 		static $map = array(
-			'&QUOT;' => '&quot;', '&LT;' => '&lt;', '&AMP;' => '&amp;', '&TRADE;' => '&trade;',
-			'&COPY;' => '&copy;', '&GT;' => '&gt;', '&REG;' => '&reg;', '&apos;'  => '&#039;'
+			array('&QUOT;','&LT;','&AMP;','&TRADE;','&COPY;','&GT;','&REG;','&apos;'),
+			array('&quot;','&lt;','&amp;','&trade;','&copy;','&gt;','&reg;','&#039;')
 		);
 
-		return html_entity_decode(strtr($s, $map), $quote_style, 'UTF-8');
+		return html_entity_decode(str_replace($map[0], $map[1], $s), $quote_style, 'UTF-8');
 	}
 
 	static function get_html_translation_table($table = HTML_SPECIALCHARS, $quote_style = ENT_COMPAT)

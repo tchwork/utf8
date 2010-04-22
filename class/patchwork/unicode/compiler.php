@@ -323,10 +323,15 @@ class patchwork_unicode_compiler
 		}
 		fclose($h);
 
+		// Only full case folding is worth serializing
+		$caseFolding = array(
+			array_keys(  $caseFolding['F']),
+			array_values($caseFolding['F'])
+		);
 	
 		$upperCase                  = serialize($upperCase);
 		$lowerCase                  = serialize($lowerCase);
-		$caseFolding                = serialize($caseFolding['F']); // Only full case folding is worth serializing
+		$caseFolding                = serialize($caseFolding);
 		$combiningClass             = serialize($combiningClass);
 		$canonicalComposition       = serialize($canonicalComposition);
 		$canonicalDecomposition     = serialize($canonicalDecomposition);
