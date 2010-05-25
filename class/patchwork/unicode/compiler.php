@@ -12,11 +12,6 @@
  ***************************************************************************/
 
 
-#>>> Add compatibility with non patchwork code
-patchwork_unicode_compiler::__constructStatic();
-#<<<
-
-
 class patchwork_unicode_compiler
 {
 	static
@@ -398,3 +393,8 @@ class patchwork_unicode_compiler
 		)));
 	}
 }
+
+/**/if (!defined('patchwork'))
+/**/{
+		patchwork_unicode_compiler::__constructStatic();
+/**/}

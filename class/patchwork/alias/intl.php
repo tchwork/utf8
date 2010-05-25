@@ -29,20 +29,6 @@ grapheme_substr   - Return part of a string
  *
  */
 
-
-if (!function_exists('grapheme_strlen'))
-{
-	function grapheme_strlen  ($s) {return patchwork_alias_intl::strlen($s);}
-	function grapheme_strpos  ($s, $needle, $offset = 0) {return patchwork_alias_intl::strpos  ($s, $needle, $offset);}
-	function grapheme_stripos ($s, $needle, $offset = 0) {return patchwork_alias_intl::stripos ($s, $needle, $offset);}
-	function grapheme_strrpos ($s, $needle, $offset = 0) {return patchwork_alias_intl::strrpos ($s, $needle, $offset);}
-	function grapheme_strripos($s, $needle, $offset = 0) {return patchwork_alias_intl::strripos($s, $needle, $offset);}
-	function grapheme_stristr ($s, $needle, $before_needle = false) {return patchwork_alias_intl::stristr($s, $needle, $before_needle);}
-	function grapheme_strstr  ($s, $needle, $before_needle = false) {return patchwork_alias_intl::strstr ($s, $needle, $before_needle);}
-	function grapheme_substr  ($s, $start, $len = INF) {return patchwork_alias_intl::substr($s, $start, $len);}
-}
-
-
 class patchwork_alias_intl
 {
 	static function strlen($s)
@@ -103,3 +89,15 @@ class patchwork_alias_intl
 		return $needle ? self::strlen(iconv_substr($s, 0, $needle, 'UTF-8')) + $offset : $needle;
 	}
 }
+
+/**/if (!function_exists('grapheme_strlen'))
+/**/{
+		function grapheme_strlen  ($s) {return patchwork_alias_intl::strlen($s);}
+		function grapheme_strpos  ($s, $needle, $offset = 0) {return patchwork_alias_intl::strpos  ($s, $needle, $offset);}
+		function grapheme_stripos ($s, $needle, $offset = 0) {return patchwork_alias_intl::stripos ($s, $needle, $offset);}
+		function grapheme_strrpos ($s, $needle, $offset = 0) {return patchwork_alias_intl::strrpos ($s, $needle, $offset);}
+		function grapheme_strripos($s, $needle, $offset = 0) {return patchwork_alias_intl::strripos($s, $needle, $offset);}
+		function grapheme_stristr ($s, $needle, $before_needle = false) {return patchwork_alias_intl::stristr($s, $needle, $before_needle);}
+		function grapheme_strstr  ($s, $needle, $before_needle = false) {return patchwork_alias_intl::strstr ($s, $needle, $before_needle);}
+		function grapheme_substr  ($s, $start, $len = INF) {return patchwork_alias_intl::substr($s, $start, $len);}
+/**/}

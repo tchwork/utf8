@@ -14,11 +14,6 @@
 
 // See http://www.unicode.org/reports/tr15/
 
-
-#>>> Add compatibility with non patchwork code
-Normalizer::__constructStatic();
-#<<<
-
 class Normalizer
 {
 	const
@@ -290,3 +285,8 @@ class Normalizer
 		return ob_get_clean();
 	}
 }
+
+/**/if (!defined('patchwork'))
+/**/{
+		Normalizer::__constructStatic();
+/**/}
