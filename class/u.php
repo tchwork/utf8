@@ -121,7 +121,8 @@ class u extends patchwork_alias_intl
 	}
 
 
-	// Here is the complete set of native PHP string functions that need UTF-8 awareness
+	// Here is the quasi complete set of native PHP string functions that need UTF-8 awareness
+	// Missing are printf-family functions and number_format
 
 	static function strlen($s) {return grapheme_strlen($s);}
 	static function substr($s, $start, $len = INF) {return INF === $len ? grapheme_substr($start, $len) : grapheme_substr($start, $len, $length);}
