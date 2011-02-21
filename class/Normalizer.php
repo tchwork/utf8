@@ -75,9 +75,7 @@ class Normalizer
 		$compMap   =& self::$C;
 		$combClass =& self::$cC;
 
-		ob_start();
-
-		$tail = '';
+		$result = $tail = '';
 
 		$i = $s[0] < "\x80" ? 1 : $ulen_mask[$s[0] & "\xf0"];
 		$len = strlen($s);
@@ -103,7 +101,7 @@ class Normalizer
 					$i += $j;
 				}
 
-				echo $last_uchr;
+				$result .= $last_uchr;
 				$last_uchr = $s[$i];
 				++$i;
 			}
@@ -133,7 +131,7 @@ class Normalizer
 							$tail = '';
 						}
 
-						echo $last_uchr;
+						$result .= $last_uchr;
 						$last_uchr = $uchr;
 					}
 				}
@@ -162,14 +160,12 @@ class Normalizer
 			}
 		}
 
-		echo $last_uchr, $tail;
-
-		return ob_get_clean();
+		return $result . $last_uchr . $tail;
 	}
 
 	protected static function decompose($s)
 	{
-		ob_start();
+		$result = '';
 
 		$ulen_mask = self::$ulen_mask;
 		$ASCII     =& self::$ASCII;
@@ -190,12 +186,12 @@ class Normalizer
 				if ($c)
 				{
 					ksort($c);
-					echo implode('', $c);
+					$result .= implode('', $c);
 					$c = array();
 				}
 
 				$j = 1 + strspn($s, $ASCII, $i+1);
-				echo substr($s, $i, $j);
+				$result .= substr($s, $i, $j);
 				$i += $j;
 			}
 			else
@@ -216,7 +212,7 @@ class Normalizer
 					if ($c)
 					{
 						ksort($c);
-						echo implode('', $c);
+						$result .= implode('', $c);
 						$c = array();
 					}
 
@@ -271,7 +267,7 @@ class Normalizer
 						}
 					}
 
-					echo $uchr;
+					$result .= $uchr;
 				}
 			}
 		}
@@ -279,10 +275,10 @@ class Normalizer
 		if ($c)
 		{
 			ksort($c);
-			echo implode('', $c);
+			$result .= implode('', $c);
 		}
 
-		return ob_get_clean();
+		return $result;
 	}
 }
 

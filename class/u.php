@@ -55,6 +55,7 @@ class u extends patchwork_alias_intl
 		static $ulen_mask = array("\xc0" => 2, "\xd0" => 2, "\xe0" => 3, "\xf0" => 4);
 
 		$cp = (string) (int) $cp;
+		$result = '9' === $cp[0] ? $s . $s : $s;
 
 		if (isset($map[$cp])) $cp =& $map[$cp];
 		else if (file_exists($i = patchworkPath('data/utf8/bestfit' . $cp . '.ser')))
@@ -69,10 +70,8 @@ class u extends patchwork_alias_intl
 			$cp = array();
 		}
 
-		$i = 0;
+		$i = $j = 0;
 		$len = strlen($s);
-
-		ob_start();
 
 		while ($i < $len)
 		{
@@ -84,10 +83,13 @@ class u extends patchwork_alias_intl
 				$i += $ulen;
 			}
 
-			echo isset($cp[$uchr]) ? $cp[$uchr] : $placeholder;
+			$uchr = isset($cp[$uchr]) ? $cp[$uchr] : $placeholder;
+
+			isset($uchr[0]) && $result[$j++] = $uchr[0];
+			isset($uchr[1]) && $result[$j++] = $uchr[1];
 		}
 
-		return ob_get_clean();
+		return substr($result, 0, $j);
 	}
 
 
