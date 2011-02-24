@@ -48,7 +48,7 @@ class patchwork_unicode_compiler
 		while (false !== $f = readdir($h)) if (false === strpos($f, '.') && is_file($map_dir . $f))
 		{
 			$data = file_get_contents($map_dir . $f);
-			preg_match_all('/^0x([0-9a-f]+)[ \t]+0x([0-9a-f]+)/mi', $data, $data, PREG_SET_ORDER);
+			preg_match_all('/^0x([0-9A-F]+)[ \t]+0x([0-9A-F]+)/mi', $data, $data, PREG_SET_ORDER);
 
 			$map = array();
 			foreach ($data as $data)
@@ -75,7 +75,7 @@ class patchwork_unicode_compiler
 		$out_dir = patchworkPath('data/utf8/charset/');
 
 		$data = file_get_contents($data);
-		preg_match_all('/^([0-9a-f]+)\t([^\t]+)\t/mi', $data, $data, PREG_SET_ORDER);
+		preg_match_all('/^([0-9A-F]+)\t([^\t]+)\t/mi', $data, $data, PREG_SET_ORDER);
 
 		$map = array();
 		foreach ($data as $data) $map[self::chr(hexdec($data[1]))] = $data[2];
@@ -387,9 +387,9 @@ class patchwork_unicode_compiler
 		$c %= 0x200000;
 
 		return $c < 0x80    ? chr($c) : (
-		       $c < 0x800   ? chr(0xc0 | $c>> 6) . chr(0x80 | $c     & 0x3f) : (
-		       $c < 0x10000 ? chr(0xe0 | $c>>12) . chr(0x80 | $c>> 6 & 0x3f) . chr(0x80 | $c    & 0x3f) : (
-		                      chr(0xf0 | $c>>18) . chr(0x80 | $c>>12 & 0x3f) . chr(0x80 | $c>>6 & 0x3f) . chr(0x80 | $c & 0x3f)
+		       $c < 0x800   ? chr(0xC0 | $c>> 6) . chr(0x80 | $c     & 0x3F) : (
+		       $c < 0x10000 ? chr(0xE0 | $c>>12) . chr(0x80 | $c>> 6 & 0x3F) . chr(0x80 | $c    & 0x3F) : (
+		                      chr(0xF0 | $c>>18) . chr(0x80 | $c>>12 & 0x3F) . chr(0x80 | $c>>6 & 0x3F) . chr(0x80 | $c & 0x3F)
 		)));
 	}
 }

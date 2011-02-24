@@ -29,8 +29,8 @@ class Normalizer
 	protected static
 
 	$C, $D, $KD, $cC, $K,
-	$ulen_mask = array("\xc0" => 2, "\xd0" => 2, "\xe0" => 3, "\xf0" => 4),
-	$ASCII = "\x20\x65\x69\x61\x73\x6e\x74\x72\x6f\x6c\x75\x64\x5d\x5b\x63\x6d\x70\x27\x0a\x67\x7c\x68\x76\x2e\x66\x62\x2c\x3a\x3d\x2d\x71\x31\x30\x43\x32\x2a\x79\x78\x29\x28\x4c\x39\x41\x53\x2f\x50\x22\x45\x6a\x4d\x49\x6b\x33\x3e\x35\x54\x3c\x44\x34\x7d\x42\x7b\x38\x46\x77\x52\x36\x37\x55\x47\x4e\x3b\x4a\x7a\x56\x23\x48\x4f\x57\x5f\x26\x21\x4b\x3f\x58\x51\x25\x59\x5c\x09\x5a\x2b\x7e\x5e\x24\x40\x60\x7f\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
+	$ulen_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4),
+	$ASCII = "\x20\x65\x69\x61\x73\x6E\x74\x72\x6F\x6C\x75\x64\x5D\x5B\x63\x6D\x70\x27\x0A\x67\x7C\x68\x76\x2E\x66\x62\x2C\x3A\x3D\x2D\x71\x31\x30\x43\x32\x2A\x79\x78\x29\x28\x4C\x39\x41\x53\x2F\x50\x22\x45\x6A\x4D\x49\x6B\x33\x3E\x35\x54\x3C\x44\x34\x7D\x42\x7B\x38\x46\x77\x52\x36\x37\x55\x47\x4E\x3B\x4A\x7A\x56\x23\x48\x4F\x57\x5F\x26\x21\x4B\x3F\x58\x51\x25\x59\x5C\x09\x5A\x2B\x7E\x5E\x24\x40\x60\x7F\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F";
 
 
 	static function isNormalized($s, $form = self::FORM_C)
@@ -77,7 +77,7 @@ class Normalizer
 
 		$result = $tail = '';
 
-		$i = $s[0] < "\x80" ? 1 : $ulen_mask[$s[0] & "\xf0"];
+		$i = $s[0] < "\x80" ? 1 : $ulen_mask[$s[0] & "\xF0"];
 		$len = strlen($s);
 
 		$last_uchr = substr($s, 0, $i);
@@ -107,11 +107,11 @@ class Normalizer
 			}
 			else
 			{
-				$ulen = $ulen_mask[$s[$i] & "\xf0"];
+				$ulen = $ulen_mask[$s[$i] & "\xF0"];
 				$uchr = substr($s, $i, $ulen);
 
-				if ($last_uchr < "\xe1\x84\x80" || "\xe1\x84\x92" < $last_uchr
-				    ||   $uchr < "\xe1\x85\xa1" || "\xe1\x85\xb5" < $uchr
+				if ($last_uchr < "\xE1\x84\x80" || "\xE1\x84\x92" < $last_uchr
+				    ||   $uchr < "\xE1\x85\xA1" || "\xE1\x85\xB5" < $uchr
 				    || $last_ucls)
 				{
 					// Table lookup and combining chars composition
@@ -140,20 +140,20 @@ class Normalizer
 					// Hangul chars
 
 					$L = ord($last_uchr[2]) - 0x80;
-					$V = ord($uchr[2]) - 0xa1;
+					$V = ord($uchr[2]) - 0xA1;
 					$T = 0;
 
 					$uchr = substr($s, $i + $ulen, 3);
 
-					if ("\xe1\x86\xa7" <= $uchr && $uchr <= "\xe1\x87\x82")
+					if ("\xE1\x86\xA7" <= $uchr && $uchr <= "\xE1\x87\x82")
 					{
-						$T = ord($uchr[2]) - 0xa7;
+						$T = ord($uchr[2]) - 0xA7;
 						0 > $T && $T += 0x40;
 						$ulen += 3;
 					}
 
-					$L = 0xac00 + ($L * 21 + $V) * 28 + $T;
-					$last_uchr = chr(0xe0 | $L>>12) . chr(0x80 | $L>>6 & 0x3f) . chr(0x80 | $L & 0x3f);
+					$L = 0xAC00 + ($L * 21 + $V) * 28 + $T;
+					$last_uchr = chr(0xE0 | $L>>12) . chr(0x80 | $L>>6 & 0x3F) . chr(0x80 | $L & 0x3F);
 				}
 
 				$i += $ulen;
@@ -196,7 +196,7 @@ class Normalizer
 			}
 			else
 			{
-				$ulen = $ulen_mask[$s[$i] & "\xf0"];
+				$ulen = $ulen_mask[$s[$i] & "\xF0"];
 				$uchr = substr($s, $i, $ulen);
 				$i += $ulen;
 
@@ -216,7 +216,7 @@ class Normalizer
 						$c = array();
 					}
 
-					if ($uchr < "\xea\xb0\x80" || "\xed\x9e\xa3" < $uchr)
+					if ($uchr < "\xEA\xB0\x80" || "\xED\x9E\xA3" < $uchr)
 					{
 						// Table lookup
 
@@ -227,7 +227,7 @@ class Normalizer
 							$uchr = $j;
 
 							$j = strlen($uchr);
-							$ulen = $uchr[0] < "\x80" ? 1 : $ulen_mask[$uchr[0] & "\xf0"];
+							$ulen = $uchr[0] < "\x80" ? 1 : $ulen_mask[$uchr[0] & "\xF0"];
 
 							if ($ulen != $j)
 							{
@@ -254,16 +254,16 @@ class Normalizer
 						// Hangul chars
 
 						$uchr = unpack('C*', $uchr);
-						$j = (($uchr[1]-224) << 12) + (($uchr[2]-128) << 6) + $uchr[3] - 0xac80;
+						$j = (($uchr[1]-224) << 12) + (($uchr[2]-128) << 6) + $uchr[3] - 0xAC80;
 
-						$uchr = "\xe1\x84" . chr(0x80 + (int)  ($j / 588))
-						         . "\xe1\x85" . chr(0xa1 + (int) (($j % 588) / 28));
+						$uchr = "\xE1\x84" . chr(0x80 + (int)  ($j / 588))
+						         . "\xE1\x85" . chr(0xA1 + (int) (($j % 588) / 28));
 
 						if ($j %= 28)
 						{
 							$uchr .= $j < 25
-								? ("\xe1\x86" . chr(0xa7 + $j))
-								: ("\xe1\x87" . chr(0x67 + $j));
+								? ("\xE1\x86" . chr(0xA7 + $j))
+								: ("\xE1\x87" . chr(0x67 + $j));
 						}
 					}
 

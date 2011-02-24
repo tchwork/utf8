@@ -52,7 +52,7 @@ class u extends patchwork_alias_intl
 		if ('' === $s) return '';
 
 		static $map = array();
-		static $ulen_mask = array("\xc0" => 2, "\xd0" => 2, "\xe0" => 3, "\xf0" => 4);
+		static $ulen_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
 
 		$cp = (string) (int) $cp;
 		$result = '9' === $cp[0] ? $s . $s : $s;
@@ -78,7 +78,7 @@ class u extends patchwork_alias_intl
 			if ($s[$i] < "\x80") $uchr = $s[$i++];
 			else
 			{
-				$ulen = $ulen_mask[$s[$i] & "\xf0"];
+				$ulen = $ulen_mask[$s[$i] & "\xF0"];
 				$uchr = substr($s, $i, $ulen);
 				$i += $ulen;
 			}
@@ -97,8 +97,8 @@ class u extends patchwork_alias_intl
 	// see http://unicode.org/reports/tr21/tr21-5.html
 
 	protected static $commonCaseFold = array(
-		array('µ','ſ',"\xcd\x85",'ς',"\xcf\x90","\xcf\x91","\xcf\x95","\xcf\x96","\xcf\xb0","\xcf\xb1","\xcf\xb5","\xe1\xba\x9b","\xe1\xbe\xbe"),
-		array('μ','s','ι',       'σ','β',       'θ',       'φ',       'π',       'κ',       'ρ',       'ε',       "\xe1\xb9\xa1",'ι'           )
+		array('µ','ſ',"\xCD\x85",'ς',"\xCF\x90","\xCF\x91","\xCF\x95","\xCF\x96","\xCF\xB0","\xCF\xB1","\xCF\xB5","\xE1\xBA\x9B","\xE1\xBE\xBE"),
+		array('μ','s','ι',       'σ','β',       'θ',       'φ',       'π',       'κ',       'ρ',       'ε',       "\xE1\xB9\xA1",'ι'           )
 	);
 
 	static function strtocasefold($s, $full = true, $turkish = false)
@@ -214,9 +214,9 @@ class u extends patchwork_alias_intl
 		$c %= 0x200000;
 
 		return $c < 0x80    ? chr($c) : (
-		       $c < 0x800   ? chr(0xc0 | $c>> 6) . chr(0x80 | $c     & 0x3f) : (
-		       $c < 0x10000 ? chr(0xe0 | $c>>12) . chr(0x80 | $c>> 6 & 0x3f) . chr(0x80 | $c    & 0x3f) : (
-		                      chr(0xf0 | $c>>18) . chr(0x80 | $c>>12 & 0x3f) . chr(0x80 | $c>>6 & 0x3f) . chr(0x80 | $c & 0x3f)
+		       $c < 0x800   ? chr(0xC0 | $c>> 6) . chr(0x80 | $c     & 0x3F) : (
+		       $c < 0x10000 ? chr(0xE0 | $c>>12) . chr(0x80 | $c>> 6 & 0x3F) . chr(0x80 | $c    & 0x3F) : (
+		                      chr(0xF0 | $c>>18) . chr(0x80 | $c>>12 & 0x3F) . chr(0x80 | $c>>6 & 0x3F) . chr(0x80 | $c & 0x3F)
 		)));
 	}
 
