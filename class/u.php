@@ -182,7 +182,7 @@ class u extends patchwork_PHP_intl
 
                     if ($cut && $wLen > $width)
                     {
-                        $w =& self::getGraphemeClusterArray($w);
+                        $w = self::getGraphemeClusterArray($w);
 
                         do
                         {
@@ -223,7 +223,7 @@ class u extends patchwork_PHP_intl
     static function count_chars($s, $mode = 1)
     {
         if (1 != $mode && 3 != $mode) trigger_error('u::count_chars(): allowed $mode are 1 or 3', E_USER_ERROR);
-        $s =& self::getGraphemeClusterArray($s);
+        $s = self::getGraphemeClusterArray($s);
         $s = array_count_values($s);
         return 1 == $mode ? $s[0] : implode('', $s[0]);
     }
@@ -311,7 +311,7 @@ class u extends patchwork_PHP_intl
 
     static function str_shuffle($s)
     {
-        $s =& self::getGraphemeClusterArray($s);
+        $s = self::getGraphemeClusterArray($s);
         shuffle($s);
         return implode('', $s);
     }
@@ -321,7 +321,7 @@ class u extends patchwork_PHP_intl
         $len = (int) $len;
         if ($len < 1) return str_split($s, $len);
 
-        $s =& self::getGraphemeClusterArray($s);
+        $s = self::getGraphemeClusterArray($s);
         if (1 === $len) return $s;
 
         $a = array();
@@ -381,7 +381,7 @@ class u extends patchwork_PHP_intl
 
     static function strrev($s)
     {
-        $s =& self::getGraphemeClusterArray($s);
+        $s = self::getGraphemeClusterArray($s);
         return implode('', array_reverse($s));
     }
 
@@ -395,8 +395,8 @@ class u extends patchwork_PHP_intl
     {
         if (INF !== $to)
         {
-            $from =& self::getGraphemeClusterArray($from);
-            $to   =& self::getGraphemeClusterArray($to);
+            $from = self::getGraphemeClusterArray($from);
+            $to   = self::getGraphemeClusterArray($to);
 
             $a = count($from);
             $b = count($to);
@@ -423,8 +423,8 @@ class u extends patchwork_PHP_intl
 
     static function substr_replace($s, $replace, $start, $len = INF)
     {
-        $s       =& self::getGraphemeClusterArray($s);
-        $replace =& self::getGraphemeClusterArray($replace);
+        $s       = self::getGraphemeClusterArray($s);
+        $replace = self::getGraphemeClusterArray($replace);
 
         if (INF === $len) $len = count($s);
 
@@ -455,9 +455,8 @@ class u extends patchwork_PHP_intl
     protected static function rxClass($s, $class = '')
     {
         $class = array($class);
-        $s =& self::getGraphemeClusterArray($s);
 
-        foreach ($s as $s)
+        foreach (self::getGraphemeClusterArray($s) as $s)
         {
             if ('-' === $s) $class[0] = '-' . $class[0];
             else if (!isset($s[2])) $class[0] .= preg_quote($s, '/');
