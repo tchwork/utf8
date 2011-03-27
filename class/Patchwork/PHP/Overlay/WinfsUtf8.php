@@ -16,7 +16,7 @@
 // based on COM Scripting.FileSystemObject object and 8.3 ShortPaths
 // See also comments on http://www.rooftopsolutions.nl/blog/filesystem-encoding-and-php
 
-class patchwork_PHP_winfsutf8
+class Patchwork_PHP_Overlay_WinfsUtf8
 {
     protected static $FS, $DIR;
 
@@ -299,30 +299,30 @@ class patchwork_PHP_winfsutf8
 
     static function dir($f)
     {
-        return self::$FS->FolderExists(self::absPath($f)) ? new patchwork_PHP_winfsutf8_directory($f) : dir($f);
+        return self::$FS->FolderExists(self::absPath($f)) ? new Patchwork_PHP_Overlay_WinfsUtf8_Directory($f) : dir($f);
     }
 
     static function closedir($d = null)
     {
         null === $d && $d = self::$DIR;
-        return $d instanceof patchwork_PHP_winfsutf8_directory ? $d->close() : closedir($d);
+        return $d instanceof Patchwork_PHP_Overlay_WinfsUtf8_Directory ? $d->close() : closedir($d);
     }
 
     static function opendir($f, $context = null)
     {
-        return self::$DIR = !$context && self::$FS->FolderExists(self::absPath($f)) ? new patchwork_PHP_winfsutf8_directory($f) : opendir($f, $context);
+        return self::$DIR = !$context && self::$FS->FolderExists(self::absPath($f)) ? new Patchwork_PHP_Overlay_WinfsUtf8_Directory($f) : opendir($f, $context);
     }
 
     static function readdir($d = null)
     {
         null === $d && $d = self::$DIR;
-        return $d instanceof patchwork_PHP_winfsutf8_directory ? $d->read() : readdir($d);
+        return $d instanceof Patchwork_PHP_Overlay_WinfsUtf8_Directory ? $d->read() : readdir($d);
     }
 
     static function rewinddir($d = null)
     {
         null === $d && $d = self::$DIR;
-        return $d instanceof patchwork_PHP_winfsutf8_directory ? $d->rewind() : rewinddir($d);
+        return $d instanceof Patchwork_PHP_Overlay_WinfsUtf8_Directory ? $d->rewind() : rewinddir($d);
     }
 
     static function scandir($f, $sorting_order = 0, $context = null)
@@ -349,7 +349,7 @@ class patchwork_PHP_winfsutf8
  */
 }
 
-class patchwork_PHP_winfsutf8_directory extends Directory
+class Patchwork_PHP_Overlay_WinfsUtf8_Directory extends Directory
 {
     public $path, $handle;
 

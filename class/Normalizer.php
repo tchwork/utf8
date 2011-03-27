@@ -281,7 +281,7 @@ class Normalizer
     }
 }
 
-/**/if (!defined('patchwork'))
+/**/if (!defined('PATCHWORK_MICROTIME'))
 /**/{
         Normalizer::__constructStatic();
 /**/}
