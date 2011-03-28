@@ -26,25 +26,10 @@ use Normalizer;
 
 class Utf8
 {
-    static function isUTF8($s)
+    static function isUtf8($s)
     {
         return '' == $s || '' !== htmlspecialchars($s, 0, 'UTF-8');
     }
-
-
-    // Unicode Normalization functions.
-    // Input strings have to be valid UTF-8.
-
-    static function isNFC($s)   {return Normalizer::isNormalized($s, Normalizer::FORM_C );}
-    static function isNFD($s)   {return Normalizer::isNormalized($s, Normalizer::FORM_D );}
-    static function isNFKC($s)  {return Normalizer::isNormalized($s, Normalizer::FORM_KC);}
-    static function isNFKD($s)  {return Normalizer::isNormalized($s, Normalizer::FORM_KD);}
-
-    static function toNFC($s)   {return Normalizer::normalize($s, Normalizer::FORM_C );}
-    static function toNFD($s)   {return Normalizer::normalize($s, Normalizer::FORM_D );}
-    static function toNFKC($s)  {return Normalizer::normalize($s, Normalizer::FORM_KC);}
-    static function toNFKD($s)  {return Normalizer::normalize($s, Normalizer::FORM_KD);}
-
 
     // Unicode to Code Page conversion using best fit mappings
     // See http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/
@@ -95,13 +80,13 @@ class Utf8
     }
 
 
-    // Unicode transformation for caseless matching
-    // see http://unicode.org/reports/tr21/tr21-5.html
-
     protected static $commonCaseFold = array(
         array('µ','ſ',"\xCD\x85",'ς',"\xCF\x90","\xCF\x91","\xCF\x95","\xCF\x96","\xCF\xB0","\xCF\xB1","\xCF\xB5","\xE1\xBA\x9B","\xE1\xBE\xBE"),
         array('μ','s','ι',       'σ','β',       'θ',       'φ',       'π',       'κ',       'ρ',       'ε',       "\xE1\xB9\xA1",'ι'           )
     );
+
+    // Unicode transformation for caseless matching
+    // see http://unicode.org/reports/tr21/tr21-5.html
 
     static function strtocasefold($s, $full = true, $turkish = false)
     {
@@ -124,6 +109,13 @@ class Utf8
         return self::strtolower($s);
     }
 
+    // Generic case sensitive collation support for self::strnatcmp()
+
+    static function strtonatfold($s)
+    {
+        $s = Normalizer::normalize($s, Normalizer::FORM_D);
+        return preg_replace('/\p{Mn}+/u', '', $s);
+    }
 
     // Here is the quasi complete set of native PHP string functions that need UTF-8 awareness
     // Missing are printf-family functions and number_format
@@ -139,8 +131,8 @@ class Utf8
     static function strrchr ($s, $needle, $before_needle = false) {return mb_strrchr ($s, $needle, $before_needle, 'UTF-8');}
     static function strrichr($s, $needle, $before_needle = false) {return mb_strrichr($s, $needle, $before_needle, 'UTF-8');}
 
-    static function strtolower($s) {return mb_strtolower($s, 'UTF-8');}
-    static function strtoupper($s) {return mb_strtoupper($s, 'UTF-8');}
+    static function strtolower($s, $form = /*<*/Normalizer::FORM_C/*>*/) {return Normalizer::isNormalized($s = mb_strtolower($s, 'UTF-8'), $form) ? $s : Normalizer::normalize($s, $form);}
+    static function strtoupper($s, $form = /*<*/Normalizer::FORM_C/*>*/) {return Normalizer::isNormalized($s = mb_strtoupper($s, 'UTF-8'), $form) ? $s : Normalizer::normalize($s, $form);}
 
     static function htmlentities    ($s, $quote_style = ENT_COMPAT) {return htmlentities    ($s, $quote_style, 'UTF-8');}
     static function htmlspecialchars($s, $quote_style = ENT_COMPAT) {return htmlspecialchars($s, $quote_style, 'UTF-8');}
@@ -267,7 +259,7 @@ class Utf8
 
     static function get_html_translation_table($table = HTML_SPECIALCHARS, $quote_style = ENT_COMPAT)
     {
-        if (HTML_ENTITIES == $table)
+        if (HTML_ENTITIES === $table)
         {
             static $entities;
             isset($entities) || $entities = unserialize(file_get_contents(patchworkPath('data/utf8/htmlentities.ser')));
@@ -292,10 +284,10 @@ class Utf8
         $freelen = $len - $slen;
         $len = $freelen % $padlen;
 
-        if (STR_PAD_RIGHT == $type) return $s . str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '');
-        if (STR_PAD_LEFT  == $type) return      str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '') . $s;
+        if (STR_PAD_RIGHT === $type) return $s . str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '');
+        if (STR_PAD_LEFT  === $type) return      str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '') . $s;
 
-        if (STR_PAD_BOTH == $type)
+        if (STR_PAD_BOTH === $type)
         {
             $freelen /= 2;
 
@@ -361,8 +353,8 @@ class Utf8
         return $charlist;
     }
 
-    static function strcmp       ($a, $b) {return $a == $b ? 0 : strcmp   (self::toNFD  ($a), self::toNFD  ($b));}
-    static function strnatcmp    ($a, $b) {return $a == $b ? 0 : strnatcmp(self::natFold($a), self::natFold($b));}
+    static function strcmp       ($a, $b) {return (string) $a === (string) $b ? 0 : strcmp(Normalizer::normalize($a, Normalizer::FORM_D), Normalizer::normalize($b, Normalizer::FORM_D));}
+    static function strnatcmp    ($a, $b) {return (string) $a === (string) $b ? 0 : strnatcmp(self::strtonatfold($a), self::strtonatfold($b));}
     static function strcasecmp   ($a, $b) {return self::strcmp   (self::strtocasefold($a), self::strtocasefold($b));}
     static function strnatcasecmp($a, $b) {return self::strnatcmp(self::strtocasefold($a), self::strtocasefold($b));}
     static function strncasecmp  ($a, $b, $len) {return self::strncmp(self::strtocasefold($a), self::strtocasefold($b), $len);}
@@ -452,12 +444,6 @@ class Utf8
         return $s[0];
     }
 
-    protected static function natFold($s)
-    {
-        // This enables a minimalist collation support for strnatcmp() and strnatcasecmp()
-        $s = self::toNFD($s);
-        return preg_replace('/\p{Mn}+/u', '', $s);
-    }
 
     protected static function rxClass($s, $class = '')
     {

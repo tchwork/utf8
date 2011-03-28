@@ -35,7 +35,23 @@ class Normalizer
 
     static function isNormalized($s, $form = self::FORM_C)
     {
-        return false;
+        if (strspn($s, self::$ASCII) === strlen($s)) return true;
+
+        if (self::FORM_C === $form && !preg_match('/[^\x00-\x{2FF}]/u', $s)) return true;
+
+        static $qc;
+
+        if (empty($qc))
+        {
+            $qc = array_combine(
+                array(0, self::FORM_C, self::FORM_KC, self::FORM_D, self::FORM_KD, 0),
+                explode("\n", file_get_contents(patchworkPath('data/utf8/quickChecks.txt')))
+            );
+
+            unset($qc[0]);
+        }
+
+        return !preg_match("/{$qc[$form]}/u", $s);
     }
 
     static function normalize($s, $form = self::FORM_C)
