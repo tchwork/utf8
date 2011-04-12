@@ -29,7 +29,7 @@ grapheme_substr   - Return part of a string
  *
  */
 
-class Patchwork_PHP_Overlay_Intl
+class Patchwork_PHP_Override_Intl
 {
     static function strlen($s)
     {
@@ -82,12 +82,12 @@ class Patchwork_PHP_Overlay_Intl
 
 /**/if (!function_exists('grapheme_strlen'))
 /**/{
-        function grapheme_strlen  ($s) {return Patchwork_PHP_Overlay_Intl::strlen($s);}
-        function grapheme_strpos  ($s, $needle, $offset = 0) {return Patchwork_PHP_Overlay_Intl::strpos  ($s, $needle, $offset);}
-        function grapheme_stripos ($s, $needle, $offset = 0) {return Patchwork_PHP_Overlay_Intl::stripos ($s, $needle, $offset);}
-        function grapheme_strrpos ($s, $needle, $offset = 0) {return Patchwork_PHP_Overlay_Intl::strrpos ($s, $needle, $offset);}
-        function grapheme_strripos($s, $needle, $offset = 0) {return Patchwork_PHP_Overlay_Intl::strripos($s, $needle, $offset);}
-        function grapheme_stristr ($s, $needle, $before_needle = false) {return Patchwork_PHP_Overlay_Intl::stristr($s, $needle, $before_needle);}
-        function grapheme_strstr  ($s, $needle, $before_needle = false) {return Patchwork_PHP_Overlay_Intl::strstr ($s, $needle, $before_needle);}
-        function grapheme_substr  ($s, $start, $len = INF) {return Patchwork_PHP_Overlay_Intl::substr($s, $start, $len);}
+        function grapheme_strlen  ($s) {return Patchwork_PHP_Override_Intl::strlen($s);}
+        function grapheme_strpos  ($s, $needle, $offset = 0) {return Patchwork_PHP_Override_Intl::strpos  ($s, $needle, $offset);}
+        function grapheme_stripos ($s, $needle, $offset = 0) {return Patchwork_PHP_Override_Intl::stripos ($s, $needle, $offset);}
+        function grapheme_strrpos ($s, $needle, $offset = 0) {return Patchwork_PHP_Override_Intl::strrpos ($s, $needle, $offset);}
+        function grapheme_strripos($s, $needle, $offset = 0) {return Patchwork_PHP_Override_Intl::strripos($s, $needle, $offset);}
+        function grapheme_stristr ($s, $needle, $before_needle = false) {return Patchwork_PHP_Override_Intl::stristr($s, $needle, $before_needle);}
+        function grapheme_strstr  ($s, $needle, $before_needle = false) {return Patchwork_PHP_Override_Intl::strstr ($s, $needle, $before_needle);}
+        function grapheme_substr  ($s, $start, $len = INF) {return Patchwork_PHP_Override_Intl::substr($s, $start, $len);}
 /**/}
