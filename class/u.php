@@ -1,4 +1,4 @@
-<?php // vi: set encoding=utf-8 expandtab shiftwidth=4:
+<?php // vi: set fenc=utf-8 ts=4 sw=4 et:
 
 /**/if (DEBUG)
 /**/{
