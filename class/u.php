@@ -26,7 +26,7 @@ class u extends patchwork_PHP_intl
 {
     static function isUTF8($s)
     {
-        return @iconv('UTF-8', 'UTF-8', $s) === (string) $s;
+        return '' == $s || '' !== htmlspecialchars($s, 0, 'UTF-8');
     }
 
 
