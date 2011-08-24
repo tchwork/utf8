@@ -28,7 +28,7 @@ class Utf8
 {
     static function isUtf8($s)
     {
-        return '' == $s || '' !== htmlspecialchars($s, 0, 'UTF-8');
+        return preg_match("''u", $s);
     }
 
     // Unicode to Code Page conversion using best fit mappings
