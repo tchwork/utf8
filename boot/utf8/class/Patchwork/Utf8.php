@@ -131,8 +131,8 @@ class Utf8
     static function strrchr ($s, $needle, $before_needle = false) {return mb_strrchr ($s, $needle, $before_needle, 'UTF-8');}
     static function strrichr($s, $needle, $before_needle = false) {return mb_strrichr($s, $needle, $before_needle, 'UTF-8');}
 
-    static function strtolower($s, $form = /*<*/Normalizer::FORM_C/*>*/) {return Normalizer::isNormalized($s = mb_strtolower($s, 'UTF-8'), $form) ? $s : Normalizer::normalize($s, $form);}
-    static function strtoupper($s, $form = /*<*/Normalizer::FORM_C/*>*/) {return Normalizer::isNormalized($s = mb_strtoupper($s, 'UTF-8'), $form) ? $s : Normalizer::normalize($s, $form);}
+    static function strtolower($s, $form = Normalizer::FORM_C) {return Normalizer::isNormalized($s = mb_strtolower($s, 'UTF-8'), $form) ? $s : Normalizer::normalize($s, $form);}
+    static function strtoupper($s, $form = Normalizer::FORM_C) {return Normalizer::isNormalized($s = mb_strtoupper($s, 'UTF-8'), $form) ? $s : Normalizer::normalize($s, $form);}
 
     static function htmlentities    ($s, $quote_style = ENT_COMPAT) {return htmlentities    ($s, $quote_style, 'UTF-8');}
     static function htmlspecialchars($s, $quote_style = ENT_COMPAT) {return htmlspecialchars($s, $quote_style, 'UTF-8');}

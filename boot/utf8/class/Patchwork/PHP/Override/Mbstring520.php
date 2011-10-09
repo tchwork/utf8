@@ -26,7 +26,7 @@ mb_strstr   - Finds first occurrence of a string within another
 
  */
 
-class Patchwork_PHP_Override_Mbstring52
+class Patchwork_PHP_Override_Mbstring520
 {
     static function mb_stripos($haystack, $needle, $offset = 0, $encoding = INF)
     {
@@ -79,7 +79,7 @@ class Patchwork_PHP_Override_Mbstring52
             $haystack = mb_substr($haystack, $offset, PHP_INT_MAX, $encoding);
         }
 
-        $pos = mb_strrpos50($haystack, $needle, $encoding);
+        $pos = mb_strrpos500($haystack, $needle, $encoding);
 
         return false !== $pos ? $offset + $pos : false;
     }
@@ -97,9 +97,9 @@ class Patchwork_PHP_Override_Mbstring52
     }
 }
 
-/**/if (!function_exists('mb_strrpos50'))
+/**/if (!function_exists('mb_strrpos500'))
 /**/{
-        function mb_strrpos50($haystack, $needle, $encoding = INF)
+        function mb_strrpos500($haystack, $needle, $encoding = INF)
         {
             INF === $encoding && $encoding = mb_internal_encoding();
             return iconv_strrpos($haystack, $needle, $encoding);

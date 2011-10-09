@@ -73,7 +73,7 @@ mb_substr               - Get part of string
 
  */
 
-class Patchwork_PHP_Override_Mbstring50
+class Patchwork_PHP_Override_Mbstring500
 {
     protected static $internal_encoding = 'UTF-8';
 
