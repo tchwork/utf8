@@ -250,7 +250,7 @@ class Compiler
                 $exclude = count($decomp) == 1 || isset($exclusion[$k]);
 
                 $decomp = array_map('hexdec', $decomp);
-                $decomp = array_map(array(__CLASS__,'chr'), $decomp);
+                $decomp = array_map(array(__CLASS__, 'chr'), $decomp);
                 $decomp = implode('', $decomp);
 
                 if ($canonic)
@@ -311,7 +311,7 @@ class Compiler
 
                 $decomp = explode(' ', $m[3]);
                 $decomp = array_map('hexdec', $decomp);
-                $decomp = array_map(array(__CLASS__,'chr'), $decomp);
+                $decomp = array_map(array(__CLASS__, 'chr'), $decomp);
                 $decomp = implode('', $decomp);
 
                 @($lowerCase[$k] != $decomp && $caseFolding[$m[2]][$k] = $decomp);
