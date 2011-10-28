@@ -385,7 +385,7 @@ class Patchwork_PHP_Override_Iconv
     {
         if (!isset(self::$convert_map[$type . $charset]))
         {
-            if (false === $map = patchworkPath('data/utf8/charset/' . $type . $charset . '.ser'))
+            if (false === $map = self::getFile($type . $charset . '.ser'))
             {
                 $map = 'to.' === $type && self::loadMap('from.', $charset, $map) ? array_reverse($map) : array();
 
@@ -466,7 +466,7 @@ class Patchwork_PHP_Override_Iconv
 
         $TRANSLIT
             && self::$translit_map
-            || self::$translit_map = unserialize(file_get_contents(patchworkPath('data/utf8/charset/translit.ser')));
+            || self::$translit_map = unserialize(file_get_contents(self::getFile('translit.ser')));
 
         $i = 0;
         $len = strlen($str);
@@ -532,5 +532,10 @@ class Patchwork_PHP_Override_Iconv
         }
 
         return implode('', $rx) . '.{' . $offset . '}';
+    }
+
+    protected static function getFile($file)
+    {
+        return dirname(dirname(__DIR__)) . '/Utf8/data/charset/' . $file;
     }
 }

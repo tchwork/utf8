@@ -238,11 +238,7 @@ class Patchwork_PHP_Override_Mbstring500
 
     protected static function loadCaseTable($upper)
     {
-        return unserialize(file_get_contents(
-            $upper
-                ? patchworkPath('data/utf8/upperCase.ser')
-                : patchworkPath('data/utf8/lowerCase.ser')
-        ));
+        return unserialize(file_get_contents(self::getFile(($upper ? 'Upp' : 'Low') . 'erCase.ser')));
     }
 
     protected static function html_encoding_callback($m)
@@ -258,5 +254,10 @@ class Patchwork_PHP_Override_Mbstring500
         for ($i = 1; $i < $len && $s[$i] < "\x80"; ++$i) $s[$i] = strtolower($s[$i]);
 
         return $s;
+    }
+
+    protected static function getFile($file)
+    {
+        return dirname(dirname(__DIR__)) . '/Utf8/data/' . $file;
     }
 }

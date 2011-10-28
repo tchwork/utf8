@@ -45,7 +45,7 @@ class Utf8
         $result = '9' === $cp[0] ? $s . $s : $s;
 
         if (isset($map[$cp])) $cp =& $map[$cp];
-        else if (file_exists($i = patchworkPath('data/utf8/bestfit' . $cp . '.ser')))
+        else if (file_exists($i = self::getFile('bestfit' . $cp . '.ser')))
         {
             $map[$cp] = unserialize(file_get_contents($i));
             $cp =& $map[$cp];
@@ -101,7 +101,7 @@ class Utf8
         if ($full)
         {
             static $fullCaseFold = false;
-            $fullCaseFold || $fullCaseFold = unserialize(file_get_contents(patchworkPath('data/utf8/caseFolding_full.ser')));
+            $fullCaseFold || $fullCaseFold = unserialize(file_get_contents(self::getFile('caseFolding_full.ser')));
 
             $s = str_replace($fullCaseFold[0], $fullCaseFold[1], $s);
         }
@@ -262,7 +262,7 @@ class Utf8
         if (HTML_ENTITIES === $table)
         {
             static $entities;
-            isset($entities) || $entities = unserialize(file_get_contents(patchworkPath('data/utf8/htmlentities.ser')));
+            isset($entities) || $entities = unserialize(file_get_contents(self::getFile('htmlentities.ser')));
             return $entities + get_html_translation_table(HTML_SPECIALCHARS, $quote_style);
         }
         else return get_html_translation_table($table, $quote_style);
@@ -465,5 +465,10 @@ class Utf8
         $class[0] = '[' . $class[0] . ']';
 
         return 1 === count($class) ? $class[0] : ('(?:' . implode('|', $class) . ')');
+    }
+
+    protected static function getFile($file)
+    {
+        return __DIR__ . '/Utf8/data/' . $file;
     }
 }

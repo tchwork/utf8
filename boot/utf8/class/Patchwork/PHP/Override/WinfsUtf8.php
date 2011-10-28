@@ -18,12 +18,7 @@
 
 class Patchwork_PHP_Override_WinfsUtf8
 {
-    protected static $FS, $DIR;
-
-    static function __constructStatic()
-    {
-        self::$FS = self::newCOM('Scripting.FileSystemObject');
-    }
+    protected static $DIR;
 
     static function newCOM($module, $server = null, $cp = CP_UTF8, $typelib = INF)
     {
@@ -34,7 +29,7 @@ class Patchwork_PHP_Override_WinfsUtf8
 
     static function hide($file)
     {
-        self::$FS->GetFile($file)->Attributes |= 2; // Set hidden attribute
+        self::getFs()->GetFile($file)->Attributes |= 2; // Set hidden attribute
     }
 
     static function absPath($f)
@@ -56,7 +51,7 @@ class Patchwork_PHP_Override_WinfsUtf8
         {
             $f = array('.', '..');
 
-            $dir = self::$FS->getFolder(self::absPath($dir));
+            $dir = self::getFs()->getFolder(self::absPath($dir));
 
             foreach ($dir->SubFolders() as $v) $f[] = $v->Name;
             foreach ($dir->Files        as $v) $f[] = $v->Name;
@@ -73,8 +68,7 @@ class Patchwork_PHP_Override_WinfsUtf8
 
     static function ShortPath($f)
     {
-        $FS = self::$FS;
-
+        $FS = self::getFs();
         $a = self::absPath($f);
 
         try
@@ -94,14 +88,14 @@ class Patchwork_PHP_Override_WinfsUtf8
 
     static function copy($from, $to, $context = null)
     {
-        if ($context || !self::$FS->FileExists(self::absPath($from)))
+        if ($context || !self::getFs()->FileExists(self::absPath($from)))
         {
             return copy($from, $to, $context);
         }
 
         try
         {
-            self::$FS->CopyFile(self::absPath($from), self::absPath($to), true);
+            self::getFs()->CopyFile(self::absPath($from), self::absPath($to), true);
             return true;
         }
         catch (com_exception $e)
@@ -113,7 +107,7 @@ class Patchwork_PHP_Override_WinfsUtf8
     static function file_exists($f)
     {
         $f = self::absPath($f);
-        return self::$FS->FileExists($f) || self::$FS->FolderExists($f);
+        return self::getFs()->FileExists($f) || self::getFs()->FolderExists($f);
     }
 
     static function file_get_contents($f, $use_include_path = false, $context = null, $offset = 0, $maxlen = null)
@@ -125,7 +119,7 @@ class Patchwork_PHP_Override_WinfsUtf8
 
     static function file_put_contents($f, $data, $use_include_path = false, $context = null)
     {
-        try {self::$FS->CreateTextFile(self::absPath($f), false)->Close();}
+        try {self::getFs()->CreateTextFile(self::absPath($f), false)->Close();}
         catch (com_exception $e) {}
 
         return null === $context
@@ -157,7 +151,7 @@ class Patchwork_PHP_Override_WinfsUtf8
         case 'x': $mode[0] = 'w';
         case 'w':
         case 'a':
-            try {self::$FS->CreateTextFile(self::absPath($f), false)->Close();}
+            try {self::getFs()->CreateTextFile(self::absPath($f), false)->Close();}
             catch (com_exception $e)
             {
                 if ('x' === $m) return false;
@@ -206,7 +200,7 @@ class Patchwork_PHP_Override_WinfsUtf8
 
             $b = array();
 
-            while (!self::$FS->FolderExists(dirname($a)))
+            while (!self::getFs()->FolderExists(dirname($a)))
             {
                 //XXX TODO
             }
@@ -214,7 +208,7 @@ class Patchwork_PHP_Override_WinfsUtf8
 
         try
         {
-            self::$FS->CreateFolder($a);
+            self::getFs()->CreateFolder($a);
             return true;
         }
         catch (com_exception $e) {}
@@ -231,13 +225,13 @@ class Patchwork_PHP_Override_WinfsUtf8
             : readfile(self::ShortPath($f), $use_include_path, $context);
     }
 
-    static function realpath($f) {return self::file_exists($f) ? self::$FS->GetAbsolutePathName(self::absPath($f)) : false;}
+    static function realpath($f) {return self::file_exists($f) ? self::getFs()->GetAbsolutePathName(self::absPath($f)) : false;}
 
     static function rename($from, $to, $context = null)
     {
         if ($context) return rename($from, $to, $context);
 
-        $FS = self::$FS;
+        $FS = self::getFs();
         $from = self::absPath($from);
         $to   = self::absPath($to);
 
@@ -284,7 +278,7 @@ class Patchwork_PHP_Override_WinfsUtf8
 
     static function touch($f, $time = null, $atime = null)
     {
-        try {self::$FS->CreateTextFile(self::absPath($f), false)->Close();}
+        try {self::getFs()->CreateTextFile(self::absPath($f), false)->Close();}
         catch (com_exception $e) {}
 
         return touch(self::ShortPath($f), $time, $atime);
@@ -299,7 +293,7 @@ class Patchwork_PHP_Override_WinfsUtf8
 
     static function dir($f)
     {
-        return self::$FS->FolderExists(self::absPath($f)) ? new Patchwork_PHP_Override_WinfsUtf8_Directory($f) : dir($f);
+        return self::getFs()->FolderExists(self::absPath($f)) ? new Patchwork_PHP_Override_WinfsUtf8_Directory($f) : dir($f);
     }
 
     static function closedir($d = null)
@@ -310,7 +304,7 @@ class Patchwork_PHP_Override_WinfsUtf8
 
     static function opendir($f, $context = null)
     {
-        return self::$DIR = !$context && self::$FS->FolderExists(self::absPath($f)) ? new Patchwork_PHP_Override_WinfsUtf8_Directory($f) : opendir($f, $context);
+        return self::$DIR = !$context && self::getFs()->FolderExists(self::absPath($f)) ? new Patchwork_PHP_Override_WinfsUtf8_Directory($f) : opendir($f, $context);
     }
 
     static function readdir($d = null)
@@ -347,6 +341,13 @@ class Patchwork_PHP_Override_WinfsUtf8
     static function ` `($f) {return ` `(self::ShortPath($f));}
     static function system($f) {return system(self::ShortPath($f));}
  */
+
+    protected static function getFs()
+    {
+        static $FS;
+        isset($FS) || $FS = self::newCOM('Scripting.FileSystemObject');
+        return $FS;
+    }
 }
 
 class Patchwork_PHP_Override_WinfsUtf8_Directory extends Directory
