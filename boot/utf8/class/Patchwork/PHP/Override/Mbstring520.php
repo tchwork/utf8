@@ -76,7 +76,7 @@ class Patchwork_PHP_Override_Mbstring520
         }
         else if ($offset = (int) $offset)
         {
-            $haystack = mb_substr($haystack, $offset, PHP_INT_MAX, $encoding);
+            $haystack = mb_substr($haystack, $offset, 2147483647, $encoding);
         }
 
         $pos = mb_strrpos500($haystack, $needle, $encoding);
@@ -91,8 +91,8 @@ class Patchwork_PHP_Override_Mbstring520
 
         return false === $pos ? false : (
               $part
-            ? mb_substr($haystack,    0,        $pos, $encoding)
-            : mb_substr($haystack, $pos, PHP_INT_MAX, $encoding)
+            ? mb_substr($haystack,    0,       $pos, $encoding)
+            : mb_substr($haystack, $pos, 2147483647, $encoding)
         );
     }
 }

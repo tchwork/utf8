@@ -15,20 +15,27 @@ namespace Patchwork;
 
 use Normalizer;
 
-/* UTF-8 Grapheme Cluster aware string manipulations.
- *
- * See also:
- * - http://phputf8.sf.net/ and its "see also" section
- * - http://annevankesteren.nl/2005/05/unicode
- * - http://www.unicode.org/reports/tr29/
- *
- */
+/** UTF-8 Grapheme Cluster aware string manipulations */
 
 class Utf8
 {
     static function isUtf8($s)
     {
         return preg_match("''u", $s);
+    }
+
+    // Generic UTF-8 to ASCII transliteration
+
+    static function toASCII($s)
+    {
+        if (preg_match("'[\x80-\xFF]'", $s))
+        {
+            $s = Normalizer::normalize($s, Normalizer::FORM_KD);
+            $s = preg_replace('/\p{Mn}+/u', '', $s);
+            $s = iconv('UTF-8', 'ASCII' . ('glibc' !== ICONV_IMPL ? '//IGNORE' : '') . '//TRANSLIT', $s);
+        }
+
+        return $s;
     }
 
     // Unicode to Code Page conversion using best fit mappings
@@ -121,7 +128,7 @@ class Utf8
     // Missing are printf-family functions and number_format
 
     static function strlen($s) {return grapheme_strlen($s);}
-    static function substr($s, $start, $len = INF) {return INF === $len ? grapheme_substr($start, $len) : grapheme_substr($start, $len, $length);}
+    static function substr($s, $start, $len = 2147483647) {return grapheme_substr($s, $start, $len);}
     static function strpos  ($s, $needle, $offset = 0) {return grapheme_strpos  ($s, $needle, $offset);}
     static function stripos ($s, $needle, $offset = 0) {return grapheme_stripos ($s, $needle, $offset);}
     static function strrpos ($s, $needle, $offset = 0) {return grapheme_strrpos ($s, $needle, $offset);}
@@ -139,9 +146,8 @@ class Utf8
 
     static function wordwrap($s, $width = 75, $break = "\n", $cut = false)
     {
-        // This implementation could be extended
-        // to handle unicode word boundaries,
-        // but that's enough work for today.
+        // This implementation could be extended to handle unicode word boundaries,
+        // but that's enough work for today (see http://www.unicode.org/reports/tr29/)
 
         $width = (int) $width;
         $s = explode($break, $s);
@@ -360,10 +366,10 @@ class Utf8
     static function strncasecmp  ($a, $b, $len) {return self::strncmp(self::strtocasefold($a), self::strtocasefold($b), $len);}
     static function strncmp      ($a, $b, $len) {return self::strcmp(grapheme_substr($a, 0, $len), grapheme_substr($b, 0, $len));}
 
-    static function strcspn($s, $charlist, $start = 0, $len = INF)
+    static function strcspn($s, $charlist, $start = 0, $len = 2147483647)
     {
         if ('' === (string) $mask) return null;
-        if ($start || INF !== $len) $s = grapheme_substr($s, $start, $len);
+        if ($start || 2147483647 != $len) $s = grapheme_substr($s, $start, $len);
 
         return preg_match('/^(.*?)' . self::rxClass($mask) . '/us', $s, $len) ? grapheme_strlen($len[1]) : grapheme_strlen($s);
     }
@@ -379,9 +385,9 @@ class Utf8
         return implode('', array_reverse($s));
     }
 
-    static function strspn($s, $mask, $start = INF, $len = INF)
+    static function strspn($s, $mask, $start = 0, $len = 2147483647)
     {
-        if (INF !== $start || INF !== $len) $s = grapheme_substr($s, $start, $len);
+        if ($start || 2147483647 != $len) $s = grapheme_substr($s, $start, $len);
         return preg_match('/^' . self::rxClass($mask) . '+/u', $s, $s) ? grapheme_strlen($s[0]) : 0;
     }
 
@@ -404,26 +410,22 @@ class Utf8
         return strtr($s, $from);
     }
 
-    static function substr_compare($a, $b, $offset, $len = INF, $i = 0)
+    static function substr_compare($a, $b, $offset, $len = 2147483647, $i = 0)
     {
         $a = grapheme_substr($a, $offset, $len);
         return $i ? self::strcasecmp($a, $b) : self::strcmp($a, $b);
     }
 
-    static function substr_count($s, $needle, $offset = 0, $len = INF)
+    static function substr_count($s, $needle, $offset = 0, $len = 2147483647)
     {
         return substr_count(grapheme_substr($s, $offset, $len), $needle);
     }
 
-    static function substr_replace($s, $replace, $start, $len = INF)
+    static function substr_replace($s, $replace, $start, $len = 2147483647)
     {
         $s       = self::getGraphemeClusters($s);
         $replace = self::getGraphemeClusters($replace);
-
-        if (INF === $len) $len = count($s);
-
         array_splice($s, $start, $len, $replace);
-
         return implode('', $s);
     }
 

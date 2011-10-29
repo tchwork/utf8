@@ -21,57 +21,46 @@ class Patchwork_PHP_Override_Mbstring8bit
 
     static function strlen($s)
     {
-        return   mb_strlen($s, '8bit');
+        return mb_strlen($s, '8bit');
     }
 
     static function strpos($haystack, $needle, $offset = 0)
     {
-        return   mb_strpos($haystack, $needle, $offset, '8bit');
+        return mb_strpos($haystack, $needle, $offset, '8bit');
     }
 
     static function strrpos($haystack, $needle, $offset = 0)
     {
-        return   mb_strrpos($haystack, $needle, $offset, '8bit');
+        return mb_strrpos($haystack, $needle, $offset, '8bit');
     }
 
-    static function substr($string, $start, $length = INF)
+    static function substr($string, $start, $length = 2147483647)
     {
-        if (INF !== $length)
-        {
-            return mb_substr($string, $start, $length, '8bit');
-        }
-        else
-        {
-            $length = mb_internal_encoding();
-            mb_internal_encoding('8bit');
-            $string = mb_substr($string, $start);
-            mb_internal_encoding($length);
-            return $string;
-        }
+        return mb_substr($string, $start, $length, '8bit');
     }
 
     static function stripos($s, $needle, $offset = 0)
     {
-        return   mb_stripos($s, $needle, $offset, '8bit');
+        return mb_stripos($s, $needle, $offset, '8bit');
     }
 
     static function stristr($s, $needle, $part = false)
     {
-        return   mb_stristr($s, $needle, $part, '8bit');
+        return mb_stristr($s, $needle, $part, '8bit');
     }
 
     static function strrchr($s, $needle, $part = false)
     {
-        return   mb_strrchr($s, $needle, $part, '8bit');
+        return mb_strrchr($s, $needle, $part, '8bit');
     }
 
     static function strripos($s, $needle, $offset = 0)
     {
-        return   mb_strripos($s, $needle, $offset, '8bit');
+        return mb_strripos($s, $needle, $offset, '8bit');
     }
 
     static function strstr($s, $needle, $part = false)
     {
-        return   mb_strstr($s, $needle, $part, '8bit');
+        return mb_strstr($s, $needle, $part, '8bit');
     }
 }

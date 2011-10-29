@@ -229,7 +229,7 @@ class Patchwork_PHP_Override_Mbstring500
         return INF !== $c ? false : 'none';
     }
 
-    static function mb_substr($s, $start, $length = PHP_INT_MAX, $encoding = INF)
+    static function mb_substr($s, $start, $length = 2147483647, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
         return iconv_substr($s, $start, $length, $encoding . '//IGNORE');

@@ -70,10 +70,10 @@ class Patchwork_PHP_Override_Intl
         return $s;
     }
 
-    static function grapheme_substr($s, $start, $len = INF)
+    static function grapheme_substr($s, $start, $len = 2147483647)
     {
         preg_match_all('/' . self::GRAPHEME_CLUSTER_RX . '/u', $s, $s);
-        $s = array_slice($s[0], $start, INF === $len ? PHP_INT_MAX : $len);
+        $s = array_slice($s[0], $start, $len);
         return implode('', $s);
     }
 

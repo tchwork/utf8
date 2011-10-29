@@ -338,7 +338,7 @@ class Patchwork_PHP_Override_Iconv
         INF === $encoding && $encoding = self::$internal_encoding;
         0 !== strncasecmp($encoding, 'UTF-8', 5) && $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
 
-        if ($offset = (int) $offset) $haystack = self::iconv_substr($haystack, $offset, PHP_INT_MAX, 'UTF-8');
+        if ($offset = (int) $offset) $haystack = self::iconv_substr($haystack, $offset, 2147483647, 'UTF-8');
         $pos = strpos($haystack, $needle);
         return false === $pos ? false : ($offset + ($pos ? iconv_strlen(substr($haystack, 0, $pos), 'UTF-8') : 0));
     }
@@ -353,7 +353,7 @@ class Patchwork_PHP_Override_Iconv
         return false === $pos ? false : iconv_strlen($pos ? substr($haystack, 0, -$pos) : $haystack, 'UTF-8');
     }
 
-    static function iconv_substr($s, $start, $length = PHP_INT_MAX, $encoding = INF)
+    static function iconv_substr($s, $start, $length = 2147483647, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
         if (0 === strncasecmp($encoding, 'UTF-8', 5)) $encoding = INF;
