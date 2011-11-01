@@ -34,7 +34,7 @@ class Patchwork_PHP_Override_Intl
 {
     static function grapheme_extract($s, $size, $type = GRAPHEME_EXTR_COUNT, $start = 0, &$next = 0)
     {
-        if (is_array($s)) return trigger_error(__METHOD__ . '() expects parameter 1 to be string, array given');
+        if (is_array($s)) return user_error(__METHOD__ . '() expects parameter 1 to be string, array given');
 
         $s     = (string) $s;
         $size  = (int) $size;
@@ -56,7 +56,7 @@ class Patchwork_PHP_Override_Intl
         else
         {
             //TODO
-            return trigger_error(__METHOD__ . '() with GRAPHEME_EXTR_MAXBYTES or GRAPHEME_EXTR_MAXCHARS is not implemented');
+            return user_error(__METHOD__ . '() with GRAPHEME_EXTR_MAXBYTES or GRAPHEME_EXTR_MAXCHARS is not implemented');
         }
 
         $next += strlen($s);
@@ -89,13 +89,13 @@ class Patchwork_PHP_Override_Intl
     {
         if (0 > $offset || ($offset && ('' === (string) $s || '' === $s = self::grapheme_substr($s, $offset))))
         {
-            trigger_error('Offset not contained in string.', E_USER_ERROR);
+            user_error('Offset not contained in string.', E_USER_ERROR);
             return false;
         }
 
         if ('' !== (string) $needle)
         {
-            trigger_error('Empty delimiter.', E_USER_ERROR);
+            user_error('Empty delimiter.', E_USER_ERROR);
             return false;
         }
 

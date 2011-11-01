@@ -97,7 +97,7 @@ class Patchwork_PHP_Override_Iconv
         if (   ('utf-8' !==  $in_charset && !self::loadMap('from.',  $in_charset,  $in_map))
             || ('utf-8' !== $out_charset && !self::loadMap(  'to.', $out_charset, $out_map)) )
         {
-            trigger_error(sprintf(self::ERROR_WRONG_CHARSET, $in_charset, $out_charset));
+            user_error(sprintf(self::ERROR_WRONG_CHARSET, $in_charset, $out_charset));
             return false;
         }
 
@@ -115,7 +115,7 @@ class Patchwork_PHP_Override_Iconv
 
             if (!self::$is_valid_utf8 && !$IGNORE)
             {
-                trigger_error(self::ERROR_ILLEGAL_CHARACTER);
+                user_error(self::ERROR_ILLEGAL_CHARACTER);
                 return false;
             }
 
@@ -426,7 +426,7 @@ class Patchwork_PHP_Override_Iconv
                         continue;
                     }
 
-                    trigger_error(self::ERROR_ILLEGAL_CHARACTER);
+                    user_error(self::ERROR_ILLEGAL_CHARACTER);
                     return false;
                 }
                 else $i += $ulen;
@@ -451,7 +451,7 @@ class Patchwork_PHP_Override_Iconv
             else if (isset($map[$str[$i] . $str[$i+1]])) $result .= $map[$str[$i] . $str[++$i]];
             else if (!$IGNORE)
             {
-                trigger_error(self::ERROR_ILLEGAL_CHARACTER);
+                user_error(self::ERROR_ILLEGAL_CHARACTER);
                 return false;
             }
         }
@@ -507,7 +507,7 @@ class Patchwork_PHP_Override_Iconv
             }
             else if (!$IGNORE)
             {
-                trigger_error(self::ERROR_ILLEGAL_CHARACTER);
+                user_error(self::ERROR_ILLEGAL_CHARACTER);
                 return false;
             }
         }

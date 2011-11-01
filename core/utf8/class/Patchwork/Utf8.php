@@ -59,7 +59,7 @@ class Utf8
         }
         else
         {
-            trigger_error('No "Best Fit" mapping found for given Code Page (' . $cp . ').');
+            user_error('No "Best Fit" mapping found for given Code Page (' . $cp . ').');
 
             $cp = array();
         }
@@ -222,7 +222,7 @@ class Utf8
 
     static function count_chars($s, $mode = 1)
     {
-        if (1 != $mode && 3 != $mode) trigger_error(__METHOD__ . '(): allowed $mode are 1 or 3', E_USER_ERROR);
+        if (1 != $mode && 3 != $mode) user_error(__METHOD__ . '(): allowed $mode are 1 or 3', E_USER_ERROR);
         $s = self::getGraphemeClusters($s);
         $s = array_count_values($s);
         return 1 == $mode ? $s[0] : implode('', $s[0]);
@@ -306,7 +306,7 @@ class Utf8
             return str_repeat($pad, $type / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '') . $s;
         }
 
-        trigger_error(__METHOD__ . '(): Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH.');
+        user_error(__METHOD__ . '(): Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH.');
     }
 
     static function str_shuffle($s)

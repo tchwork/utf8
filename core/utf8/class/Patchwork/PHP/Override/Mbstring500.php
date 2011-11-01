@@ -113,7 +113,7 @@ class Patchwork_PHP_Override_Mbstring500
 
     static function mb_encode_mimeheader($s, $charset = INF, $transfer_encoding = INF, $linefeed = INF, $indent = INF)
     {
-        trigger_error('mb_encode_mimeheader() is bugged. Please use iconv_mime_encode() instead.');
+        user_error('mb_encode_mimeheader() is bugged. Please use iconv_mime_encode() instead.');
     }
 
 
