@@ -13,8 +13,12 @@
 
 namespace Patchwork\Utf8;
 
-// See http://www.unicode.org/reports/tr15/
-
+/**
+ * Normalizer is a PHP fallback implementation of the Normalizer class provided by the intl extension.
+ *
+ * It has been validated with Unicode 5.1 Normalization Conformance Test.
+ * See http://www.unicode.org/reports/tr15/ for detailed info about Unicode normalizations.
+ */
 class Normalizer
 {
     const

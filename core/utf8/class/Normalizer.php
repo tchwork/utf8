@@ -11,7 +11,10 @@
  *
  ***************************************************************************/
 
-
+/**
+ * Normalizer plugs Patchwork\Utf8\Normalizer as a PHP implementation
+ * of intl's Normalizer when the extension in not enabled.
+ */
 class Normalizer extends Patchwork\Utf8\Normalizer
 {
 }

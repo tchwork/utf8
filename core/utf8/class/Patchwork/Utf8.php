@@ -15,8 +15,10 @@ namespace Patchwork;
 
 use Normalizer;
 
-/** UTF-8 Grapheme Cluster aware string manipulations */
-
+/**
+ * UTF-8 Grapheme Cluster aware string manipulations implementing the quasi complete
+ * set of native PHP string functions that need UTF-8 awareness and more.
+ */
 class Utf8
 {
     static function isUtf8($s)
