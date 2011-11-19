@@ -18,6 +18,7 @@ use Normalizer;
 /**
  * UTF-8 Grapheme Cluster aware string manipulations implementing the quasi complete
  * set of native PHP string functions that need UTF-8 awareness and more.
+ * Missing are printf-family functions and number_format.
  */
 class Utf8
 {
@@ -40,7 +41,7 @@ class Utf8
         return $s;
     }
 
-    // Unicode to Code Page conversion using best fit mappings
+    // Utf-8 to Code Page conversion using best fit mappings
     // See http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/
 
     static function bestFit($cp, $s, $placeholder = '')
@@ -53,16 +54,15 @@ class Utf8
         $cp = (string) (int) $cp;
         $result = '9' === $cp[0] ? $s . $s : $s;
 
-        if (isset($map[$cp])) $cp =& $map[$cp];
-        else if (file_exists($i = self::getFile('bestfit' . $cp . '.ser')))
+        if (isset($map[$cp])) $cp = $map[$cp];
+        else if (false !== $i = self::getData('bestfit' . $cp))
         {
-            $map[$cp] = unserialize(file_get_contents($i));
-            $cp =& $map[$cp];
+            $map[$cp] = $i;
+            $cp = $map[$cp];
         }
         else
         {
             user_error('No "Best Fit" mapping found for given Code Page (' . $cp . ').');
-
             $cp = array();
         }
 
@@ -110,7 +110,7 @@ class Utf8
         if ($full)
         {
             static $fullCaseFold = false;
-            $fullCaseFold || $fullCaseFold = unserialize(file_get_contents(self::getFile('caseFolding_full.ser')));
+            $fullCaseFold || $fullCaseFold = self::getData('caseFolding_full');
 
             $s = str_replace($fullCaseFold[0], $fullCaseFold[1], $s);
         }
@@ -126,8 +126,7 @@ class Utf8
         return preg_replace('/\p{Mn}+/u', '', $s);
     }
 
-    // Here is the quasi complete set of native PHP string functions that need UTF-8 awareness
-    // Missing are printf-family functions and number_format
+    // PHP string functions that need UTF-8 awareness
 
     static function strlen($s) {return grapheme_strlen($s);}
     static function substr($s, $start, $len = 2147483647) {return grapheme_substr($s, $start, $len);}
@@ -270,7 +269,7 @@ class Utf8
         if (HTML_ENTITIES === $table)
         {
             static $entities;
-            isset($entities) || $entities = unserialize(file_get_contents(self::getFile('htmlentities.ser')));
+            isset($entities) || $entities = self::getData('htmlentities');
             return $entities + get_html_translation_table(HTML_SPECIALCHARS, $quote_style);
         }
         else return get_html_translation_table($table, $quote_style);
@@ -471,8 +470,10 @@ class Utf8
         return 1 === count($class) ? $class[0] : ('(?:' . implode('|', $class) . ')');
     }
 
-    protected static function getFile($file)
+    protected static function getData($file)
     {
-        return __DIR__ . '/Utf8/data/' . $file;
+        $file = __DIR__ . '/Utf8/data/' . $file . '.ser';
+        if (file_exists($file)) return unserialize(file_get_contents($file));
+        else return false;
     }
 }

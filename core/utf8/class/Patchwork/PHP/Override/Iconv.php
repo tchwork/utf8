@@ -385,13 +385,11 @@ class Patchwork_PHP_Override_Iconv
     {
         if (!isset(self::$convert_map[$type . $charset]))
         {
-            if (false === $map = self::getFile($type . $charset . '.ser'))
+            if (false === $map = self::getData($type . $charset))
             {
-                $map = 'to.' === $type && self::loadMap('from.', $charset, $map) ? array_reverse($map) : array();
-
-                if (!$map) return false;
+                if ('to.' === $type && self::loadMap('from.', $charset, $map)) $map = array_reverse($map);
+                else return false;
             }
-            else $map = unserialize(file_get_contents($map));
 
             self::$convert_map[$type . $charset] = $map;
         }
@@ -466,7 +464,7 @@ class Patchwork_PHP_Override_Iconv
 
         $TRANSLIT
             && self::$translit_map
-            || self::$translit_map = unserialize(file_get_contents(self::getFile('translit.ser')));
+            || self::$translit_map = self::getData('translit');
 
         $i = 0;
         $len = strlen($str);
@@ -534,8 +532,10 @@ class Patchwork_PHP_Override_Iconv
         return implode('', $rx) . '.{' . $offset . '}';
     }
 
-    protected static function getFile($file)
+    protected static function getData($file)
     {
-        return dirname(dirname(__DIR__)) . '/Utf8/data/charset/' . $file;
+        $file = dirname(dirname(__DIR__)) . '/Utf8/data/charset/' . $file . '.ser';
+        if (file_exists($file)) return unserialize(file_get_contents($file));
+        else return false;
     }
 }
