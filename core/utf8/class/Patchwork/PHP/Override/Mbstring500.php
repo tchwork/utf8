@@ -11,68 +11,62 @@
  *
  ***************************************************************************/
 
-
-/*
- * Partial mbstring implementation in pure PHP
+/**
+ * Partial mbstring implementation in pure PHP.
+ *
+ * Implemented:
+ * - mb_convert_encoding     - Convert character encoding
+ * - mb_decode_mimeheader    - Decode string in MIME header field
+ * - mb_encode_mimeheader    - Encode string for MIME header XXX NATIVE IMPLEMENTATION IS REALLY BUGGED
+ * - mb_convert_case         - Perform case folding on a string
+ * - mb_internal_encoding    - Set/Get internal character encoding
+ * - mb_list_encodings       - Returns an array of all supported encodings
+ * - mb_strlen               - Get string length
+ * - mb_strpos               - Find position of first occurrence of string in a string
+ * - mb_strrpos              - Find position of last occurrence of a string in a string
+ * - mb_strtolower           - Make a string lowercase
+ * - mb_strtoupper           - Make a string uppercase
+ * - mb_substitute_character - Set/Get substitution character
+ * - mb_substr               - Get part of string
  *
  * Not implemented:
-
-mb_check_encoding             - Check if the string is valid for the specified encoding
-mb_convert_kana               - Convert "kana" one from another ("zen-kaku", "han-kaku" and more)
-mb_convert_variables          - Convert character code in variable(s)
-mb_decode_numericentity       - Decode HTML numeric string reference to character
-mb_detect_encoding            - Detect character encoding
-mb_detect_order               - Set/Get character encoding detection order
-mb_encode_numericentity       - Encode character to HTML numeric string reference
-mb_ereg_match                 - Regular expression match for multibyte string
-mb_ereg_replace               - Replace regular expression with multibyte support
-mb_ereg_search_getpos         - Returns start point for next regular expression match
-mb_ereg_search_getregs        - Retrieve the result from the last multibyte regular expression match
-mb_ereg_search_init           - Setup string and regular expression for multibyte regular expression match
-mb_ereg_search_pos            - Return position and length of matched part of multibyte regular expression for predefined multibyte string
-mb_ereg_search_regs           - Returns the matched part of multibyte regular expression
-mb_ereg_search_setpos         - Set start point of next regular expression match
-mb_ereg_search                - Multibyte regular expression match for predefined multibyte string
-mb_ereg                       - Regular expression match with multibyte support
-mb_eregi_replace              - Replace regular expression with multibyte support ignoring case
-mb_eregi                      - Regular expression match ignoring case with multibyte support
-mb_get_info                   - Get internal settings of mbstring
-mb_http_input                 - Detect HTTP input character encoding
-mb_http_output                - Set/Get HTTP output character encoding
-mb_language                   - Set/Get current language
-mb_list_encodings_alias_names - Returns an array of all supported alias encodings
-mb_list_mime_names            - Returns an array or string of all supported mime names
-mb_output_handler             - Callback function converts character encoding in output buffer
-mb_parse_str                  - Parse GET/POST/COOKIE data and set global variable
-mb_preferred_mime_name        - Get MIME charset string
-mb_regex_encoding             - Returns current encoding for multibyte regex as string
-mb_regex_set_options          - Set/Get the default options for mbregex functions
-mb_send_mail                  - Send encoded mail
-mb_split                      - Split multibyte string using regular expression
-mb_strcut                     - Get part of string
-mb_strimwidth                 - Get truncated string with specified width
-mb_strwidth                   - Return width of string
-mb_substr_count               - Count the number of substring occurrences
-
-
- * Implemented:
-
-mb_convert_encoding     - Convert character encoding
-mb_decode_mimeheader    - Decode string in MIME header field
-mb_encode_mimeheader    - Encode string for MIME header XXX NATIVE IMPLEMENTATION IS REALLY BUGGED
-mb_convert_case         - Perform case folding on a string
-mb_internal_encoding    - Set/Get internal character encoding
-mb_list_encodings       - Returns an array of all supported encodings
-mb_strlen               - Get string length
-mb_strpos               - Find position of first occurrence of string in a string
-mb_strrpos              - Find position of last occurrence of a string in a string
-mb_strtolower           - Make a string lowercase
-mb_strtoupper           - Make a string uppercase
-mb_substitute_character - Set/Get substitution character
-mb_substr               - Get part of string
-
+ * - mb_check_encoding             - Check if the string is valid for the specified encoding
+ * - mb_convert_kana               - Convert "kana" one from another ("zen-kaku", "han-kaku" and more)
+ * - mb_convert_variables          - Convert character code in variable(s)
+ * - mb_decode_numericentity       - Decode HTML numeric string reference to character
+ * - mb_detect_encoding            - Detect character encoding
+ * - mb_detect_order               - Set/Get character encoding detection order
+ * - mb_encode_numericentity       - Encode character to HTML numeric string reference
+ * - mb_ereg_match                 - Regular expression match for multibyte string
+ * - mb_ereg_replace               - Replace regular expression with multibyte support
+ * - mb_ereg_search_getpos         - Returns start point for next regular expression match
+ * - mb_ereg_search_getregs        - Retrieve the result from the last multibyte regular expression match
+ * - mb_ereg_search_init           - Setup string and regular expression for multibyte regular expression match
+ * - mb_ereg_search_pos            - Return position and length of matched part of multibyte regular expression for predefined multibyte string
+ * - mb_ereg_search_regs           - Returns the matched part of multibyte regular expression
+ * - mb_ereg_search_setpos         - Set start point of next regular expression match
+ * - mb_ereg_search                - Multibyte regular expression match for predefined multibyte string
+ * - mb_ereg                       - Regular expression match with multibyte support
+ * - mb_eregi_replace              - Replace regular expression with multibyte support ignoring case
+ * - mb_eregi                      - Regular expression match ignoring case with multibyte support
+ * - mb_get_info                   - Get internal settings of mbstring
+ * - mb_http_input                 - Detect HTTP input character encoding
+ * - mb_http_output                - Set/Get HTTP output character encoding
+ * - mb_language                   - Set/Get current language
+ * - mb_list_encodings_alias_names - Returns an array of all supported alias encodings
+ * - mb_list_mime_names            - Returns an array or string of all supported mime names
+ * - mb_output_handler             - Callback function converts character encoding in output buffer
+ * - mb_parse_str                  - Parse GET/POST/COOKIE data and set global variable
+ * - mb_preferred_mime_name        - Get MIME charset string
+ * - mb_regex_encoding             - Returns current encoding for multibyte regex as string
+ * - mb_regex_set_options          - Set/Get the default options for mbregex functions
+ * - mb_send_mail                  - Send encoded mail
+ * - mb_split                      - Split multibyte string using regular expression
+ * - mb_strcut                     - Get part of string
+ * - mb_strimwidth                 - Get truncated string with specified width
+ * - mb_strwidth                   - Return width of string
+ * - mb_substr_count               - Count the number of substring occurrences
  */
-
 class Patchwork_PHP_Override_Mbstring500
 {
     protected static $internal_encoding = 'UTF-8';

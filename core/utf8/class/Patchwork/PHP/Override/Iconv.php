@@ -11,27 +11,22 @@
  *
  ***************************************************************************/
 
-
-/*
+/**
  * iconv implementation in pure PHP
  *
  * Implemented:
-
-iconv              - Convert string to requested character encoding
-iconv_mime_decode  - Decodes a MIME header field
-iconv_mime_decode_headers - Decodes multiple MIME header fields at once
-iconv_get_encoding - Retrieve internal configuration variables of iconv extension
-iconv_set_encoding - Set current setting for character encoding conversion
-iconv_mime_encode  - Composes a MIME header field
-ob_iconv_handler   - Convert character encoding as output buffer handler
-iconv_strlen       - Returns the character count of string
-iconv_strpos       - Finds position of first occurrence of a needle within a haystack
-iconv_strrpos      - Finds the last occurrence of a needle within a haystack
-iconv_substr       - Cut out part of a string
-
- *
+ * - iconv              - Convert string to requested character encoding
+ * - iconv_mime_decode  - Decodes a MIME header field
+ * - iconv_mime_decode_headers - Decodes multiple MIME header fields at once
+ * - iconv_get_encoding - Retrieve internal configuration variables of iconv extension
+ * - iconv_set_encoding - Set current setting for character encoding conversion
+ * - iconv_mime_encode  - Composes a MIME header field
+ * - ob_iconv_handler   - Convert character encoding as output buffer handler
+ * - iconv_strlen       - Returns the character count of string
+ * - iconv_strpos       - Finds position of first occurrence of a needle within a haystack
+ * - iconv_strrpos      - Finds the last occurrence of a needle within a haystack
+ * - iconv_substr       - Cut out part of a string
  */
-
 class Patchwork_PHP_Override_Iconv
 {
     const
@@ -94,8 +89,8 @@ class Patchwork_PHP_Override_Iconv
 
         // Load charset maps
 
-        if (   ('utf-8' !==  $in_charset && !self::loadMap('from.',  $in_charset,  $in_map))
-            || ('utf-8' !== $out_charset && !self::loadMap(  'to.', $out_charset, $out_map)) )
+        if ( ('utf-8' !==  $in_charset && !self::loadMap('from.',  $in_charset,  $in_map))
+          || ('utf-8' !== $out_charset && !self::loadMap(  'to.', $out_charset, $out_map)) )
         {
             user_error(sprintf(self::ERROR_WRONG_CHARSET, $in_charset, $out_charset));
             return false;

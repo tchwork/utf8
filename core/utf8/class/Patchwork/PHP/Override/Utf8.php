@@ -23,6 +23,14 @@ Patchwork_PHP_Override_Utf8::$cp1252 = /*<*/$map[0]/*>*/;
 Patchwork_PHP_Override_Utf8::$utf8   = /*<*/$map[1]/*>*/;
 
 
+/**
+ * Basic string functions enhanced to Utf-8.
+ *
+ * htmlspecialchars and htmlentities default charset is set to UTF-8,
+ * adding the $double_enc parameter introduced in PHP 5.2.3.
+ *
+ * utf8_encode/decode are enhanced to Windows-1252.
+ */
 class Patchwork_PHP_Override_Utf8
 {
     static $cp1252, $utf8;
@@ -40,9 +48,6 @@ class Patchwork_PHP_Override_Utf8
             ? htmlentities($s, $style, $charset)
             : htmlentities(html_entity_decode($s, $style, $charset), $quote_style, $charset);
     }
-
-
-    // utf8_encode/decode support enhanced to Windows-1252
 
     static function utf8_encode($s)
     {

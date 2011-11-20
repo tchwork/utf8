@@ -2,20 +2,23 @@
  *
  *   Copyright : (C) 2011 Nicolas Grekas. All rights reserved.
  *   Email     : p@tchwork.org
- *   License   : http://www.gnu.org/licenses/agpl.txt GNU/AGPL
+ *   License   : http://www.gnu.org/licenses/lgpl.txt GNU/LGPL
  *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU Affero General Public License as
- *   published by the Free Software Foundation, either version 3 of the
- *   License, or (at your option) any later version.
+ *   This library is free software; you can redistribute it and/or
+ *   modify it under the terms of the GNU Lesser General Public
+ *   License as published by the Free Software Foundation; either
+ *   version 3 of the License, or (at your option) any later version.
  *
  ***************************************************************************/
 
-
-// Unicode aware filesystem access on MS-Windows
-// based on COM Scripting.FileSystemObject object and 8.3 ShortPaths
-// See also comments on http://www.rooftopsolutions.nl/blog/filesystem-encoding-and-php
-
+/**
+ * Unicode aware filesystem access on MS-Windows.
+ *
+ * Based on COM Scripting.FileSystemObject object and 8.3 ShortPaths.
+ * See also comments on http://www.rooftopsolutions.nl/blog/filesystem-encoding-and-php
+ *
+ * Experimental proof of concept only.
+ */
 class Patchwork_PHP_Override_WinfsUtf8
 {
     protected static $DIR;

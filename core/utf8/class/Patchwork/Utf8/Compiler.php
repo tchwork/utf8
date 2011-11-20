@@ -13,14 +13,14 @@
 
 namespace Patchwork\Utf8;
 
-// See http://unicode.org/Public/UNIDATA/ for unicode data
-// See http://unicode.org/Public/MAPPINGS/ for charset conversion maps
-// See http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/ for mappings
-// See http://www.gnu.org/software/libiconv/ for translit.def
-
 /**
  * Compiler is a use once class that implements the compilation of unicode
  * and charset data to a format suitable for other Utf8 classes.
+ *
+ * See http://unicode.org/Public/UNIDATA/ for unicode data
+ * See http://unicode.org/Public/MAPPINGS/ for charset conversion maps
+ * See http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/ for mappings
+ * See http://www.gnu.org/software/libiconv/ for translit.def
  */
 class Compiler
 {
