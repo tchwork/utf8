@@ -205,7 +205,7 @@ class Patchwork_PHP_Override_WinfsUtf8
 
             while (!self::getFs()->FolderExists(dirname($a)))
             {
-                //XXX TODO
+                //TODO
             }
         }
 
