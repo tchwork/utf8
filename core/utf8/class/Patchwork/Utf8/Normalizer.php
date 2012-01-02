@@ -46,15 +46,7 @@ class Normalizer
 
         static $qc;
 
-        if (empty($qc))
-        {
-            $qc = array_combine(
-                array(0, self::FORM_C, self::FORM_KC, self::FORM_D, self::FORM_KD, 0),
-                explode("\n", self::getContents('quickChecks.txt'))
-            );
-
-            unset($qc[0]);
-        }
+        if (empty($qc)) $qc = self::getData('quickChecks');
 
         return !preg_match("/{$qc[$form]}/u", $s);
     }
@@ -71,17 +63,17 @@ class Normalizer
         default: throw new Exception('Unknown normalization form');
         }
 
-        if ($K && empty(self::$KD)) self::$KD = unserialize(self::getContents('compatibilityDecomposition.ser'));
+        if ($K && empty(self::$KD)) self::$KD = self::getData('compatibilityDecomposition');
 
         if (empty(self::$D))
         {
-            self::$D = unserialize(self::getContents('canonicalDecomposition.ser'));
-            self::$cC = unserialize(self::getContents('combiningClass.ser'));
+            self::$D = self::getData('canonicalDecomposition');
+            self::$cC = self::getData('combiningClass');
         }
 
         if ($C)
         {
-            if (empty(self::$C)) self::$C = unserialize(self::getContents('canonicalComposition.ser'));
+            if (empty(self::$C)) self::$C = self::getData('canonicalComposition');
             return self::recompose(self::decompose($s, $K));
         }
         else return self::decompose($s, $K);
@@ -300,8 +292,10 @@ class Normalizer
         return $result;
     }
 
-    protected static function getContents($file)
+    protected static function getData($file)
     {
-        return file_get_contents(__DIR__ . '/data/' . $file);
+        $file = __DIR__ . '/data/' . $file . '.ser';
+        if (file_exists($file)) return unserialize(file_get_contents($file));
+        else return false;
     }
 }

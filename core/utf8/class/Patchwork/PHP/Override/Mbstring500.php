@@ -12,7 +12,7 @@
  ***************************************************************************/
 
 /**
- * Partial mbstring implementation in pure PHP.
+ * Partial mbstring implementation in pure PHP, iconv based, UTF-8 centric.
  *
  * Implemented:
  * - mb_convert_encoding     - Convert character encoding
@@ -37,18 +37,7 @@
  * - mb_detect_encoding            - Detect character encoding
  * - mb_detect_order               - Set/Get character encoding detection order
  * - mb_encode_numericentity       - Encode character to HTML numeric string reference
- * - mb_ereg_match                 - Regular expression match for multibyte string
- * - mb_ereg_replace               - Replace regular expression with multibyte support
- * - mb_ereg_search_getpos         - Returns start point for next regular expression match
- * - mb_ereg_search_getregs        - Retrieve the result from the last multibyte regular expression match
- * - mb_ereg_search_init           - Setup string and regular expression for multibyte regular expression match
- * - mb_ereg_search_pos            - Return position and length of matched part of multibyte regular expression for predefined multibyte string
- * - mb_ereg_search_regs           - Returns the matched part of multibyte regular expression
- * - mb_ereg_search_setpos         - Set start point of next regular expression match
- * - mb_ereg_search                - Multibyte regular expression match for predefined multibyte string
- * - mb_ereg                       - Regular expression match with multibyte support
- * - mb_eregi_replace              - Replace regular expression with multibyte support ignoring case
- * - mb_eregi                      - Regular expression match ignoring case with multibyte support
+ * - mb_ereg*                      - Regular expression with multibyte support
  * - mb_get_info                   - Get internal settings of mbstring
  * - mb_http_input                 - Detect HTTP input character encoding
  * - mb_http_output                - Set/Get HTTP output character encoding

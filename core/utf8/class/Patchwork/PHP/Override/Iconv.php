@@ -12,7 +12,7 @@
  ***************************************************************************/
 
 /**
- * iconv implementation in pure PHP
+ * iconv implementation in pure PHP, UTF-8 centric.
  *
  * Implemented:
  * - iconv              - Convert string to requested character encoding
