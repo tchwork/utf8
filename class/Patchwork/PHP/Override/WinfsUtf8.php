@@ -48,7 +48,7 @@ class Patchwork_PHP_Override_WinfsUtf8
         return getcwd() . '\\' . $f;
     }
 
-    static function &ls($dir)
+    static function ls($dir)
     {
         try
         {
@@ -363,7 +363,7 @@ class Patchwork_PHP_Override_WinfsUtf8_Directory extends Directory
     {
         $this->path = $path;
         $this->handle = $this;
-        $this->childs =& WIN::ls($path);
+        $this->childs = WIN::ls($path);
 
         if (!$this->childs)
         {

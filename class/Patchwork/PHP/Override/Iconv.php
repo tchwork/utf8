@@ -254,7 +254,7 @@ class Patchwork_PHP_Override_Iconv
 
         $Q = 'Q' === $scheme;
 
-        foreach ($chars as &$c)
+        foreach ($chars as $c)
         {
             if ('UTF-8' !== $out && false === $c = self::iconv('UTF-8', $out, $c)) return false;
 
@@ -393,7 +393,7 @@ class Patchwork_PHP_Override_Iconv
         return true;
     }
 
-    protected static function utf8_to_utf8(&$str, $IGNORE)
+    protected static function utf8_to_utf8($str, $IGNORE)
     {
         $ulen_mask = self::$ulen_mask;
         $valid     = self::$is_valid_utf8;
@@ -435,7 +435,7 @@ class Patchwork_PHP_Override_Iconv
         return substr($u, 0, $j);
     }
 
-    protected static function map_to_utf8(&$result, &$map, &$str, $IGNORE)
+    protected static function map_to_utf8(&$result, $map, $str, $IGNORE)
     {
         $len = strlen($str);
         for ($i = 0; $i < $len; ++$i)
@@ -452,7 +452,7 @@ class Patchwork_PHP_Override_Iconv
         return true;
     }
 
-    protected static function map_from_utf8(&$result, &$map, &$str, $IGNORE, $TRANSLIT)
+    protected static function map_from_utf8(&$result, $map, $str, $IGNORE, $TRANSLIT)
     {
         $ulen_mask = self::$ulen_mask;
         $valid     = self::$is_valid_utf8;
