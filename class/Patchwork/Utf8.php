@@ -443,13 +443,21 @@ class Utf8
 
     static function getGraphemeClusters($s)
     {
-        $gca = array();
-        $pos = 0;
-        $len = strlen($s);
+/**/    if (extension_loaded('intl'))
+/**/    {
+            $gca = array();
+            $pos = 0;
+            $len = strlen($s);
 
-        while ($pos < $len) $gca[] = grapheme_extract($s, 1, GRAPHEME_EXTR_COUNT, $pos, $pos);
+            while ($pos < $len) $gca[] = grapheme_extract($s, 1, GRAPHEME_EXTR_COUNT, $pos, $pos);
 
-        return $gca;
+            return $gca;
+/**/    }
+/**/    else
+/**/    {
+            preg_match_all('/' . PHP\Override\Intl::GRAPHEME_CLUSTER_RX . '/u', $s, $s);
+            return $s[0];
+/**/    }
     }
 
 
