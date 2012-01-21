@@ -11,6 +11,8 @@
  *
  ***************************************************************************/
 
+namespace Patchwork\PHP\Override;
+
 /**
  * Partial intl implementation in pure PHP.
  *
@@ -25,7 +27,7 @@
  * - grapheme_strstr   - Returns part of haystack string from the first occurrence of needle to the end of haystack
  * - grapheme_substr   - Return part of a string
  */
-class Patchwork_PHP_Override_Intl
+class Intl
 {
     static function grapheme_extract($s, $size, $type = GRAPHEME_EXTR_COUNT, $start = 0, &$next = 0)
     {

@@ -11,6 +11,8 @@
  *
  ***************************************************************************/
 
+namespace Patchwork\PHP\Override;
+
 /**
  * Partial mbstring implementation in pure PHP.
  *
@@ -22,7 +24,7 @@
  * - mb_strripos - Finds position of last occurrence of a string within another, case insensitive
  * - mb_strstr   - Finds first occurrence of a string within anothers
  */
-class Patchwork_PHP_Override_Mbstring520
+class Mbstring520
 {
     static function mb_stripos($haystack, $needle, $offset = 0, $encoding = INF)
     {

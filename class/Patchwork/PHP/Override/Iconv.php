@@ -11,6 +11,8 @@
  *
  ***************************************************************************/
 
+namespace Patchwork\PHP\Override;
+
 /**
  * iconv implementation in pure PHP, UTF-8 centric.
  *
@@ -27,7 +29,7 @@
  * - iconv_strrpos      - Finds the last occurrence of a needle within a haystack
  * - iconv_substr       - Cut out part of a string
  */
-class Patchwork_PHP_Override_Iconv
+class Iconv
 {
     const
 

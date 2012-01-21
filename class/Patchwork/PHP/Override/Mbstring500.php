@@ -11,6 +11,8 @@
  *
  ***************************************************************************/
 
+namespace Patchwork\PHP\Override;
+
 /**
  * Partial mbstring implementation in pure PHP, iconv based, UTF-8 centric.
  *
@@ -56,7 +58,7 @@
  * - mb_strwidth                   - Return width of string
  * - mb_substr_count               - Count the number of substring occurrences
  */
-class Patchwork_PHP_Override_Mbstring500
+class Mbstring500
 {
     protected static $internal_encoding = 'UTF-8';
 
