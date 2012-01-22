@@ -47,5 +47,8 @@ implementations are provided:
   grapheme_strlen, grapheme_strpos, grapheme_strripos, grapheme_strrpos,
   grapheme_strstr, grapheme_substr.
 
+Fallback implementations for `utf8_encode` and `utf8_decode` are also provided,
+*enhanced to Windows-1252* instead of ISO-8859-1.
+
 No bootstrapper is currently provided to enable these fallbacks when required.
 This is left as an exercise for the reader :)
