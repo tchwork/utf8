@@ -14,7 +14,7 @@
 namespace Patchwork\PHP\Override;
 
 /**
- * Partial mbstring implementation in pure PHP, iconv based, UTF-8 centric.
+ * Partial mbstring implementation in PHP, iconv based, UTF-8 centric.
  *
  * Implemented:
  * - mb_convert_encoding     - Convert character encoding

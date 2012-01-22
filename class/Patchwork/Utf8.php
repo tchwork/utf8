@@ -24,14 +24,14 @@ class Utf8
 {
     static function isUtf8($s)
     {
-        return preg_match("''u", $s);
+        return preg_match("//u", $s);
     }
 
     // Generic UTF-8 to ASCII transliteration
 
     static function toASCII($s)
     {
-        if (preg_match("'[\x80-\xFF]'", $s))
+        if (preg_match("/[\x80-\xFF]/", $s))
         {
             $s = Normalizer::normalize($s, Normalizer::FORM_KD);
             $s = preg_replace('/\p{Mn}+/u', '', $s);
@@ -41,7 +41,7 @@ class Utf8
         return $s;
     }
 
-    // Utf-8 to Code Page conversion using best fit mappings
+    // UTF-8 to Code Page conversion using best fit mappings
     // See http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/
 
     static function bestFit($cp, $s, $placeholder = '')
@@ -434,6 +434,12 @@ class Utf8
     {
         $c = iconv_substr($s, 0, 1, 'UTF-8');
         return self::ucwords($c) . substr($s, strlen($c));
+    }
+
+    static function lcfirst($s)
+    {
+        $c = iconv_substr($s, 0, 1, 'UTF-8');
+        return mb_strtolower($c, 'UTF-8') . substr($s, strlen($c));
     }
 
     static function ucwords($s)

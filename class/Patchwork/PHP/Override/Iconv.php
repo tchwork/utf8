@@ -296,10 +296,10 @@ class Iconv
 
     static function iconv_strlen($s, $encoding = INF)
     {
-        static $xml = null; null === $xml && $xml = extension_loaded('xml');
-        return $xml
-            ? self::strlen1($s, $encoding)
-            : self::strlen2($s, $encoding);
+/**/    if (extension_loaded('xml'))
+            return self::strlen1($s, $encoding);
+/**/    else
+            return self::strlen2($s, $encoding);
     }
 
     static function strlen1($s, $encoding = INF)
