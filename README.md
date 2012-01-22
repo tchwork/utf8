@@ -50,5 +50,12 @@ implementations are provided:
 Fallback implementations for `utf8_encode` and `utf8_decode` are also provided,
 *enhanced to Windows-1252* instead of ISO-8859-1.
 
-No bootstrapper is currently provided to enable these fallbacks when required.
-This is left as an exercise for the reader :)
+Usage
+-----
+
+Including the `bootup.utf8.php` file is the easiest way to enable these features
+and configure PHP for a UTF-8 aware application.
+
+This code is extracted from the [Patchwork](http://pa.tchwork.com/) framework.
+It is released here standalone in the hope that it can be used in a different
+context successfully!
