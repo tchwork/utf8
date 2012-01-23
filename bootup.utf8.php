@@ -18,8 +18,8 @@ require __DIR__ . '/class/Patchwork/PHP/Override/Utf8.php';
 
 // utf8_encode/decode support enhanced to Windows-1252
 
-function utf8_cp1252_encode($s) {return o\Utf8::utf8_encode($s);};
-function utf8_cp1252_decode($s) {return o\Utf8::utf8_decode($s);};
+function cp1252_utf8($s) {return o\Utf8::utf8_encode($s);};
+function utf8_cp1252($s) {return o\Utf8::utf8_decode($s);};
 
 if (!extension_loaded('xml'))
 {
@@ -32,7 +32,7 @@ if (!extension_loaded('xml'))
 
 if (extension_loaded('mbstring'))
 {
-    if ( in_array(strtolower(ini_get('mbstring.encoding_translation')), array(true, 'on', 'yes', 'true'))
+    if ( ((int) ini_get('mbstring.encoding_translation') || in_array(strtolower(ini_get('mbstring.encoding_translation')), array('on', 'yes', 'true')))
         && !in_array(strtolower(ini_get('mbstring.http_input')), array('pass', '8bit', 'utf-8')) )
             throw new Exception('Please disable "mbstring.encoding_translation" or set "mbstring.http_input" to "utf-8" or "pass"');
 
