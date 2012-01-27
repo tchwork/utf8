@@ -1,6 +1,6 @@
 <?php /****************** vi: set fenc=utf-8 ts=4 sw=4 et: *****************
  *
- *   Copyright : (C) 2011 Nicolas Grekas. All rights reserved.
+ *   Copyright : (C) 2012 Nicolas Grekas. All rights reserved.
  *   Email     : p@tchwork.org
  *   License   : http://www.gnu.org/licenses/lgpl.txt GNU/LGPL
  *
