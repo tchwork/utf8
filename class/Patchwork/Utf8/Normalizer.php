@@ -60,7 +60,7 @@ class Normalizer
         case self::FORM_D: $C = false; $K = false; break;
         case self::FORM_KC: $C = true; $K = true; break;
         case self::FORM_KD: $C = false; $K = true; break;
-        default: throw new Exception('Unknown normalization form');
+        default: throw new \Exception('Unknown normalization form');
         }
 
         if ($K && empty(self::$KD)) self::$KD = self::getData('compatibilityDecomposition');

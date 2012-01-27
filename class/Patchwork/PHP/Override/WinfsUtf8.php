@@ -11,6 +11,8 @@
  *
  ***************************************************************************/
 
+namespace Patchwork\PHP\Override;
+
 /**
  * Unicode aware filesystem access on MS-Windows.
  *
@@ -59,7 +61,7 @@ class WinfsUtf8
             foreach ($dir->SubFolders() as $v) $f[] = $v->Name;
             foreach ($dir->Files        as $v) $f[] = $v->Name;
         }
-        catch (Exception $f)
+        catch (\Exception $f)
         {
             $f = array();
         }
