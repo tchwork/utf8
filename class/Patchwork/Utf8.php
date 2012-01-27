@@ -24,7 +24,7 @@ class Utf8
 {
     static function isUtf8($s)
     {
-        return preg_match("//u", $s);
+        return (bool) preg_match("//u", $s);
     }
 
     // Generic UTF-8 to ASCII transliteration
