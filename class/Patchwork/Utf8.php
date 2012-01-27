@@ -24,7 +24,7 @@ class Utf8
 {
     static function isUtf8($s)
     {
-        return (bool) preg_match("//u", $s);
+        return (bool) preg_match('//u', $s); // Since PHP 5.2.5, this also excludes invalid five and six bytes sequences
     }
 
     // Generic UTF-8 to ASCII transliteration
@@ -55,7 +55,7 @@ class Utf8
         $result = '9' === $cp[0] ? $s . $s : $s;
 
         if (isset($map[$cp])) $cp = $map[$cp];
-        else if (false !== $i = self::getData('bestfit' . $cp))
+        else if (false !== $i = self::getData('charset/bestfit' . $cp))
         {
             $map[$cp] = $i;
             $cp = $map[$cp];
@@ -129,7 +129,7 @@ class Utf8
     // PHP string functions that need UTF-8 awareness
 
     static function strlen($s) {return grapheme_strlen($s);}
-    static function substr($s, $start, $len = 2147483647) {return grapheme_substr($s, $start, $len);}
+    static function substr($s, $start, $len = 2147483647) {if (false !== $len = grapheme_substr($s, $start, $len)) return $len; return grapheme_substr($s, $start);}
     static function strpos  ($s, $needle, $offset = 0) {return grapheme_strpos  ($s, $needle, $offset);}
     static function stripos ($s, $needle, $offset = 0) {return grapheme_stripos ($s, $needle, $offset);}
     static function strrpos ($s, $needle, $offset = 0) {return grapheme_strrpos ($s, $needle, $offset);}
@@ -291,8 +291,8 @@ class Utf8
         $freelen = $len - $slen;
         $len = $freelen % $padlen;
 
-        if (STR_PAD_RIGHT === $type) return $s . str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '');
-        if (STR_PAD_LEFT  === $type) return      str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '') . $s;
+        if (STR_PAD_RIGHT === $type) return $s . str_repeat($pad, $freelen / $padlen) . ($len ? self::substr($pad, 0, $len) : '');
+        if (STR_PAD_LEFT  === $type) return      str_repeat($pad, $freelen / $padlen) . ($len ? self::substr($pad, 0, $len) : '') . $s;
 
         if (STR_PAD_BOTH === $type)
         {
@@ -300,11 +300,11 @@ class Utf8
 
             $type = ceil($freelen);
             $len = $type % $padlen;
-            $s .= str_repeat($pad, $type / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '');
+            $s .= str_repeat($pad, $type / $padlen) . ($len ? self::substr($pad, 0, $len) : '');
 
             $type = floor($freelen);
             $len = $type % $padlen;
-            return str_repeat($pad, $type / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '') . $s;
+            return str_repeat($pad, $type / $padlen) . ($len ? self::substr($pad, 0, $len) : '') . $s;
         }
 
         user_error(__METHOD__ . '(): Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH.');
@@ -365,12 +365,12 @@ class Utf8
     static function strcasecmp   ($a, $b) {return self::strcmp   (self::strtocasefold($a), self::strtocasefold($b));}
     static function strnatcasecmp($a, $b) {return self::strnatcmp(self::strtocasefold($a), self::strtocasefold($b));}
     static function strncasecmp  ($a, $b, $len) {return self::strncmp(self::strtocasefold($a), self::strtocasefold($b), $len);}
-    static function strncmp      ($a, $b, $len) {return self::strcmp(grapheme_substr($a, 0, $len), grapheme_substr($b, 0, $len));}
+    static function strncmp      ($a, $b, $len) {return self::strcmp(self::substr($a, 0, $len), self::substr($b, 0, $len));}
 
     static function strcspn($s, $charlist, $start = 0, $len = 2147483647)
     {
         if ('' === (string) $mask) return null;
-        if ($start || 2147483647 != $len) $s = grapheme_substr($s, $start, $len);
+        if ($start || 2147483647 != $len) $s = self::substr($s, $start, $len);
 
         return preg_match('/^(.*?)' . self::rxClass($mask) . '/us', $s, $len) ? grapheme_strlen($len[1]) : grapheme_strlen($s);
     }
@@ -388,7 +388,7 @@ class Utf8
 
     static function strspn($s, $mask, $start = 0, $len = 2147483647)
     {
-        if ($start || 2147483647 != $len) $s = grapheme_substr($s, $start, $len);
+        if ($start || 2147483647 != $len) $s = self::substr($s, $start, $len);
         return preg_match('/^' . self::rxClass($mask) . '+/u', $s, $s) ? grapheme_strlen($s[0]) : 0;
     }
 
@@ -413,13 +413,13 @@ class Utf8
 
     static function substr_compare($a, $b, $offset, $len = 2147483647, $i = 0)
     {
-        $a = grapheme_substr($a, $offset, $len);
+        $a = self::substr($a, $offset, $len);
         return $i ? self::strcasecmp($a, $b) : self::strcmp($a, $b);
     }
 
     static function substr_count($s, $needle, $offset = 0, $len = 2147483647)
     {
-        return substr_count(grapheme_substr($s, $offset, $len), $needle);
+        return substr_count(self::substr($s, $offset, $len), $needle);
     }
 
     static function substr_replace($s, $replace, $start, $len = 2147483647)
