@@ -69,8 +69,6 @@ class Intl
 
     static function grapheme_substr($s, $start, $len = 2147483647)
     {
-        // Be aware that native grapheme_substr() is currently too heavily bugged to be relied on
-
         preg_match_all('/' . self::GRAPHEME_CLUSTER_RX . '/u', $s, $s);
         $c = count($s[0]);
         $s = array_slice($s[0], $start, $len);
@@ -94,7 +92,7 @@ class Intl
             return false;
         }
 
-        if ('' !== (string) $needle)
+        if ('' === (string) $needle)
         {
             user_error('Empty delimiter.', E_USER_ERROR);
             return false;

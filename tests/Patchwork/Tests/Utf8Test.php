@@ -3,7 +3,7 @@
 namespace Patchwork\Tests;
 
 use Patchwork\Utf8 as u;
-use Normalizer;
+use Normalizer as n;
 
 class Utf8Test extends \PHPUnit_Framework_TestCase
 {
@@ -63,19 +63,23 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         }
 
         $c = "déjà";
-        $d = Normalizer::normalize("déjà", Normalizer::FORM_D);
+        $d = n::normalize("déjà", n::NFD);
         $this->assertTrue( $c > $d );
 
         $this->assertSame( u::strlen($c), 4 );
         $this->assertSame( u::strlen($d), 4 );
+
+        $this->assertSame( u::strlen(n::normalize('한국어', n::NFD)), 3 );
     }
 
     function testSubstr()
     {
         $b = "deja";
         $c = "déjà";
-        $d = Normalizer::normalize("déjà", Normalizer::FORM_D);
+        $d = n::normalize("déjà", n::NFD);
         $this->assertTrue( $c > $d );
+
+        $this->assertSame( u::substr('한국어', 1, 20), '국어' );
 
         $this->assertSame( substr($b,  0,  2), "de" );
         $this->assertSame( substr($b, -2,  3), "ja" );
@@ -89,9 +93,9 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         $this->assertSame( u::substr($c,  1, -3), "" );
         $this->assertSame( u::substr($c,  1, -4), false );
 
-        $this->assertSame( u::substr($d,  0,  2), Normalizer::normalize("dé", Normalizer::FORM_D) );
-        $this->assertSame( u::substr($d, -2,  3), Normalizer::normalize("jà", Normalizer::FORM_D) );
-        $this->assertSame( u::substr($d, -3, -1), Normalizer::normalize("éj", Normalizer::FORM_D) );
+        $this->assertSame( u::substr($d,  0,  2), n::normalize("dé", n::NFD) );
+        $this->assertSame( u::substr($d, -2,  3), n::normalize("jà", n::NFD) );
+        $this->assertSame( u::substr($d, -3, -1), n::normalize("éj", n::NFD) );
         $this->assertSame( u::substr($d,  1, -3), "" );
         $this->assertSame( u::substr($d,  1, -4), false );
     }

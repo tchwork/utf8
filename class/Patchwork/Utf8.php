@@ -13,7 +13,7 @@
 
 namespace Patchwork;
 
-use Normalizer;
+use Normalizer as n;
 
 /**
  * UTF-8 Grapheme Cluster aware string manipulations implementing the quasi complete
@@ -33,7 +33,7 @@ class Utf8
     {
         if (preg_match("/[\x80-\xFF]/", $s))
         {
-            $s = Normalizer::normalize($s, Normalizer::FORM_KD);
+            $s = n::normalize($s, n::NFKD);
             $s = preg_replace('/\p{Mn}+/u', '', $s);
             $s = iconv('UTF-8', 'ASCII' . ('glibc' !== ICONV_IMPL ? '//IGNORE' : '') . '//TRANSLIT', $s);
         }
@@ -123,7 +123,7 @@ class Utf8
 
     static function strtonatfold($s)
     {
-        $s = Normalizer::normalize($s, Normalizer::FORM_D);
+        $s = n::normalize($s, n::NFD);
         return preg_replace('/\p{Mn}+/u', '', $s);
     }
 
@@ -136,6 +136,7 @@ class Utf8
             if ($start >= 0 && $len >= 0)
             {
                 // Native grapheme_substr() is currently too heavily bugged to be used when $start or $len are negative
+                // See http://bugs.php.net/55562 and http://bugs.php.net/60918
 
                 if (2147483647 > $len && false !== $c = grapheme_substr($s, $start, $len)) return $c;
                 else return grapheme_substr($s, $start);
@@ -159,8 +160,8 @@ class Utf8
     static function strrchr ($s, $needle, $before_needle = false) {return mb_strrchr ($s, $needle, $before_needle, 'UTF-8');}
     static function strrichr($s, $needle, $before_needle = false) {return mb_strrichr($s, $needle, $before_needle, 'UTF-8');}
 
-    static function strtolower($s, $form = Normalizer::FORM_C) {if (Normalizer::isNormalized($s = mb_strtolower($s, 'UTF-8'), $form)) return $s; return Normalizer::normalize($s, $form);}
-    static function strtoupper($s, $form = Normalizer::FORM_C) {if (Normalizer::isNormalized($s = mb_strtoupper($s, 'UTF-8'), $form)) return $s; return Normalizer::normalize($s, $form);}
+    static function strtolower($s, $form = n::NFC) {if (n::isNormalized($s = mb_strtolower($s, 'UTF-8'), $form)) return $s; return n::normalize($s, $form);}
+    static function strtoupper($s, $form = n::NFC) {if (n::isNormalized($s = mb_strtoupper($s, 'UTF-8'), $form)) return $s; return n::normalize($s, $form);}
 
     static function htmlentities    ($s, $quote_style = ENT_COMPAT) {return htmlentities    ($s, $quote_style, 'UTF-8');}
     static function htmlspecialchars($s, $quote_style = ENT_COMPAT) {return htmlspecialchars($s, $quote_style, 'UTF-8');}
@@ -380,7 +381,7 @@ class Utf8
         return $charlist;
     }
 
-    static function strcmp       ($a, $b) {return (string) $a === (string) $b ? 0 : strcmp(Normalizer::normalize($a, Normalizer::FORM_D), Normalizer::normalize($b, Normalizer::FORM_D));}
+    static function strcmp       ($a, $b) {return (string) $a === (string) $b ? 0 : strcmp(n::normalize($a, n::NFD), n::normalize($b, n::NFD));}
     static function strnatcmp    ($a, $b) {return (string) $a === (string) $b ? 0 : strnatcmp(self::strtonatfold($a), self::strtonatfold($b));}
     static function strcasecmp   ($a, $b) {return self::strcmp   (self::strtocasefold($a), self::strtocasefold($b));}
     static function strnatcasecmp($a, $b) {return self::strnatcmp(self::strtocasefold($a), self::strtocasefold($b));}

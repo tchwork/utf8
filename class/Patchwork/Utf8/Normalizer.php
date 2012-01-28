@@ -23,12 +23,11 @@ class Normalizer
 {
     const
 
-    NONE = '',
-    FORM_C = 'NFC',
-    FORM_D = 'NFD',
-    FORM_KC = 'NFKC',
-    FORM_KD = 'NFKD',
-    OPTION_DEFAULT = 'NFC';
+    NONE = 1,
+    FORM_D  = 2, NFD  = 2,
+    FORM_KD = 3, NFKD = 3,
+    FORM_C  = 4, NFC  = 4,
+    FORM_KC = 5, NFKC = 5;
 
 
     protected static
@@ -38,28 +37,22 @@ class Normalizer
     $ASCII = "\x20\x65\x69\x61\x73\x6E\x74\x72\x6F\x6C\x75\x64\x5D\x5B\x63\x6D\x70\x27\x0A\x67\x7C\x68\x76\x2E\x66\x62\x2C\x3A\x3D\x2D\x71\x31\x30\x43\x32\x2A\x79\x78\x29\x28\x4C\x39\x41\x53\x2F\x50\x22\x45\x6A\x4D\x49\x6B\x33\x3E\x35\x54\x3C\x44\x34\x7D\x42\x7B\x38\x46\x77\x52\x36\x37\x55\x47\x4E\x3B\x4A\x7A\x56\x23\x48\x4F\x57\x5F\x26\x21\x4B\x3F\x58\x51\x25\x59\x5C\x09\x5A\x2B\x7E\x5E\x24\x40\x60\x7F\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F";
 
 
-    static function isNormalized($s, $form = self::FORM_C)
+    static function isNormalized($s, $form = self::NFC)
     {
         if (strspn($s, self::$ASCII) === strlen($s)) return true;
-
-        if (self::FORM_C === $form && !preg_match('/[^\x00-\x{2FF}]/u', $s)) return true;
-
-        static $qc;
-
-        if (empty($qc)) $qc = self::getData('quickChecks');
-
-        return !preg_match("/{$qc[$form]}/u", $s);
+        if (self::NFC === $form && !preg_match('/[^\x00-\x{2FF}]/u', $s)) return true;
+        return false; // Pretend false as quick checks implementented in PHP won't be so quick
     }
 
-    static function normalize($s, $form = self::FORM_C)
+    static function normalize($s, $form = self::NFC)
     {
         switch ($form)
         {
         case self::NONE: return $s;
-        case self::FORM_C: $C = true; $K = false; break;
-        case self::FORM_D: $C = false; $K = false; break;
-        case self::FORM_KC: $C = true; $K = true; break;
-        case self::FORM_KD: $C = false; $K = true; break;
+        case self::NFC:  $C = true;  $K = false; break;
+        case self::NFD:  $C = false; $K = false; break;
+        case self::NFKC: $C = true;  $K = true;  break;
+        case self::NFKD: $C = false; $K = true;  break;
         default: throw new \Exception('Unknown normalization form');
         }
 

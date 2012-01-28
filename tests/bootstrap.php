@@ -4,7 +4,6 @@ $dir = dirname(dirname(__FILE__));
 
 require $dir . '/bootup.utf8.php';
 require_once $dir . '/class/Patchwork/Utf8.php';
-require_once $dir . '/class/Patchwork/Utf8/Compiler.php';
 require_once $dir . '/class/Patchwork/Utf8/Normalizer.php';
 require_once $dir . '/class/Patchwork/PHP/Override/Utf8.php';
 require_once $dir . '/class/Patchwork/PHP/Override/Intl.php';
