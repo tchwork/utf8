@@ -117,26 +117,23 @@ class WinfsUtf8
 
     static function file_get_contents($f, $use_include_path = false, $context = null, $offset = 0, $maxlen = null)
     {
-        return null === $maxlen
-            ? file_get_contents(self::ShortPath($f), $use_include_path, $context, $offset)
-            : file_get_contents(self::ShortPath($f), $use_include_path, $context, $offset, $maxlen);
+        if (null === $maxlen) return file_get_contents(self::ShortPath($f), $use_include_path, $context, $offset);
+        else return file_get_contents(self::ShortPath($f), $use_include_path, $context, $offset, $maxlen);
     }
 
-    static function file_put_contents($f, $data, $use_include_path = false, $context = null)
+    static function file_put_contents($f, $data, $flags = 0, $context = null)
     {
         try {self::getFs()->CreateTextFile(self::absPath($f), false)->Close();}
         catch (com_exception $e) {}
 
-        return null === $context
-            ? file_put_contents(self::ShortPath($f), $data, $use_include_path)
-            : file_put_contents(self::ShortPath($f), $data, $use_include_path, $context);
+        if (null === $context) return file_put_contents(self::ShortPath($f), $data, $flags);
+        else return file_put_contents(self::ShortPath($f), $data, $flags, $context);
     }
 
-    static function file($f, $use_include_path = false, $context = null)
+    static function file($f, $flags = 0, $context = null)
     {
-        return null === $context
-            ? file(self::ShortPath($f), $use_include_path)
-            : file(self::ShortPath($f), $use_include_path, $context);
+        if (null === $context) return file(self::ShortPath($f), $flags);
+        else return file(self::ShortPath($f), $flags, $context);
     }
 
     static function fileatime($f) {return fileatime(self::ShortPath($f));}

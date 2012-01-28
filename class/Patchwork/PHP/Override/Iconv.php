@@ -103,7 +103,8 @@ class Iconv
         {
             // Convert input to UTF-8
             $result = '';
-            $str = self::map_to_utf8($result, $in_map, $str, $IGNORE) ? $result : false;
+            if (self::map_to_utf8($result, $in_map, $str, $IGNORE)) $str = $result;
+            else $str = false;
             self::$is_valid_utf8 = true;
         }
         else
@@ -127,7 +128,8 @@ class Iconv
         {
             // Convert output to UTF-8
             $result = '';
-            return self::map_from_utf8($result, $out_map, $str, $IGNORE, $TRANSLIT) ? $result : false;
+            if (self::map_from_utf8($result, $out_map, $str, $IGNORE, $TRANSLIT)) return $result;
+            else return false;
         }
         else return $str;
     }
@@ -177,9 +179,8 @@ class Iconv
 
         while ($i < $len)
         {
-            $str[$i+2] = 'Q' === strtoupper($str[$i+1])
-                ? rawurldecode(strtr(str_replace('%', '%25', $str[$i+2]), '=_', '% '))
-                : base64_decode($str[$i+2]);
+            if ('Q' !== strtoupper($str[$i+1])) $str[$i+2] = base64_decode($str[$i+2]);
+            else $str[$i+2] = rawurldecode(strtr(str_replace('%', '%25', $str[$i+2]), '=_', '% '));
 
             $str[$i+2] = self::iconv($str[$i], $charset, $str[$i+2]);
             $str[$i+3] = self::iconv('UTF-8' , $charset, $str[$i+3]);
@@ -374,7 +375,8 @@ class Iconv
 
         $s = preg_match($rx, $s, $s) ? $s[1] : '';
 
-        return INF === $encoding ? $s : self::iconv('UTF-8', $encoding, $s);
+        if (INF === $encoding) return $s;
+        else return self::iconv('UTF-8', $encoding, $s);
     }
 
 

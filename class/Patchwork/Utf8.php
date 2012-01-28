@@ -79,7 +79,8 @@ class Utf8
                 $i += $ulen;
             }
 
-            $uchr = isset($cp[$uchr]) ? $cp[$uchr] : $placeholder;
+            if (isset($cp[$uchr])) $uchr = $cp[$uchr];
+            else $uchr = $placeholder;
 
             isset($uchr[0]) && $result[$j++] = $uchr[0];
             isset($uchr[1]) && $result[$j++] = $uchr[1];
@@ -139,8 +140,8 @@ class Utf8
     static function strrchr ($s, $needle, $before_needle = false) {return mb_strrchr ($s, $needle, $before_needle, 'UTF-8');}
     static function strrichr($s, $needle, $before_needle = false) {return mb_strrichr($s, $needle, $before_needle, 'UTF-8');}
 
-    static function strtolower($s, $form = Normalizer::FORM_C) {return Normalizer::isNormalized($s = mb_strtolower($s, 'UTF-8'), $form) ? $s : Normalizer::normalize($s, $form);}
-    static function strtoupper($s, $form = Normalizer::FORM_C) {return Normalizer::isNormalized($s = mb_strtoupper($s, 'UTF-8'), $form) ? $s : Normalizer::normalize($s, $form);}
+    static function strtolower($s, $form = Normalizer::FORM_C) {if (Normalizer::isNormalized($s = mb_strtolower($s, 'UTF-8'), $form)) return $s; return Normalizer::normalize($s, $form);}
+    static function strtoupper($s, $form = Normalizer::FORM_C) {if (Normalizer::isNormalized($s = mb_strtoupper($s, 'UTF-8'), $form)) return $s; return Normalizer::normalize($s, $form);}
 
     static function htmlentities    ($s, $quote_style = ENT_COMPAT) {return htmlentities    ($s, $quote_style, 'UTF-8');}
     static function htmlspecialchars($s, $quote_style = ENT_COMPAT) {return htmlspecialchars($s, $quote_style, 'UTF-8');}
@@ -291,8 +292,8 @@ class Utf8
         $freelen = $len - $slen;
         $len = $freelen % $padlen;
 
-        if (STR_PAD_RIGHT === $type) return $s . str_repeat($pad, $freelen / $padlen) . ($len ? self::substr($pad, 0, $len) : '');
-        if (STR_PAD_LEFT  === $type) return      str_repeat($pad, $freelen / $padlen) . ($len ? self::substr($pad, 0, $len) : '') . $s;
+        if (STR_PAD_RIGHT === $type) return $s . str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '');
+        if (STR_PAD_LEFT  === $type) return      str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '') . $s;
 
         if (STR_PAD_BOTH === $type)
         {
@@ -300,11 +301,11 @@ class Utf8
 
             $type = ceil($freelen);
             $len = $type % $padlen;
-            $s .= str_repeat($pad, $type / $padlen) . ($len ? self::substr($pad, 0, $len) : '');
+            $s .= str_repeat($pad, $type / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '');
 
             $type = floor($freelen);
             $len = $type % $padlen;
-            return str_repeat($pad, $type / $padlen) . ($len ? self::substr($pad, 0, $len) : '') . $s;
+            return str_repeat($pad, $type / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '') . $s;
         }
 
         user_error(__METHOD__ . '(): Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH.');
@@ -377,7 +378,8 @@ class Utf8
 
     static function strpbrk($s, $charlist)
     {
-        return preg_match('/' . self::rxClass($charlist) . '.*/us', $s, $s) ? $s[0] : false;
+        if (preg_match('/' . self::rxClass($charlist) . '/us', $s, $m)) return substr($s, strpos($s, $m[0]));
+        else return false;
     }
 
     static function strrev($s)
@@ -481,7 +483,8 @@ class Utf8
 
         $class[0] = '[' . $class[0] . ']';
 
-        return 1 === count($class) ? $class[0] : ('(?:' . implode('|', $class) . ')');
+        if (1 === count($class)) return $class[0];
+        else return '(?:' . implode('|', $class) . ')';
     }
 
     protected static function getData($file)

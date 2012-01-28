@@ -39,16 +39,14 @@ class Utf8
 
     static function htmlspecialchars($s, $style = ENT_COMPAT, $charset = 'UTF-8', $double_enc = true)
     {
-        return $double_enc || false === strpos($s, '&') || false === strpos($s, ';')
-            ? htmlspecialchars($s, $style, $charset)
-            : htmlspecialchars(html_entity_decode($s, $style, $charset), $style, $charset);
+        if ($double_enc || false === strpos($s, '&') || false === strpos($s, ';')) return htmlspecialchars($s, $style, $charset);
+        else return htmlspecialchars(html_entity_decode($s, $style, $charset), $style, $charset);
     }
 
     static function htmlentities($s, $style = ENT_COMPAT, $charset = 'UTF-8', $double_enc = true)
     {
-        return $double_enc || false === strpos($s, '&') || false === strpos($s, ';')
-            ? htmlentities($s, $style, $charset)
-            : htmlentities(html_entity_decode($s, $style, $charset), $quote_style, $charset);
+        if ($double_enc || false === strpos($s, '&') || false === strpos($s, ';')) return htmlentities($s, $style, $charset);
+        else return htmlentities(html_entity_decode($s, $style, $charset), $quote_style, $charset);
     }
 
     static function utf8_encode($s)

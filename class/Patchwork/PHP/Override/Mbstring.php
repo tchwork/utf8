@@ -73,13 +73,13 @@ class Mbstring
     {
         INF === $from_encoding && $from_encoding = self::$internal_encoding;
 
-        if ('base64' === $to_encoding) return 'base64' === $from_encoding ? $s : base64_encode($s);
-
         if ('base64' === $from_encoding)
         {
             $s = base64_decode($s);
             $from_encoding = $to_encoding;
         }
+
+        if ('base64' === $to_encoding) return base64_encode($s);
 
         if ('html-entities' === $to_encoding)
         {
@@ -120,7 +120,8 @@ class Mbstring
         {
         case MB_CASE_TITLE:
             $s = preg_replace_callback('/\b\p{Ll}/u', array(__CLASS__, 'title_case_callback'), $s);
-            return INF === $encoding ? $s : iconv('UTF-8', $encoding, $s);
+            if (INF === $encoding) return $s;
+            else return iconv('UTF-8', $encoding, $s);
 
         case MB_CASE_UPPER:
             static $upper;
@@ -166,7 +167,8 @@ class Mbstring
             }
         }
 
-        return INF === $encoding ? $s : iconv('UTF-8', $encoding, $s);
+        if (INF === $encoding) return $s;
+        else return iconv('UTF-8', $encoding, $s);
     }
 
     static function mb_internal_encoding($encoding = INF)
@@ -273,7 +275,9 @@ class Mbstring
     static function mb_strstr($haystack, $needle, $part = false, $encoding = INF)
     {
         $pos = strpos($haystack, $needle);
-        return false === $pos ? false : ($part ? substr($haystack, 0, $pos) : substr($haystack, $pos));
+        if (false === $pos) return false;
+        if ($part) return substr($haystack, 0, $pos);
+        else return substr($haystack, $pos);
     }
 
 
@@ -281,11 +285,9 @@ class Mbstring
     {
         INF === $encoding && $encoding = self::$internal_encoding;
 
-        return false === $pos ? false : (
-              $part
-            ? self::mb_substr($haystack,    0,       $pos, $encoding)
-            : self::mb_substr($haystack, $pos, 2147483647, $encoding)
-        );
+        if (false === $pos) return false;
+        if ($part) return self::mb_substr($haystack,    0,       $pos, $encoding);
+        else return self::mb_substr($haystack, $pos, 2147483647, $encoding);
     }
 
     protected static function html_encoding_callback($m)
