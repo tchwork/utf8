@@ -69,9 +69,13 @@ class Intl
 
     static function grapheme_substr($s, $start, $len = 2147483647)
     {
+        // Be aware that native grapheme_substr() is currently too heavily bugged to be relied on
+
         preg_match_all('/' . self::GRAPHEME_CLUSTER_RX . '/u', $s, $s);
+        $c = count($s[0]);
         $s = array_slice($s[0], $start, $len);
-        return implode('', $s);
+        if (isset($s[0])) return implode('', $s);
+        return substr(str_repeat('-', $c), $start, $len);
     }
 
     static function grapheme_strpos  ($s, $needle, $offset = 0) {return self::grapheme_position($s, $needle, $offset, 0);}

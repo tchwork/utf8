@@ -129,8 +129,27 @@ class Utf8
 
     // PHP string functions that need UTF-8 awareness
 
+    static function substr($s, $start, $len = 2147483647)
+    {
+/**/    if (extension_loaded('intl'))
+/**/    {
+            if ($start >= 0 && $len >= 0)
+            {
+                // Native grapheme_substr() is currently too heavily bugged to be used when $start or $len are negative
+
+                if (2147483647 > $len && false !== $c = grapheme_substr($s, $start, $len)) return $c;
+                else return grapheme_substr($s, $start);
+            }
+/**/    }
+
+        $s = self::getGraphemeClusters($s);
+        $c = count($s);
+        $s = array_slice($s, $start, $len);
+        if (isset($s[0])) return implode('', $s);
+        return substr(str_repeat('-', $c), $start, $len);
+    }
+
     static function strlen($s) {return grapheme_strlen($s);}
-    static function substr($s, $start, $len = 2147483647) {if (false !== $len = grapheme_substr($s, $start, $len)) return $len; return grapheme_substr($s, $start);}
     static function strpos  ($s, $needle, $offset = 0) {return grapheme_strpos  ($s, $needle, $offset);}
     static function stripos ($s, $needle, $offset = 0) {return grapheme_stripos ($s, $needle, $offset);}
     static function strrpos ($s, $needle, $offset = 0) {return grapheme_strrpos ($s, $needle, $offset);}
