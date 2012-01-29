@@ -175,6 +175,7 @@ class Utf8
             $words = explode(' ', $s[$i]);
             $line && $result[] = $line;
             $line = $words[0];
+            $lineLen = grapheme_strlen($line);
             $jLen = count($words);
 
             for ($j = 1; $j < $jLen; ++$j)
