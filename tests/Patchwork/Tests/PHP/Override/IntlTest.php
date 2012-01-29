@@ -26,11 +26,13 @@ class IntlTest extends \PHPUnit_Framework_TestCase
     {
         $c = "déjà";
 
-        $this->assertSame( i::grapheme_substr($c, -2, 2), "jà" );
-        $this->assertSame( i::grapheme_substr($c, -2, 3), "jà" );
-
-        $this->assertSame( grapheme_substr($c, -2, 2), "jà" );
-        $this->assertSame( grapheme_substr($c, -2, 3), false ); // Should be "jà", but grapheme_substr() is buggy
+        $this->assertSame( i::grapheme_substr($c, -2,  3), "jà" );
+        $this->assertSame( i::grapheme_substr($c, -2, -1), "j" );
+        $this->assertSame( i::grapheme_substr($c, -1,  0), "" );
+        $this->assertSame( i::grapheme_substr($c, -2, -2), "" );
+        $this->assertSame( i::grapheme_substr($c,  5,  0), false );
+        $this->assertSame( i::grapheme_substr($c, -5,  0), false );
+        $this->assertSame( i::grapheme_substr($c,  1, -4), false );
     }
 
     function testGrapheme_strpos()

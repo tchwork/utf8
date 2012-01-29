@@ -191,3 +191,7 @@ if (!extension_loaded('intl'))
     function grapheme_strstr($s, $needle, $before_needle = false) {return o\Intl::grapheme_strstr($s, $needle, $before_needle);};
     function grapheme_substr($s, $start, $len = 2147483647) {return o\Intl::grapheme_substr($s, $start, $len);};
 }
+else if (PHP_VERSION_ID < 50309)
+{
+    require __DIR__ . '/class/Patchwork/PHP/Override/Intl.php';
+}

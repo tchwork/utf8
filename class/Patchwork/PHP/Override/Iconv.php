@@ -361,15 +361,16 @@ class Iconv
         $start = (int) $start;
 
         if (0 > $start) $start += $slen;
-        if (0 > $start) $start = 0;
-        if ($start >= $slen) return '';
+        if (0 > $start) return false;
+        if ($start >= $slen) return false;
 
         $rx = $slen - $start;
 
         if (0 > $length) $length += $rx;
-        if (0 >= $length) return '';
+        if (0 === $length) return '';
+        if (0 > $length) return false;
 
-        if ($length > $slen - $start) $length = $rx;
+        if ($length > $rx) $length = $rx;
 
         $rx = '/^' . ($start ? self::preg_offset($start) : '') . '(' . self::preg_offset($length) . ')/u';
 

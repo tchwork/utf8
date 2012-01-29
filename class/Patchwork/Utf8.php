@@ -131,23 +131,14 @@ class Utf8
 
     static function substr($s, $start, $len = 2147483647)
     {
-/**/    if (extension_loaded('intl'))
+/**/    if (extension_loaded('intl') && PHP_VERSION_ID < 50309)
 /**/    {
-            if ($start >= 0 && $len >= 0)
-            {
-                // Native grapheme_substr() is currently too heavily bugged to be used when $start or $len are negative
-                // See http://bugs.php.net/55562 and http://bugs.php.net/60918
-
-                if (2147483647 > $len && false !== $c = grapheme_substr($s, $start, $len)) return $c;
-                else return grapheme_substr($s, $start);
-            }
+            return PHP\Override\Intl::grapheme_substr_workaround55562($s, $start, $len);
 /**/    }
-
-        $s = self::getGraphemeClusters($s);
-        $c = count($s);
-        $s = array_slice($s, $start, $len);
-        if (isset($s[0])) return implode('', $s);
-        return substr(str_repeat('-', $c), $start, $len);
+/**/    else
+/**/    {
+            return grapheme_substr($s, $start, $len);
+/**/    }
     }
 
     static function strlen($s) {return grapheme_strlen($s);}
