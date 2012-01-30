@@ -55,7 +55,7 @@ class Utf8
         $result = '9' === $cp[0] ? $s . $s : $s;
 
         if (isset($map[$cp])) $cp = $map[$cp];
-        else if (false !== $i = self::getData('charset/bestfit' . $cp))
+        else if (false !== $i = self::getData('bestfit' . $cp))
         {
             $map[$cp] = $i;
             $cp = $map[$cp];

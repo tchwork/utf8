@@ -21,33 +21,16 @@ namespace Patchwork\PHP\Override;
 /**/$map[0] = explode('-', "\xC2" . str_replace(' ', "-\xC2", $map[0]));
 /**/$map[1] = explode('    ', $map[1]);
 
-Utf8::$cp1252 = /*<*/$map[0]/*>*/;
-Utf8::$utf8   = /*<*/$map[1]/*>*/;
+Xml::$cp1252 = /*<*/$map[0]/*>*/;
+Xml::$utf8   = /*<*/$map[1]/*>*/;
 
 
 /**
- * Basic string functions enhanced to Utf-8.
- *
- * htmlspecialchars and htmlentities default charset is set to UTF-8,
- * adding the $double_enc parameter introduced in PHP 5.2.3.
- *
- * utf8_encode/decode are enhanced to Windows-1252.
+ * utf8_encode/decode enhanced to Windows-1252.
  */
-class Utf8
+class Xml
 {
     static $cp1252, $utf8;
-
-    static function htmlspecialchars($s, $style = ENT_COMPAT, $charset = 'UTF-8', $double_enc = true)
-    {
-        if ($double_enc || false === strpos($s, '&') || false === strpos($s, ';')) return htmlspecialchars($s, $style, $charset);
-        else return htmlspecialchars(html_entity_decode($s, $style, $charset), $style, $charset);
-    }
-
-    static function htmlentities($s, $style = ENT_COMPAT, $charset = 'UTF-8', $double_enc = true)
-    {
-        if ($double_enc || false === strpos($s, '&') || false === strpos($s, ';')) return htmlentities($s, $style, $charset);
-        else return htmlentities(html_entity_decode($s, $style, $charset), $quote_style, $charset);
-    }
 
     static function utf8_encode($s)
     {

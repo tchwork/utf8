@@ -1,8 +1,8 @@
 <?php
 
-namespace Patchwork\Tests\Utf8;
+namespace Patchwork\Tests\PHP\Override;
 
-use Patchwork\Utf8\Normalizer as pn;
+use Patchwork\PHP\Override\Normalizer as pn;
 use Normalizer as in;
 
 class NormalizerTest extends \PHPUnit_Framework_TestCase

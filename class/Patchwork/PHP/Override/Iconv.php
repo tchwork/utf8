@@ -534,7 +534,7 @@ class Iconv
 
     protected static function getData($file)
     {
-        $file = dirname(dirname(__DIR__)) . '/Utf8/data/charset/' . $file . '.ser';
+        $file = __DIR__ . '/charset/' . $file . '.ser';
         if (file_exists($file)) return unserialize(file_get_contents($file));
         else return false;
     }

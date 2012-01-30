@@ -14,17 +14,17 @@
 use Patchwork\PHP\Override as o;
 
 require __DIR__ . '/class/Patchwork/Utf8.php';
-require __DIR__ . '/class/Patchwork/PHP/Override/Utf8.php';
+require __DIR__ . '/class/Patchwork/PHP/Override/Xml.php';
 
 // utf8_encode/decode support enhanced to Windows-1252
 
-function cp1252_utf8($s) {return o\Utf8::utf8_encode($s);};
-function utf8_cp1252($s) {return o\Utf8::utf8_decode($s);};
+function cp1252_utf8($s) {return o\Xml::utf8_encode($s);};
+function utf8_cp1252($s) {return o\Xml::utf8_decode($s);};
 
 if (!extension_loaded('xml'))
 {
-    function utf8_encode($s) {return o\Utf8::utf8_encode($s);};
-    function utf8_decode($s) {return o\Utf8::utf8_decode($s);};
+    function utf8_encode($s) {return o\Xml::utf8_encode($s);};
+    function utf8_decode($s) {return o\Xml::utf8_decode($s);};
 }
 
 
@@ -169,13 +169,13 @@ if (!preg_match('/^.$/u', '§')) throw new Exception('PCRE is not compiled with 
 
 if (!extension_loaded('intl'))
 {
-    require __DIR__ . '/class/Patchwork/Utf8/Normalizer.php';
+    require __DIR__ . '/class/Patchwork/PHP/Override/Normalizer.php';
     require __DIR__ . '/class/Patchwork/PHP/Override/Intl.php';
 
-    class Normalizer extends Patchwork\Utf8\Normalizer {}
+    class Normalizer extends o\Normalizer {}
 
-    function normalizer_is_normalized($s, $form = 'NFC') {return Patchwork\Utf8\Normalizer::isNormalized($s, $form);};
-    function normalizer_normalize($s, $form = 'NFC') {return Patchwork\Utf8\Normalizer::normalize($s, $form);};
+    function normalizer_is_normalized($s, $form = o\Normalizer::NFC) {return o\Normalizer::isNormalized($s, $form);};
+    function normalizer_normalize($s, $form = o\Normalizer::NFC) {return o\Normalizer::normalize($s, $form);};
 
     define('GRAPHEME_EXTR_COUNT', 0);
     define('GRAPHEME_EXTR_MAXBYTES', 1);

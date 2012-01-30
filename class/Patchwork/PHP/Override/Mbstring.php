@@ -307,7 +307,7 @@ class Mbstring
 
     protected static function getData($file)
     {
-        $file = dirname(dirname(__DIR__)) . '/Utf8/data/' . $file . '.ser';
+        $file = __DIR__ . '/unidata/' . $file . '.ser';
         if (file_exists($file)) return unserialize(file_get_contents($file));
         else return false;
     }

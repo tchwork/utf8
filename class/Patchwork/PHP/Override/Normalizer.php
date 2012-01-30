@@ -11,7 +11,7 @@
  *
  ***************************************************************************/
 
-namespace Patchwork\Utf8;
+namespace Patchwork\PHP\Override;
 
 /**
  * Normalizer is a PHP fallback implementation of the Normalizer class provided by the intl extension.
@@ -287,7 +287,7 @@ class Normalizer
 
     protected static function getData($file)
     {
-        $file = __DIR__ . '/data/' . $file . '.ser';
+        $file = __DIR__ . '/unidata/' . $file . '.ser';
         if (file_exists($file)) return unserialize(file_get_contents($file));
         else return false;
     }

@@ -24,8 +24,9 @@ namespace Patchwork\Utf8;
  */
 class Compiler
 {
-    static function charsetMaps($map_dir, $out_dir)
+    static function charsetMaps($out_dir, $map_dir = null)
     {
+        isset($map_dir) || $map_dir = __DIR__ . '/unicode/charset/';
         $h = opendir($map_dir);
         while (false !== $f = readdir($h)) if (false === strpos($f, '.') && is_file($map_dir . $f))
         {
@@ -48,8 +49,9 @@ class Compiler
         closedir($h);
     }
 
-    static function translitMap($translit_def, $out_dir)
+    static function translitMap($out_dir, $translit_def = null)
     {
+        isset($translit_def) || $translit_def = __DIR__ . '/unicode/charset/translit.def';
         $data = file_get_contents($data);
         preg_match_all('/^([0-9A-F]+)\t([^\t]+)\t/mi', $data, $data, PREG_SET_ORDER);
 
@@ -59,8 +61,9 @@ class Compiler
         file_put_contents($out_dir . 'translit.ser', serialize($map));
     }
 
-    static function bestFit($map_dir, $out_dir)
+    static function bestFit($out_dir, $map_dir = null)
     {
+        isset($map_dir) || $map_dir = __DIR__ . '/unicode/charset/';
         $h = opendir($map_dir);
         while (false !== $f = readdir($h)) if (0 === strpos($f, 'bestfit') && preg_match('/^bestfit\d+\.txt$/D', $f))
         {
@@ -294,6 +297,6 @@ class Compiler
 
     protected static function getFile($file)
     {
-        return __DIR__ . '/data/' . $file;
+        return __DIR__ . '/unicode/data/' . $file;
     }
 }
