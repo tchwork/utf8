@@ -131,7 +131,7 @@ class Utf8
 
     static function substr($s, $start, $len = 2147483647)
     {
-/**/    if (extension_loaded('intl') && PHP_VERSION_ID < 50309)
+/**/    if (extension_loaded('intl') && PHP_VERSION_ID < 50400)
 /**/    {
             return PHP\Override\Intl::grapheme_substr_workaround55562($s, $start, $len);
 /**/    }
