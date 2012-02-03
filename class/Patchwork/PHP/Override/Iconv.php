@@ -39,9 +39,9 @@ class Iconv
 
     static protected
 
-    $input_encoding = 'UTF-8//IGNORE',
-    $output_encoding = 'UTF-8//IGNORE',
-    $internal_encoding = 'UTF-8//IGNORE',
+    $input_encoding = 'UTF-8',
+    $output_encoding = 'UTF-8',
+    $internal_encoding = 'UTF-8',
 
     $alias = array(
         'ascii'   => 'us-ascii',
@@ -306,7 +306,7 @@ class Iconv
     static function strlen1($s, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        0 !== strncasecmp($encoding, 'UTF-8', 5) && $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
+        if (0 !== strncasecmp($encoding, 'UTF-8', 5) && false === $s = self::iconv($encoding, 'UTF-8', $s)) return false;
 
         return strlen(utf8_decode($s));
     }
@@ -314,7 +314,7 @@ class Iconv
     static function strlen2($s, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        0 !== strncasecmp($encoding, 'UTF-8', 5) && $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
+        if (0 !== strncasecmp($encoding, 'UTF-8', 5) && false === $s = self::iconv($encoding, 'UTF-8', $s)) return false;
 
         $ulen_mask = self::$ulen_mask;
 
@@ -334,7 +334,7 @@ class Iconv
     static function iconv_strpos($haystack, $needle, $offset = 0, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        0 !== strncasecmp($encoding, 'UTF-8', 5) && $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
+        if (0 !== strncasecmp($encoding, 'UTF-8', 5) && false === $s = self::iconv($encoding, 'UTF-8', $s)) return false;
 
         if ($offset = (int) $offset) $haystack = self::iconv_substr($haystack, $offset, 2147483647, 'UTF-8');
         $pos = strpos($haystack, $needle);
@@ -344,7 +344,7 @@ class Iconv
     static function iconv_strrpos($haystack, $needle, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        0 !== strncasecmp($encoding, 'UTF-8', 5) && $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
+        if (0 !== strncasecmp($encoding, 'UTF-8', 5) && false === $s = self::iconv($encoding, 'UTF-8', $s)) return false;
 
         $needle = self::iconv_substr($needle, 0, 1, 'UTF-8');
         $pos = strpos(strrev($haystack), strrev($needle));
@@ -355,7 +355,7 @@ class Iconv
     {
         INF === $encoding && $encoding = self::$internal_encoding;
         if (0 === strncasecmp($encoding, 'UTF-8', 5)) $encoding = INF;
-        else $s = self::iconv($encoding, 'UTF-8//IGNORE', $s);
+        else if (false === $s = self::iconv($encoding, 'UTF-8', $s)) return false;
 
         $slen = iconv_strlen($s, 'UTF-8');
         $start = (int) $start;
