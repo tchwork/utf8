@@ -65,7 +65,7 @@ class Xml
         return $s;
     }
 
-    function utf8_decode($s)
+    static function utf8_decode($s)
     {
         $s = str_replace(self::$utf8, self::$cp1252, $s);
 
