@@ -31,7 +31,7 @@ class Intl
 {
     static function grapheme_extract($s, $size, $type = GRAPHEME_EXTR_COUNT, $start = 0, &$next = 0)
     {
-        if (is_array($s)) return user_error(__METHOD__ . '() expects parameter 1 to be string, array given');
+        if (is_array($s)) return user_error(__METHOD__ . '() expects parameter 1 to be string, array given', E_USER_WARNING);
 
         $s     = (string) $s;
         $size  = (int) $size;
@@ -50,11 +50,13 @@ class Intl
             $next += strlen($s[0]);
             $s = isset($s[1]) ? $s[1] : '';
         }
+        // @codeCoverageIgnoreStart
         else
         {
             //TODO
-            return user_error(__METHOD__ . '() with GRAPHEME_EXTR_MAXBYTES or GRAPHEME_EXTR_MAXCHARS is not implemented');
+            return user_error(__METHOD__ . '() with GRAPHEME_EXTR_MAXBYTES or GRAPHEME_EXTR_MAXCHARS is not implemented', E_USER_WARNING);
         }
+        // @codeCoverageIgnoreEnd
 
         $next += strlen($s);
 
@@ -88,7 +90,7 @@ class Intl
         return implode('', array_slice($s[0], $start, $len));
     }
 
-    static function grapheme_substr_workaround55562($s, $start, $len = 2147483647)
+    static function grapheme_substr_workaround55562($s, $start, $len)
     {
         // Intl based http://bugs.php.net/55562 workaround
 
@@ -121,7 +123,7 @@ class Intl
 
     protected static function grapheme_position($s, $needle, $offset, $mode)
     {
-        if (0 > $offset || ($offset && ('' === (string) $s || '' === $s = self::grapheme_substr($s, $offset))))
+        if (0 > $offset || ($offset > 0 && '' === $s = (string) self::grapheme_substr($s, $offset)))
         {
             user_error('Offset not contained in string.', E_USER_ERROR);
             return false;
@@ -140,7 +142,7 @@ class Intl
         case 0: $needle = iconv_strpos ($s, $needle, 0, 'UTF-8'); break;
         case 1: $needle = mb_stripos   ($s, $needle, 0, 'UTF-8'); break;
         case 2: $needle = iconv_strrpos($s, $needle,    'UTF-8'); break;
-        case 3: $needle = mb_strripos  ($s, $needle, 0, 'UTF-8'); break;
+        default: $needle = mb_strripos ($s, $needle, 0, 'UTF-8'); break;
         }
 
         return $needle ? self::grapheme_strlen(iconv_substr($s, 0, $needle, 'UTF-8')) + $offset : $needle;

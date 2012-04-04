@@ -68,12 +68,18 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         $this->assertSame( substr($b, -2,  3), "ja" );
         $this->assertSame( substr($b, -3, -1), "ej" );
         $this->assertSame( substr($b,  1, -3), "" );
+        $this->assertSame( substr($c,  5,  0), "" ); // u::substr() returns false here
+        $this->assertSame( substr($c, -5,  0), "" ); // u::substr() returns false here
         $this->assertSame( substr($b,  1, -4), false );
 
+        $this->assertSame( u::substr($c,  2    ), "jà" );
+        $this->assertSame( u::substr($c, -2    ), "jà" );
         $this->assertSame( u::substr($c,  0,  2), "dé" );
         $this->assertSame( u::substr($c, -2,  3), "jà" );
         $this->assertSame( u::substr($c, -3, -1), "éj" );
         $this->assertSame( u::substr($c,  1, -3), "" );
+        $this->assertSame( u::substr($c,  5,  0), false ); // Modelled after grapheme_substr(), not substr() (see above)
+        $this->assertSame( u::substr($c, -5,  0), false ); // Modelled after grapheme_substr(), not substr() (see above)
         $this->assertSame( u::substr($c,  1, -4), false );
 
         $this->assertSame( u::substr($d,  0,  2), n::normalize("dé", n::NFD) );
