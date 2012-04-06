@@ -123,18 +123,8 @@ class Intl
 
     protected static function grapheme_position($s, $needle, $offset, $mode)
     {
-        if (0 > $offset || ($offset > 0 && '' === $s = (string) self::grapheme_substr($s, $offset)))
-        {
-            user_error('Offset not contained in string.', E_USER_ERROR);
-            return false;
-        }
-
-        if ('' === (string) $needle)
-        {
-            user_error('Empty delimiter.', E_USER_ERROR);
-            return false;
-        }
-
+        if ($offset > 0) $s = (string) self::grapheme_substr($s, $offset);
+        if ('' === (string) $needle) return false;
         if ('' === (string) $s) return false;
 
         switch ($mode)
