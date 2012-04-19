@@ -26,6 +26,9 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
     );
 
 
+    /**
+     * @covers Patchwork\Utf8::isUtf8
+     */
     function testIsUtf8()
     {
         foreach (self::$utf8ValidityMap as $u => $t)
@@ -35,26 +38,43 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @covers Patchwork\Utf8::toASCII
+     */
     function testToASCII()
     {
+        $this->assertSame( u::toASCII(''), '' );
         $this->assertSame( u::toASCII('déjà vu'), 'deja vu' );
     }
 
+    /**
+     * @covers Patchwork\Utf8::bestFit
+     */
     function testBestFit()
     {
+        $this->assertSame( u::bestFit(-1, ''), '' );
         $this->assertSame( u::bestFit(1252, 'déjà vu'), iconv('UTF-8', 'CP1252', 'déjà vu') );
     }
 
+    /**
+     * @covers Patchwork\Utf8::strtocasefold
+     */
     function testStrtocasefold()
     {
         $this->assertSame( u::strtocasefold('Σσς'), 'σσσ' );
     }
 
+    /**
+     * @covers Patchwork\Utf8::strtonatfold
+     */
     function testStrtonatfold()
     {
         $this->assertSame( u::strtonatfold('Déjà Σσς'), 'Deja Σσς' );
     }
 
+    /**
+     * @covers Patchwork\Utf8::substr
+     */
     function testSubstr()
     {
         $b = "deja";
@@ -89,6 +109,9 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         $this->assertSame( u::substr($d,  1, -4), false );
     }
 
+    /**
+     * @covers Patchwork\Utf8::strlen
+     */
     function testStrlen()
     {
         foreach (self::$utf8ValidityMap as $u => $t) if ($t)
@@ -106,26 +129,42 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         $this->assertSame( u::strlen(n::normalize('한국어', n::NFD)), 3 );
     }
 
+    /**
+     * @covers Patchwork\Utf8::strpos
+     * @covers Patchwork\Utf8::stripos
+     * @covers Patchwork\Utf8::strrpos
+     * @covers Patchwork\Utf8::strripos
+     */
     function testStrpos()
     {
         $this->assertSame( u::strpos('déjà', 'à'), 3 );
-    }
-
-    function testStripos()
-    {
         $this->assertSame( u::stripos('DÉJÀ', 'à'), 3 );
-    }
-
-    function testStrrpos()
-    {
         $this->assertSame( u::strrpos('déjà', 'é'), 1 );
-    }
-
-    function testStrripos()
-    {
         $this->assertSame( u::strripos('DÉJÀ', 'é'), 1 );
     }
 
+    /**
+     * @covers Patchwork\Utf8::strstr
+     * @covers Patchwork\Utf8::stristr
+     * @covers Patchwork\Utf8::strrchr
+     * @covers Patchwork\Utf8::strrichr
+     */
+    function testStrstr()
+    {
+        $this->assertSame( u::strstr('déjàdéjà', 'é'), 'éjàdéjà' );
+        $this->assertSame( u::stristr('DÉJÀDÉJÀ', 'é'), 'ÉJÀDÉJÀ' );
+        $this->assertSame( u::strrchr('déjàdéjà', 'é'), 'éjà' );
+        $this->assertSame( u::strrichr('DÉJÀDÉJÀ', 'é'), 'ÉJÀ' );
+
+        $this->assertSame( u::strstr('déjàdéjà', 'é', true), 'd' );
+        $this->assertSame( u::stristr('DÉJÀDÉJÀ', 'é', true), 'D' );
+        $this->assertSame( u::strrchr('déjàdéjà', 'é', true), 'déjàd' );
+        $this->assertSame( u::strrichr('DÉJÀDÉJÀ', 'é', true), 'DÉJÀD' );
+    }
+
+    /**
+     * @covers Patchwork\Utf8::wordwrap
+     */
     function testWordwrap()
     {
         $this->assertSame(
@@ -147,6 +186,10 @@ oooooooooooooooooooooo"
         );
     }
 
+    /**
+     * @covers Patchwork\Utf8::chr
+     * @covers Patchwork\Utf8::ord
+     */
     function testChrOrd()
     {
         foreach (self::$utf8ValidityMap as $u => $t) if ($t)
@@ -155,6 +198,9 @@ oooooooooooooooooooooo"
         }
     }
 
+    /**
+     * @covers Patchwork\Utf8::str_pad
+     */
     function testStr_pad()
     {
         $this->assertSame( u::str_pad('ÉÈ', 10, 'à-', STR_PAD_RIGHT), 'ÉÈà-à-à-à-');
@@ -162,12 +208,18 @@ oooooooooooooooooooooo"
         $this->assertSame( u::str_pad('ÉÈ', 10, 'à-', STR_PAD_BOTH ), 'à-à-ÉÈà-à-');
     }
 
+    /**
+     * @covers Patchwork\Utf8::str_split
+     */
     function testStr_split()
     {
         $this->assertSame( u::str_split('déjà', 1), array('d','é','j','à') );
         $this->assertSame( u::str_split('déjà', 2), array('dé','jà') );
     }
 
+    /**
+     * @covers Patchwork\Utf8::str_word_count
+     */
     function testStr_word_count()
     {
         $this->assertSame( u::str_word_count('déjà vu', 2), array(0 => 'déjà', 5 => 'vu') );

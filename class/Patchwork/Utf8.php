@@ -46,7 +46,7 @@ class Utf8
 
     static function bestFit($cp, $s, $placeholder = '')
     {
-        if ('' === $s) return '';
+        if (!$i = strlen($s)) return 0 === $i ? '' : false;
 
         static $map = array();
         static $ulen_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
