@@ -154,9 +154,6 @@ class Utf8
     static function strtolower($s, $form = n::NFC) {if (n::isNormalized($s = mb_strtolower($s, 'UTF-8'), $form)) return $s; return n::normalize($s, $form);}
     static function strtoupper($s, $form = n::NFC) {if (n::isNormalized($s = mb_strtoupper($s, 'UTF-8'), $form)) return $s; return n::normalize($s, $form);}
 
-    static function htmlentities    ($s, $quote_style = ENT_COMPAT) {return htmlentities    ($s, $quote_style, 'UTF-8');}
-    static function htmlspecialchars($s, $quote_style = ENT_COMPAT) {return htmlspecialchars($s, $quote_style, 'UTF-8');}
-
     static function wordwrap($s, $width = 75, $break = "\n", $cut = false)
     {
         // This implementation could be extended to handle unicode word boundaries,
@@ -266,27 +263,6 @@ class Utf8
     }
 
     static function trim($s, $charlist = INF) {return self::rtrim(self::ltrim($s, $charlist), $charlist);}
-
-    static function html_entity_decode($s, $quote_style = ENT_COMPAT)
-    {
-        static $map = array(
-            array('&QUOT;','&LT;','&AMP;','&TRADE;','&COPY;','&GT;','&REG;','&apos;'),
-            array('&quot;','&lt;','&amp;','&trade;','&copy;','&gt;','&reg;','&#039;')
-        );
-
-        return html_entity_decode(str_replace($map[0], $map[1], $s), $quote_style, 'UTF-8');
-    }
-
-    static function get_html_translation_table($table = HTML_SPECIALCHARS, $quote_style = ENT_COMPAT)
-    {
-        if (HTML_ENTITIES === $table)
-        {
-            static $entities;
-            isset($entities) || $entities = self::getData('htmlentities');
-            return $entities + get_html_translation_table(HTML_SPECIALCHARS, $quote_style);
-        }
-        else return get_html_translation_table($table, $quote_style);
-    }
 
     static function str_ireplace($search, $replace, $subject, &$count = null)
     {
