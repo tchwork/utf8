@@ -171,23 +171,23 @@ class Utf8
         {
             $words = explode(' ', $s[$i]);
             $line && $result[] = $line;
-            $line = $words[0];
             $lineLen = grapheme_strlen($line);
             $jLen = count($words);
 
-            for ($j = 1; $j < $jLen; ++$j)
+            for ($j = 0; $j < $jLen; ++$j)
             {
                 $w = $words[$j];
                 $wLen = grapheme_strlen($w);
 
                 if ($lineLen + $wLen < $width)
                 {
-                    $line .= ' ' . $w;
+                    if ($j) $line .= ' ';
+                    $line .= $w;
                     $lineLen += $wLen + 1;
                 }
                 else
                 {
-                    $result[] = $line;
+                    if ($j || $i) $result[] = $line;
                     $line = '';
                     $lineLen = 0;
 
@@ -206,11 +206,8 @@ class Utf8
                         $w = implode('', $w);
                     }
 
-                    if ($wLen)
-                    {
-                        $line = $w;
-                        $lineLen = $wLen;
-                    }
+                    $line = $w;
+                    $lineLen = $wLen;
                 }
             }
         }
@@ -266,7 +263,9 @@ class Utf8
 
     static function str_ireplace($search, $replace, $subject, &$count = null)
     {
-        $subject = preg_replace('/' . preg_quote($search, '/') . '/ui', $replace, $subject, -1, $replace);
+        $search = (array) $search;
+        foreach ($search as &$s) $s = '' !== (string) $s ? '/' . preg_quote($s, '/') . '/ui' : '/^(?<=.)$/';
+        $subject = preg_replace($search, $replace, $subject, -1, $replace);
         $count = $replace;
         return $subject;
     }
