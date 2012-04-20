@@ -358,10 +358,10 @@ class Utf8
 
     static function strcspn($s, $charlist, $start = 0, $len = 2147483647)
     {
-        if ('' === (string) $mask) return null;
+        if ('' === (string) $charlist) return null;
         if ($start || 2147483647 != $len) $s = self::substr($s, $start, $len);
 
-        return preg_match('/^(.*?)' . self::rxClass($mask) . '/us', $s, $len) ? grapheme_strlen($len[1]) : grapheme_strlen($s);
+        return preg_match('/^(.*?)' . self::rxClass($charlist) . '/us', $s, $len) ? grapheme_strlen($len[1]) : grapheme_strlen($s);
     }
 
     static function strpbrk($s, $charlist)
