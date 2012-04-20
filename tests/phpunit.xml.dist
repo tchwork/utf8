@@ -6,6 +6,7 @@
     <testsuites>
         <testsuite name="Patchwork UTF-8 Test Suite">
             <directory>./Patchwork/</directory>
+            <directory>./php-utf8/</directory>
         </testsuite>
     </testsuites>
 </phpunit>
