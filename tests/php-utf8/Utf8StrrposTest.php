@@ -19,7 +19,7 @@ class Utf8StrrposTest extends PHPUnit_Framework_TestCase
     public function test_utf8_invalid()
     {
         $str = "Iñtërnâtiôn\xe9àlizætiøn";
-        $this->assertEquals(15, u::strrpos($str, 'æ'));
+        $this->assertFalse(u::strrpos($str, 'æ'));
     }
 
     public function test_ascii()

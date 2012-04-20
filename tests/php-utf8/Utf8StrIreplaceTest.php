@@ -35,8 +35,9 @@ class Utf8StrIreplaceTest extends PHPUnit_Framework_TestCase
     public function test_replace_count()
     {
         $str = 'Iñtërnâtiônàlizætiøn';
-        $replaced = 'IñtërXâtiôXàlizætiøn';
-        $this->assertEquals($replaced, u::str_ireplace('n', 'X', $str, 2));
+        $replaced = 'IñtërXâtiôXàlizætiøX';
+        $this->assertEquals($replaced, u::str_ireplace('n', 'X', $str, $count));
+        $this->assertEquals(3, $count);
     }
 
     public function test_replace_different_search_replace_length()

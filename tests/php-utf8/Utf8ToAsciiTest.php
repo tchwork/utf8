@@ -7,7 +7,7 @@ class Utf8ToAsciiTest extends PHPUnit_Framework_TestCase
     public function test_utf8()
     {
         $str = 'testiñg';
-        $this->assertEquals('testig', u::toASCII($str));
+        $this->assertEquals('testing', u::toASCII($str));
     }
 
     public function test_ascii()
@@ -19,7 +19,7 @@ class Utf8ToAsciiTest extends PHPUnit_Framework_TestCase
     public function test_invalid_char()
     {
         $str = "tes\xe9ting";
-        $this->assertEquals('testing', u::toASCII($str));
+        $this->assertEmpty(u::toASCII($str));
     }
 
     public function test_empty_str()
@@ -31,12 +31,12 @@ class Utf8ToAsciiTest extends PHPUnit_Framework_TestCase
     public function test_nul_and_non_7_bit()
     {
         $str = "a\x00ñ\x00c";
-        $this->assertEquals('ac', u::toASCII($str, 'both'));
+        $this->assertEquals("a\x00n\x00c", u::toASCII($str));
     }
 
     public function test_nul()
     {
         $str = "a\x00b\x00c";
-        $this->assertEquals('abc', u::toASCII($str, 'ctrl_chars'));
+        $this->assertEquals($str, u::toASCII($str));
     }
 }

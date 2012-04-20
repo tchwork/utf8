@@ -22,7 +22,7 @@ class Utf8StristrTest extends PHPUnit_Framework_TestCase
     {
         $str = 'iñtërnâtiônàlizætiøn';
         $search = '';
-        $this->assertEquals('iñtërnâtiônàlizætiøn', u::stristr($str, $search));
+        $this->assertFalse(u::stristr($str, $search));
     }
 
     public function test_empty_str()

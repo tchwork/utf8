@@ -13,7 +13,7 @@ class Utf8StrlenTest extends PHPUnit_Framework_TestCase
     public function test_utf8_invalid()
     {
         $str = "Iñtërnâtiôn\xe9àlizætiøn";
-        $this->assertEquals(20, u::strlen($str));
+        $this->assertNull(u::strlen($str));
     }
 
     public function test_ascii()

@@ -15,14 +15,14 @@ class Utf8StrcasecmpTest extends PHPUnit_Framework_TestCase
     {
         $str_x = 'iñtërnâtiônàlizætiøn';
         $str_y = 'IÑTËRNÂTIÔÀLIZÆTIØN';
-        $this->assertTrue(u::strcasecmp($str_x, $str_y) < 0);
+        $this->assertTrue(u::strcasecmp($str_x, $str_y) > 0);
     }
 
     public function test_greater()
     {
         $str_x = 'iñtërnâtiôàlizætiøn';
         $str_y = 'IÑTËRNÂTIÔNÀLIZÆTIØN';
-        $this->assertTrue(u::strcasecmp($str_x, $str_y) > 0);
+        $this->assertTrue(u::strcasecmp($str_x, $str_y) < 0);
     }
 
     public function test_empty_x()
