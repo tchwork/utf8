@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit colors="true"
+         bootstrap="bootstrap.php"
+>
+    <testsuites>
+        <testsuite name="Patchwork Normalizer Unicode conformance Test Suite">
+            <directory>./unicode/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
