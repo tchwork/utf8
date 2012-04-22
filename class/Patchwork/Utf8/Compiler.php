@@ -52,7 +52,7 @@ class Compiler
     static function translitMap($out_dir, $translit_def = null)
     {
         isset($translit_def) || $translit_def = __DIR__ . '/unicode/charset/translit.def';
-        $data = file_get_contents($data);
+        $data = file_get_contents($translit_def);
         preg_match_all('/^([0-9A-F]+)\t([^\t]+)\t/mi', $data, $data, PREG_SET_ORDER);
 
         $map = array();
