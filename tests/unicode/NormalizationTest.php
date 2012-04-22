@@ -5,7 +5,7 @@ use Patchwork\PHP\Override\Normalizer as n;
 
 class NormalizationTest extends \PHPUnit_Framework_TestCase
 {
-    public $unicodeVersion = 50;
+    public $unicodeVersion = 61;
 
     function testNormalize()
     {
