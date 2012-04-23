@@ -34,20 +34,20 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     function testNormalize()
     {
         $c = in::normalize("déjà", pn::NFC) . in::normalize("훈쇼™", pn::NFD);
-        $this->assertSame( pn::normalize($c, pn::NONE), $c );
-        $this->assertSame( in::normalize($c, pn::NONE), $c );
+        $this->assertSame( $c, pn::normalize($c, pn::NONE) );
+        $this->assertSame( $c, in::normalize($c, pn::NONE) );
 
         $c = "déjà 훈쇼™";
         $d = in::normalize($c, pn::NFD);
         $kc = in::normalize($c, pn::NFKC);
         $kd = in::normalize($c, pn::NFKD);
 
-        $this->assertSame( pn::normalize(''), '' );
-        $this->assertSame( pn::normalize($d), $c );
-        $this->assertSame( pn::normalize($d, pn::NFC), $c );
-        $this->assertSame( pn::normalize($c, pn::NFD), $d );
-        $this->assertSame( pn::normalize($d, pn::NFKC), $kc );
-        $this->assertSame( pn::normalize($c, pn::NFKD), $kd );
+        $this->assertSame( '', pn::normalize('') );
+        $this->assertSame( $c, pn::normalize($d) );
+        $this->assertSame( $c, pn::normalize($d, pn::NFC) );
+        $this->assertSame( $d, pn::normalize($c, pn::NFD) );
+        $this->assertSame( $kc, pn::normalize($d, pn::NFKC) );
+        $this->assertSame( $kd, pn::normalize($c, pn::NFKD) );
 
         $this->assertFalse( pn::normalize($c, -1) );
         $this->assertFalse( pn::normalize("\xFF") );

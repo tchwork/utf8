@@ -24,17 +24,17 @@ class IntlTest extends \PHPUnit_Framework_TestCase
         $this->assertSame( grapheme_extract('',    0), i::grapheme_extract('',    0) );
         $this->assertSame( grapheme_extract('abc', 0), i::grapheme_extract('abc', 0) );
 
-        $this->assertSame( i::grapheme_extract('한국어', 2, GRAPHEME_EXTR_COUNT, 3, $next), '국어' );
-        $this->assertSame( $next, 9 );
+        $this->assertSame( '국어', i::grapheme_extract('한국어', 2, GRAPHEME_EXTR_COUNT, 3, $next) );
+        $this->assertSame( 9, $next );
 
-        $this->assertSame( grapheme_extract('한국어', 2, GRAPHEME_EXTR_COUNT, 3, $next), '국어' );
-        $this->assertSame( $next, 9 );
+        $this->assertSame( '국어', grapheme_extract('한국어', 2, GRAPHEME_EXTR_COUNT, 3, $next) );
+        $this->assertSame( 9, $next );
 
         $next = 0;
-        $this->assertSame( i::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next), '한' );
-        $this->assertSame( i::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next), '국' );
-        $this->assertSame( i::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next), '어' );
-        $this->assertSame( i::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next), '' );
+        $this->assertSame( '한', i::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next) );
+        $this->assertSame( '국', i::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next) );
+        $this->assertSame( '어', i::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next) );
+        $this->assertSame( '', i::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next) );
     }
 
     /**
@@ -42,7 +42,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
      */
     function testGrapheme_extract_todo()
     {
-        $this->assertSame( 'a',    grapheme_extract('abc', 1, GRAPHEME_EXTR_MAXBYTES) );
+        $this->assertSame( 'a', grapheme_extract('abc', 1, GRAPHEME_EXTR_MAXBYTES) );
 
         try
         {
@@ -60,11 +60,11 @@ class IntlTest extends \PHPUnit_Framework_TestCase
      */
     function testGrapheme_strlen()
     {
-        $this->assertSame( i::grapheme_strlen('한국어'), 3 );
-        $this->assertSame( i::grapheme_strlen(n::normalize('한국어', n::NFD)), 3 );
+        $this->assertSame( 3, i::grapheme_strlen('한국어') );
+        $this->assertSame( 3, i::grapheme_strlen(n::normalize('한국어', n::NFD)) );
 
-        $this->assertSame( grapheme_strlen('한국어'), 3 );
-        $this->assertSame( grapheme_strlen(n::normalize('한국어', n::NFD)), 3 );
+        $this->assertSame( 3, grapheme_strlen('한국어') );
+        $this->assertSame( 3, grapheme_strlen(n::normalize('한국어', n::NFD)) );
     }
 
     /**
@@ -74,15 +74,15 @@ class IntlTest extends \PHPUnit_Framework_TestCase
     {
         $c = "déjà";
 
-        $this->assertSame( i::grapheme_substr($c,  2    ), "jà" );
-        $this->assertSame( i::grapheme_substr($c, -2    ), "jà" );
-        $this->assertSame( i::grapheme_substr($c, -2,  3), "jà" );
-        $this->assertSame( i::grapheme_substr($c, -2, -1), "j" );
-        $this->assertSame( i::grapheme_substr($c, -1,  0), "" );
-        $this->assertSame( i::grapheme_substr($c, -2, -2), "" );
-        $this->assertSame( i::grapheme_substr($c,  5,  0), false );
-        $this->assertSame( i::grapheme_substr($c, -5,  0), false );
-        $this->assertSame( i::grapheme_substr($c,  1, -4), false );
+        $this->assertSame( "jà", i::grapheme_substr($c,  2) );
+        $this->assertSame( "jà", i::grapheme_substr($c, -2) );
+        $this->assertSame( "jà", i::grapheme_substr($c, -2, 3) );
+        $this->assertSame( "j", i::grapheme_substr($c, -2, -1) );
+        $this->assertSame( "", i::grapheme_substr($c, -1,  0) );
+        $this->assertSame( "", i::grapheme_substr($c, -2, -2) );
+        $this->assertSame( false, i::grapheme_substr($c,  5,  0) );
+        $this->assertSame( false, i::grapheme_substr($c, -5,  0) );
+        $this->assertSame( false, i::grapheme_substr($c,  1, -4) );
 
         $this->assertSame( grapheme_substr($c,  2    ), "jà" );
         $this->assertSame( grapheme_substr($c, -2    ), "jà" );
@@ -107,23 +107,23 @@ class IntlTest extends \PHPUnit_Framework_TestCase
      */
     function testGrapheme_strpos()
     {
-        $this->assertSame( i::grapheme_strpos('abc', ''), false );
-        $this->assertSame( i::grapheme_strpos('abc', 'd'), false );
-        $this->assertSame( i::grapheme_strpos('abc', 'a', 3), false );
-        $this->assertSame( i::grapheme_strpos('abc', 'a', -1), 0 );
-        $this->assertSame( i::grapheme_strpos('한국어', '국'), 1 );
-        $this->assertSame( i::grapheme_stripos('DÉJÀ', 'à'), 3 );
-        $this->assertSame( i::grapheme_strrpos('한국어', '국'), 1 );
-        $this->assertSame( i::grapheme_strripos('DÉJÀ', 'à'), 3 );
+        $this->assertSame( false, i::grapheme_strpos('abc', '') );
+        $this->assertSame( false, i::grapheme_strpos('abc', 'd') );
+        $this->assertSame( false, i::grapheme_strpos('abc', 'a', 3) );
+        $this->assertSame( 0, i::grapheme_strpos('abc', 'a', -1) );
+        $this->assertSame( 1, i::grapheme_strpos('한국어', '국') );
+        $this->assertSame( 3, i::grapheme_stripos('DÉJÀ', 'à') );
+        $this->assertSame( 1, i::grapheme_strrpos('한국어', '국') );
+        $this->assertSame( 3, i::grapheme_strripos('DÉJÀ', 'à') );
 
-        $this->assertSame( grapheme_strpos('abc', ''), false );
-        $this->assertSame( grapheme_strpos('abc', 'd'), false );
-        $this->assertSame( grapheme_strpos('abc', 'a', 3), false );
-        $this->assertSame( grapheme_strpos('abc', 'a', -1), 0 );
-        $this->assertSame( grapheme_strpos('한국어', '국'), 1 );
-        $this->assertSame( grapheme_stripos('DÉJÀ', 'à'), 3 );
-        $this->assertSame( grapheme_strrpos('한국어', '국'), 1 );
-        $this->assertSame( grapheme_strripos('DÉJÀ', 'à'), 3 );
+        $this->assertSame( false, grapheme_strpos('abc', '') );
+        $this->assertSame( false, grapheme_strpos('abc', 'd') );
+        $this->assertSame( false, grapheme_strpos('abc', 'a', 3) );
+        $this->assertSame( 0, grapheme_strpos('abc', 'a', -1) );
+        $this->assertSame( 1, grapheme_strpos('한국어', '국') );
+        $this->assertSame( 3, grapheme_stripos('DÉJÀ', 'à') );
+        $this->assertSame( 1, grapheme_strrpos('한국어', '국') );
+        $this->assertSame( 3, grapheme_strripos('DÉJÀ', 'à') );
     }
 
     /**
@@ -132,10 +132,10 @@ class IntlTest extends \PHPUnit_Framework_TestCase
      */
     function testGrapheme_strstr()
     {
-        $this->assertSame( i::grapheme_strstr('한국어', '국'), '국어' );
-        $this->assertSame( i::grapheme_stristr('DÉJÀ', 'é'), 'ÉJÀ' );
+        $this->assertSame( '국어', i::grapheme_strstr('한국어', '국') );
+        $this->assertSame( 'ÉJÀ', i::grapheme_stristr('DÉJÀ', 'é') );
 
-        $this->assertSame( grapheme_strstr('한국어', '국'), '국어' );
-        $this->assertSame( grapheme_stristr('DÉJÀ', 'é'), 'ÉJÀ' );
+        $this->assertSame( '국어', grapheme_strstr('한국어', '국') );
+        $this->assertSame( 'ÉJÀ', grapheme_stristr('DÉJÀ', 'é') );
     }
 }

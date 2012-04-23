@@ -43,8 +43,8 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      */
     function testToASCII()
     {
-        $this->assertSame( u::toASCII(''), '' );
-        $this->assertSame( u::toASCII('déjà vu'), 'deja vu' );
+        $this->assertSame( '', u::toASCII('') );
+        $this->assertSame( 'deja vu', u::toASCII('déjà vu') );
     }
 
     /**
@@ -52,8 +52,8 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      */
     function testBestFit()
     {
-        $this->assertSame( u::bestFit(-1, ''), '' );
-        $this->assertSame( u::bestFit(1252, 'déjà vu'), iconv('UTF-8', 'CP1252', 'déjà vu') );
+        $this->assertSame( '', u::bestFit(-1, '') );
+        $this->assertSame( iconv('UTF-8', 'CP1252', 'déjà vu'), u::bestFit(1252, 'déjà vu') );
     }
 
     /**
@@ -61,7 +61,7 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      */
     function testStrtocasefold()
     {
-        $this->assertSame( u::strtocasefold('Σσς'), 'σσσ' );
+        $this->assertSame( 'σσσ', u::strtocasefold('Σσς') );
     }
 
     /**
@@ -69,7 +69,7 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      */
     function testStrtonatfold()
     {
-        $this->assertSame( u::strtonatfold('Déjà Σσς'), 'Deja Σσς' );
+        $this->assertSame( 'Deja Σσς', u::strtonatfold('Déjà Σσς') );
     }
 
     /**
@@ -82,31 +82,31 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         $d = n::normalize("déjà", n::NFD);
         $this->assertTrue( $c > $d );
 
-        $this->assertSame( u::substr('한국어', 1, 20), '국어' );
+        $this->assertSame( '국어', u::substr('한국어', 1, 20) );
 
-        $this->assertSame( substr($b,  0,  2), "de" );
-        $this->assertSame( substr($b, -2,  3), "ja" );
-        $this->assertSame( substr($b, -3, -1), "ej" );
-        $this->assertSame( substr($b,  1, -3), "" );
-        $this->assertSame( substr($c,  5,  0), "" ); // u::substr() returns false here
-        $this->assertSame( substr($c, -5,  0), "" ); // u::substr() returns false here
-        $this->assertSame( substr($b,  1, -4), false );
+        $this->assertSame( "de", substr($b,  0,  2) );
+        $this->assertSame( "ja", substr($b, -2,  3) );
+        $this->assertSame( "ej", substr($b, -3, -1) );
+        $this->assertSame( "", substr($b,  1, -3) );
+        $this->assertSame( "", substr($c,  5,  0) ); // u::substr() returns false here
+        $this->assertSame( "", substr($c, -5,  0) ); // u::substr() returns false here
+        $this->assertSame( false, substr($b,  1, -4) );
 
-        $this->assertSame( u::substr($c,  2    ), "jà" );
-        $this->assertSame( u::substr($c, -2    ), "jà" );
-        $this->assertSame( u::substr($c,  0,  2), "dé" );
-        $this->assertSame( u::substr($c, -2,  3), "jà" );
-        $this->assertSame( u::substr($c, -3, -1), "éj" );
-        $this->assertSame( u::substr($c,  1, -3), "" );
-        $this->assertSame( u::substr($c,  5,  0), false ); // Modelled after grapheme_substr(), not substr() (see above)
-        $this->assertSame( u::substr($c, -5,  0), false ); // Modelled after grapheme_substr(), not substr() (see above)
-        $this->assertSame( u::substr($c,  1, -4), false );
+        $this->assertSame( "jà", u::substr($c,  2    ) );
+        $this->assertSame( "jà", u::substr($c, -2    ) );
+        $this->assertSame( "dé", u::substr($c,  0,  2) );
+        $this->assertSame( "jà", u::substr($c, -2,  3) );
+        $this->assertSame( "éj", u::substr($c, -3, -1) );
+        $this->assertSame( "", u::substr($c,  1, -3) );
+        $this->assertSame( false, u::substr($c,  5,  0) ); // Modelled after grapheme_substr(), not substr() (see above)
+        $this->assertSame( false, u::substr($c, -5,  0) ); // Modelled after grapheme_substr(), not substr() (see above)
+        $this->assertSame( false, u::substr($c,  1, -4) );
 
-        $this->assertSame( u::substr($d,  0,  2), n::normalize("dé", n::NFD) );
-        $this->assertSame( u::substr($d, -2,  3), n::normalize("jà", n::NFD) );
-        $this->assertSame( u::substr($d, -3, -1), n::normalize("éj", n::NFD) );
-        $this->assertSame( u::substr($d,  1, -3), "" );
-        $this->assertSame( u::substr($d,  1, -4), false );
+        $this->assertSame( n::normalize("dé", n::NFD), u::substr($d,  0,  2) );
+        $this->assertSame( n::normalize("jà", n::NFD), u::substr($d, -2,  3) );
+        $this->assertSame( n::normalize("éj", n::NFD), u::substr($d, -3, -1) );
+        $this->assertSame( "", u::substr($d,  1, -3) );
+        $this->assertSame( false, u::substr($d,  1, -4) );
     }
 
     /**
@@ -116,17 +116,17 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
     {
         foreach (self::$utf8ValidityMap as $u => $t) if ($t)
         {
-            $this->assertSame( u::strlen($u), 1 );
+            $this->assertSame( 1, u::strlen($u) );
         }
 
         $c = "déjà";
         $d = n::normalize("déjà", n::NFD);
         $this->assertTrue( $c > $d );
 
-        $this->assertSame( u::strlen($c), 4 );
-        $this->assertSame( u::strlen($d), 4 );
+        $this->assertSame( 4, u::strlen($c) );
+        $this->assertSame( 4, u::strlen($d) );
 
-        $this->assertSame( u::strlen(n::normalize('한국어', n::NFD)), 3 );
+        $this->assertSame( 3, u::strlen(n::normalize('한국어', n::NFD)) );
     }
 
     /**
@@ -137,10 +137,10 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      */
     function testStrpos()
     {
-        $this->assertSame( u::strpos('déjà', 'à'), 3 );
-        $this->assertSame( u::stripos('DÉJÀ', 'à'), 3 );
-        $this->assertSame( u::strrpos('déjà', 'é'), 1 );
-        $this->assertSame( u::strripos('DÉJÀ', 'é'), 1 );
+        $this->assertSame( 3, u::strpos('déjà', 'à') );
+        $this->assertSame( 3, u::stripos('DÉJÀ', 'à') );
+        $this->assertSame( 1, u::strrpos('déjà', 'é') );
+        $this->assertSame( 1, u::strripos('DÉJÀ', 'é') );
     }
 
     /**
@@ -151,15 +151,15 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      */
     function testStrstr()
     {
-        $this->assertSame( u::strstr('déjàdéjà', 'é'), 'éjàdéjà' );
-        $this->assertSame( u::stristr('DÉJÀDÉJÀ', 'é'), 'ÉJÀDÉJÀ' );
-        $this->assertSame( u::strrchr('déjàdéjà', 'é'), 'éjà' );
-        $this->assertSame( u::strrichr('DÉJÀDÉJÀ', 'é'), 'ÉJÀ' );
+        $this->assertSame( 'éjàdéjà', u::strstr('déjàdéjà', 'é') );
+        $this->assertSame( 'ÉJÀDÉJÀ', u::stristr('DÉJÀDÉJÀ', 'é') );
+        $this->assertSame( 'éjà', u::strrchr('déjàdéjà', 'é') );
+        $this->assertSame( 'ÉJÀ', u::strrichr('DÉJÀDÉJÀ', 'é') );
 
-        $this->assertSame( u::strstr('déjàdéjà', 'é', true), 'd' );
-        $this->assertSame( u::stristr('DÉJÀDÉJÀ', 'é', true), 'D' );
-        $this->assertSame( u::strrchr('déjàdéjà', 'é', true), 'déjàd' );
-        $this->assertSame( u::strrichr('DÉJÀDÉJÀ', 'é', true), 'DÉJÀD' );
+        $this->assertSame( 'd', u::strstr('déjàdéjà', 'é', true) );
+        $this->assertSame( 'D', u::stristr('DÉJÀDÉJÀ', 'é', true) );
+        $this->assertSame( 'déjàd', u::strrchr('déjàdéjà', 'é', true) );
+        $this->assertSame( 'DÉJÀD', u::strrichr('DÉJÀDÉJÀ', 'é', true) );
     }
 
     /**
@@ -168,8 +168,6 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
     function testWordwrap()
     {
         $this->assertSame(
-            u::wordwrap("L’École supérieure de physique et de chimie industrielles de la ville de Paris, ou ESPCI ParisTech, est une grande école d’ingénieurs fondée en 1882. Elle est située rue Vauquelin sur la montagne Sainte-Geneviève dans le cinquième arrondissement de Paris. Yoooooooooooooooooooooooooooooooooooooooooooooo", 25, "\n", true),
-
 "L’École supérieure de
 physique et de chimie
 industrielles de la ville
@@ -182,7 +180,8 @@ montagne Sainte-Geneviève
 dans le cinquième
 arrondissement de Paris.
 Yoooooooooooooooooooooooo
-oooooooooooooooooooooo"
+oooooooooooooooooooooo",
+            u::wordwrap("L’École supérieure de physique et de chimie industrielles de la ville de Paris, ou ESPCI ParisTech, est une grande école d’ingénieurs fondée en 1882. Elle est située rue Vauquelin sur la montagne Sainte-Geneviève dans le cinquième arrondissement de Paris. Yoooooooooooooooooooooooooooooooooooooooooooooo", 25, "\n", true)
         );
     }
 
@@ -194,7 +193,7 @@ oooooooooooooooooooooo"
     {
         foreach (self::$utf8ValidityMap as $u => $t) if ($t)
         {
-            $this->assertSame( u::chr(u::ord($u)), $u );
+            $this->assertSame( $u, u::chr(u::ord($u)) );
         }
     }
 
@@ -203,9 +202,9 @@ oooooooooooooooooooooo"
      */
     function testStr_pad()
     {
-        $this->assertSame( u::str_pad('ÉÈ', 10, 'à-', STR_PAD_RIGHT), 'ÉÈà-à-à-à-');
-        $this->assertSame( u::str_pad('ÉÈ', 10, 'à-', STR_PAD_LEFT ), 'à-à-à-à-ÉÈ');
-        $this->assertSame( u::str_pad('ÉÈ', 10, 'à-', STR_PAD_BOTH ), 'à-à-ÉÈà-à-');
+        $this->assertSame( 'ÉÈà-à-à-à-', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_RIGHT) );
+        $this->assertSame( 'à-à-à-à-ÉÈ', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_LEFT ) );
+        $this->assertSame( 'à-à-ÉÈà-à-', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_BOTH ) );
     }
 
     /**
@@ -213,8 +212,8 @@ oooooooooooooooooooooo"
      */
     function testStr_split()
     {
-        $this->assertSame( u::str_split('déjà', 1), array('d','é','j','à') );
-        $this->assertSame( u::str_split('déjà', 2), array('dé','jà') );
+        $this->assertSame( array('d','é','j','à'), u::str_split('déjà', 1) );
+        $this->assertSame( array('dé','jà'), u::str_split('déjà', 2) );
     }
 
     /**
@@ -222,6 +221,6 @@ oooooooooooooooooooooo"
      */
     function testStr_word_count()
     {
-        $this->assertSame( u::str_word_count('déjà vu', 2), array(0 => 'déjà', 5 => 'vu') );
+        $this->assertSame( array(0 => 'déjà', 5 => 'vu'), u::str_word_count('déjà vu', 2) );
     }
 }
