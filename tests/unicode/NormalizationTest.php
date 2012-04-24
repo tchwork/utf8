@@ -7,6 +7,9 @@ class NormalizationTest extends \PHPUnit_Framework_TestCase
 {
     public $unicodeVersion = 61;
 
+    /**
+     * @covers Patchwork\PHP\Override\Normalizer
+     */
     function testNormalize()
     {
         $t = file(__DIR__ . '/NormalizationTest.' . $this->unicodeVersion . '.txt');

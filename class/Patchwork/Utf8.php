@@ -228,12 +228,11 @@ class Utf8
         )));
     }
 
-    static function count_chars($s, $mode = 1)
+    static function count_chars($s, $mode = 0)
     {
-        if (1 != $mode && 3 != $mode) user_error(__METHOD__ . '(): allowed $mode are 1 or 3', E_USER_ERROR);
+        if (1 != $mode) user_error(__METHOD__ . '(): the only allowed $mode is 1', E_USER_WARNING);
         $s = self::getGraphemeClusters($s);
-        $s = array_count_values($s);
-        return 1 == $mode ? $s[0] : implode('', $s[0]);
+        return array_count_values($s);
     }
 
     static function ltrim($s, $charlist = INF)
@@ -279,10 +278,9 @@ class Utf8
         $freelen = $len - $slen;
         $len = $freelen % $padlen;
 
-        if (STR_PAD_RIGHT === $type) return $s . str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '');
-        if (STR_PAD_LEFT  === $type) return      str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '') . $s;
-
-        if (STR_PAD_BOTH === $type)
+        if (STR_PAD_RIGHT == $type) return $s . str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '');
+        if (STR_PAD_LEFT  == $type) return      str_repeat($pad, $freelen / $padlen) . ($len ? grapheme_substr($pad, 0, $len) : '') . $s;
+        if (STR_PAD_BOTH  == $type)
         {
             $freelen /= 2;
 

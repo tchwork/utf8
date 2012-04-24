@@ -125,14 +125,14 @@ class Mbstring
 
         case MB_CASE_UPPER:
             static $upper;
-            isset($upper) || $upper = self::getData('UpperCase');
+            isset($upper) || $upper = self::getData('upperCase');
             $map = $upper;
             break;
 
         case MB_CASE_LOWER:
         default:
             static $lower;
-            isset($lower) || $lower = self::getData('LowerCase');
+            isset($lower) || $lower = self::getData('lowerCase');
             $map = $lower;
         }
 
@@ -198,7 +198,12 @@ class Mbstring
     static function mb_strpos ($haystack, $needle, $offset = 0, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        return iconv_strpos($haystack, $needle, $offset, $encoding . '//IGNORE');
+        if ('' === (string) $needle)
+        {
+            user_error(__METHOD__ . ': Empty delimiter', E_USER_WARNING);
+            return false;
+        }
+        else return iconv_strpos($haystack, $needle, $offset, $encoding . '//IGNORE');
     }
 
     static function mb_strrpos($haystack, $needle, $offset = 0, $encoding = INF)
@@ -237,7 +242,20 @@ class Mbstring
     static function mb_substr($s, $start, $length = 2147483647, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        return iconv_substr($s, $start, $length, $encoding . '//IGNORE');
+
+        if ($start < 0)
+        {
+            $start = iconv_strlen($s, $encoding . '//IGNORE') + $start;
+            if ($start < 0) $start = 0;
+        }
+
+        if ($length < 0)
+        {
+            $length = iconv_strlen($s, $encoding . '//IGNORE') + $length - $start;
+            if ($length < 0) return '';
+        }
+
+        return (string) iconv_substr($s, $start, $length, $encoding . '//IGNORE');
     }
 
     static function mb_stripos($haystack, $needle, $offset = 0, $encoding = INF)

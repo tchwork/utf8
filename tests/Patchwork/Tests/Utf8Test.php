@@ -49,6 +49,7 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Patchwork\Utf8::bestFit
+     * @covers Patchwork\Utf8::getData
      */
     function testBestFit()
     {
@@ -62,6 +63,7 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
     function testStrtocasefold()
     {
         $this->assertSame( 'σσσ', u::strtocasefold('Σσς') );
+        $this->assertSame( 'ııii', u::strtocasefold('Iıİi', true, true) ); // Turkish
     }
 
     /**
@@ -73,13 +75,23 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Patchwork\Utf8::strtolower
+     * @covers Patchwork\Utf8::strtoupper
+     */
+    function testStrCase()
+    {
+        $this->assertSame( 'déjà σσς', u::strtolower('DÉJÀ Σσς') );
+        $this->assertSame( 'DÉJÀ ΣΣΣ', u::strtoupper('Déjà Σσς') );
+    }
+
+    /**
      * @covers Patchwork\Utf8::substr
      */
     function testSubstr()
     {
         $b = "deja";
         $c = "déjà";
-        $d = n::normalize("déjà", n::NFD);
+        $d = n::normalize($c, n::NFD);
         $this->assertTrue( $c > $d );
 
         $this->assertSame( '국어', u::substr('한국어', 1, 20) );
@@ -120,7 +132,7 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         }
 
         $c = "déjà";
-        $d = n::normalize("déjà", n::NFD);
+        $d = n::normalize($c, n::NFD);
         $this->assertTrue( $c > $d );
 
         $this->assertSame( 4, u::strlen($c) );
@@ -137,10 +149,15 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      */
     function testStrpos()
     {
-        $this->assertSame( 3, u::strpos('déjà', 'à') );
+        $this->assertSame( false, u::strpos('abc', '') );
+        $this->assertSame( false, u::strpos('abc', 'd') );
+        $this->assertSame( false, u::strpos('abc', 'a', 3) );
+        $this->assertSame( 0, u::strpos('abc', 'a', -1) );
+        $this->assertSame( 1, u::strpos('한국어', '국') );
         $this->assertSame( 3, u::stripos('DÉJÀ', 'à') );
-        $this->assertSame( 1, u::strrpos('déjà', 'é') );
-        $this->assertSame( 1, u::strripos('DÉJÀ', 'é') );
+        $this->assertSame( false, u::strrpos('한국어', '') );
+        $this->assertSame( 1, u::strrpos('한국어', '국') );
+        $this->assertSame( 3, u::strripos('DÉJÀ', 'à') );
     }
 
     /**
@@ -186,6 +203,36 @@ oooooooooooooooooooooo",
     }
 
     /**
+     * @covers Patchwork\Utf8::count_chars
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    function testCountChars()
+    {
+        $c = "déjà 한국어";
+        $c .= n::normalize($c, n::NFD);
+
+        $e = array(
+            'd' => 2,
+            'é' => 1,
+            'j' => 2,
+            'à' => 1,
+            ' ' => 2,
+            '한' => 1,
+            '국' => 1,
+            '어' => 1,
+            'é' => 1,
+            'à' => 1,
+            '한' => 1,
+            '국' => 1,
+            '어' => 1,
+        );
+
+        $this->assertSame( $e, u::count_chars($c, 1) );
+        $this->assertSame( $e, u::count_chars($c) );
+        $this->assertFalse( true, 'The previous line should trigger a warning (the only allowed $mode is 1)' );
+    }
+
+    /**
      * @covers Patchwork\Utf8::chr
      * @covers Patchwork\Utf8::ord
      */
@@ -205,6 +252,24 @@ oooooooooooooooooooooo",
         $this->assertSame( 'ÉÈà-à-à-à-', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_RIGHT) );
         $this->assertSame( 'à-à-à-à-ÉÈ', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_LEFT ) );
         $this->assertSame( 'à-à-ÉÈà-à-', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_BOTH ) );
+    }
+
+    /**
+     * @covers Patchwork\Utf8::str_shuffle
+     */
+    function testStr_shuffle()
+    {
+        $c = "déjà 한국어";
+        $c .= n::normalize($c, n::NFD);
+
+        $this->assertTrue(
+               $c != ($d = u::str_shuffle($c))
+            || $c != ($d = u::str_shuffle($c))
+        );
+
+        $this->assertSame( strlen($c), strlen($d) );
+        $this->assertSame( u::strlen($c), u::strlen($d) );
+        $this->assertSame( '', u::trim($d, $c) );
     }
 
     /**
