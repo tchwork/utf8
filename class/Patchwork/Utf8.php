@@ -141,11 +141,29 @@ class Utf8
 
     static function strlen($s) {return grapheme_strlen($s);}
     static function strpos  ($s, $needle, $offset = 0) {return grapheme_strpos  ($s, $needle, $offset);}
-    static function stripos ($s, $needle, $offset = 0) {return grapheme_stripos ($s, $needle, $offset);}
     static function strrpos ($s, $needle, $offset = 0) {return grapheme_strrpos ($s, $needle, $offset);}
-    static function strripos($s, $needle, $offset = 0) {return grapheme_strripos($s, $needle, $offset);}
+
+    static function stripos ($s, $needle, $offset = 0)
+    {
+        if ($offset < 0) $offset = 0;
+        if (!$needle = mb_stripos($s, $needle, $offset, 'UTF-8')) return $needle;
+        return grapheme_strlen(iconv_substr($s, 0, $needle, 'UTF-8'));
+    }
+
+    static function strripos($s, $needle, $offset = 0)
+    {
+        if ($offset < 0) $offset = 0;
+        if (!$needle = mb_strripos($s, $needle, $offset, 'UTF-8')) return $needle;
+        return grapheme_strlen(iconv_substr($s, 0, $needle, 'UTF-8'));
+    }
+
+    static function stristr ($s, $needle, $before_needle = false)
+    {
+        if ('' == (string) $needle) return false;
+        return mb_stristr($s, $needle, $before_needle, 'UTF-8');
+    }
+
     static function strstr  ($s, $needle, $before_needle = false) {return grapheme_strstr ($s, $needle, $before_needle);}
-    static function stristr ($s, $needle, $before_needle = false) {return grapheme_stristr($s, $needle, $before_needle);}
     static function strrchr ($s, $needle, $before_needle = false) {return mb_strrchr ($s, $needle, $before_needle, 'UTF-8');}
     static function strrichr($s, $needle, $before_needle = false) {return mb_strrichr($s, $needle, $before_needle, 'UTF-8');}
 

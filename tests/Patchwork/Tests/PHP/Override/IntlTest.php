@@ -89,6 +89,13 @@ class IntlTest extends \PHPUnit_Framework_TestCase
             $this->assertSame( "", grapheme_substr($c, -1,  0) );
             $this->assertSame( false, grapheme_substr($c,  1, -4) );
         }
+        else
+        {
+            // Expected fail: this buggy behavior has been fixed in PHP5.4
+            $this->assertSame( false, grapheme_substr($c, -2,  3) );
+            $this->assertSame( false, grapheme_substr($c, -1,  0) );
+            $this->assertSame( 'éjà', grapheme_substr($c,  1, -4) );
+        }
         $this->assertSame( "j", grapheme_substr($c, -2, -1) );
         $this->assertSame( "", grapheme_substr($c, -2, -2) );
         $this->assertSame( false, grapheme_substr($c,  5,  0) );
@@ -143,6 +150,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
         $this->assertSame( false, p::grapheme_strrpos('한국어', '') );
         $this->assertSame( 1, p::grapheme_strrpos('한국어', '국') );
         $this->assertSame( 3, p::grapheme_strripos('DÉJÀ', 'à') );
+        $this->assertSame( 16, p::grapheme_stripos('der Straße nach Paris', 'Paris') );
     }
 
     /**
@@ -156,5 +164,12 @@ class IntlTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame( '국어', p::grapheme_strstr('한국어', '국') );
         $this->assertSame( 'ÉJÀ', p::grapheme_stristr('DÉJÀ', 'é') );
+        $this->assertSame( 'Paris', p::grapheme_stristr('der Straße nach Paris', 'Paris') );
+    }
+
+    function testGrapheme_bugs()
+    {
+        $this->assertSame( 17, grapheme_stripos('der Straße nach Paris', 'Paris') ); // Expected fail: the non-bugged result is 16
+        $this->assertSame( 'aris', grapheme_stristr('der Straße nach Paris', 'Paris') );  // Expected fail: the non-bugged result is Paris
     }
 }

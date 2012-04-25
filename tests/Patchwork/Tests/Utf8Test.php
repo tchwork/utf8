@@ -159,9 +159,12 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         $this->assertSame( 0, u::strpos('abc', 'a', -1) );
         $this->assertSame( 1, u::strpos('한국어', '국') );
         $this->assertSame( 3, u::stripos('DÉJÀ', 'à') );
+        $this->assertSame( 1, u::stripos('aςσb', 'ΣΣ') );
         $this->assertSame( false, u::strrpos('한국어', '') );
         $this->assertSame( 1, u::strrpos('한국어', '국') );
         $this->assertSame( 3, u::strripos('DÉJÀ', 'à') );
+        $this->assertSame( 1, u::strripos('aςσb', 'ΣΣ') );
+        $this->assertSame( 16, u::stripos('der Straße nach Paris', 'Paris') );
     }
 
     /**
@@ -174,13 +177,16 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame( 'éjàdéjà', u::strstr('déjàdéjà', 'é') );
         $this->assertSame( 'ÉJÀDÉJÀ', u::stristr('DÉJÀDÉJÀ', 'é') );
+        $this->assertSame( 'ςσb', u::stristr('aςσb', 'ΣΣ') );
         $this->assertSame( 'éjà', u::strrchr('déjàdéjà', 'é') );
         $this->assertSame( 'ÉJÀ', u::strrichr('DÉJÀDÉJÀ', 'é') );
 
         $this->assertSame( 'd', u::strstr('déjàdéjà', 'é', true) );
         $this->assertSame( 'D', u::stristr('DÉJÀDÉJÀ', 'é', true) );
+        $this->assertSame( 'a', u::stristr('aςσb', 'ΣΣ', true) );
         $this->assertSame( 'déjàd', u::strrchr('déjàdéjà', 'é', true) );
         $this->assertSame( 'DÉJÀD', u::strrichr('DÉJÀDÉJÀ', 'é', true) );
+        $this->assertSame( 'Paris', u::stristr('der Straße nach Paris', 'Paris') );
     }
 
     /**

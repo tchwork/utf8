@@ -124,6 +124,7 @@ class Intl
     protected static function grapheme_position($s, $needle, $offset, $mode)
     {
         if ($offset > 0) $s = (string) self::grapheme_substr($s, $offset);
+        else if ($offset < 0) $offset = 0;
         if ('' === (string) $needle) return false;
         if ('' === (string) $s) return false;
 
