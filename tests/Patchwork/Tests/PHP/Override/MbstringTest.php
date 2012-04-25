@@ -16,6 +16,7 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame( 'déjà σσς', p::mb_strtolower('DÉJÀ Σσς') );
         $this->assertSame( 'DÉJÀ ΣΣΣ', p::mb_strtoupper('Déjà Σσς') );
+        $this->assertSame( 'Déjà Σσσ', p::mb_convert_case('DÉJÀ ΣΣΣ', MB_CASE_TITLE) );
     }
 
     /**

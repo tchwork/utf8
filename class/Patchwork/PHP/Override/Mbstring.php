@@ -116,21 +116,14 @@ class Mbstring
         if ('UTF-8' === strtoupper($encoding)) $encoding = INF;
         else $s = iconv($encoding, 'UTF-8//IGNORE', $s);
 
-        switch ($mode)
+        if (MB_CASE_UPPER == $mode)
         {
-        case MB_CASE_TITLE:
-            $s = preg_replace_callback('/\b\p{Ll}/u', array(__CLASS__, 'title_case_callback'), $s);
-            if (INF === $encoding) return $s;
-            else return iconv('UTF-8', $encoding, $s);
-
-        case MB_CASE_UPPER:
             static $upper;
             isset($upper) || $upper = self::getData('upperCase');
             $map = $upper;
-            break;
-
-        case MB_CASE_LOWER:
-        default:
+        }
+        else
+        {
             static $lower;
             isset($lower) || $lower = self::getData('lowerCase');
             $map = $lower;
@@ -165,6 +158,11 @@ class Mbstring
                     $i   += $nlen - $ulen;
                 }
             }
+        }
+
+        if (MB_CASE_TITLE == $mode)
+        {
+            $s = preg_replace_callback('/\b\p{Ll}/u', array(__CLASS__, 'title_case_callback'), $s);
         }
 
         if (INF === $encoding) return $s;
@@ -315,12 +313,7 @@ class Mbstring
 
     protected static function title_case_callback($s)
     {
-        $s = self::mb_convert_case($s[0], MB_CASE_UPPER, 'UTF-8');
-
-        $len = strlen($s);
-        for ($i = 1; $i < $len && $s[$i] < "\x80"; ++$i) $s[$i] = strtolower($s[$i]);
-
-        return $s;
+        return self::mb_convert_case($s[0], MB_CASE_UPPER, 'UTF-8');
     }
 
     protected static function getData($file)
