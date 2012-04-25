@@ -30,6 +30,8 @@ class Compiler
         $h = opendir($map_dir);
         while (false !== $f = readdir($h)) if (false === strpos($f, '.') && is_file($map_dir . $f))
         {
+            unset($l1, $l2);
+
             $data = file_get_contents($map_dir . $f);
             preg_match_all('/^0x([0-9A-F]+)[ \t]+0x([0-9A-F]+)/mi', $data, $data, PREG_SET_ORDER);
 
@@ -38,11 +40,14 @@ class Compiler
             {
                 $data = array_map('hexdec', $data);
                 $data[1] = $data[1] > 255
-                    ? chr($data[1]>>8) . chr($data[1]%256)
-                    : chr($data[1]);
+                    ? ($l2 = chr($data[1]>>8) . chr($data[1]%256))
+                    : ($l1 = chr($data[1]));
 
                 $map[$data[1]] = self::chr($data[2]);
+
             }
+
+            if (isset($l1, $l2)) uksort($map, array(__CLASS__, 'cmpByLength'));
 
             file_put_contents("{$out_dir}from.{$f}.ser", serialize($map));
         }
@@ -82,13 +87,14 @@ class Compiler
 
                     if (isset($s[1]))
                     {
-                        $k = hexdec(substr($s[0], 2));
-                        $k = self::chr($k);
+                        $s[0] = substr($s[0], 2);
+                        $s[1] = substr($s[1], 2);
+                        $s = array_map('hexdec', $s);
+                        $s[1] = $s[1] > 255
+                            ? chr($s[1]>>8) . chr($s[1]%256)
+                            : chr($s[1]);
 
-                        $v = substr($s[1], 2);
-                        $v = chr(hexdec(substr($v, 0, 2))) . (4 === strlen($v) ? chr(hexdec(substr($v, 0, 4))) : '');
-
-                        $map[$k] = $v;
+                        $map[self::chr($s[0])] = $s[1];
                     }
                 }
 
@@ -298,5 +304,10 @@ class Compiler
     protected static function getFile($file)
     {
         return __DIR__ . '/unicode/data/' . $file;
+    }
+
+    protected static function cmpByLength($a, $b)
+    {
+        return strlen($b) - strlen($a);
     }
 }

@@ -44,7 +44,7 @@ class Utf8
     // UTF-8 to Code Page conversion using best fit mappings
     // See http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/
 
-    static function bestFit($cp, $s, $placeholder = '')
+    static function bestFit($cp, $s, $placeholder = '?')
     {
         if (!$i = strlen($s)) return 0 === $i ? '' : false;
 
@@ -54,20 +54,18 @@ class Utf8
         $cp = (string) (int) $cp;
         $result = '9' === $cp[0] ? $s . $s : $s;
 
-        if (isset($map[$cp])) $cp = $map[$cp];
-        else if (false !== $i = self::getData('bestfit' . $cp))
+        if ('932' === $cp && 2 === func_num_args()) $placeholder = "\x81\x45"; // Katakana Middle Dot in CP932
+
+        if (!isset($map[$cp]))
         {
+            $i = self::getData('bestfit' . $cp);
+            if (false === $i) return false;
             $map[$cp] = $i;
-            $cp = $map[$cp];
-        }
-        else
-        {
-            user_error('No "Best Fit" mapping found for given Code Page (' . $cp . ').');
-            $cp = array();
         }
 
         $i = $j = 0;
         $len = strlen($s);
+        $cp = $map[$cp];
 
         while ($i < $len)
         {

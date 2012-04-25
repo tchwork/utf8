@@ -75,6 +75,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Patchwork\PHP\Override\Intl::grapheme_substr
+     * @covers Patchwork\PHP\Override\Intl::grapheme_substr_workaround55562
      */
     function testGrapheme_substr()
     {
@@ -102,6 +103,16 @@ class IntlTest extends \PHPUnit_Framework_TestCase
         $this->assertSame( "", p::grapheme_substr($c, -2, -2) );
         $this->assertSame( false, p::grapheme_substr($c,  5,  0) );
         $this->assertSame( false, p::grapheme_substr($c, -5,  0) );
+
+        $this->assertSame( "jà", p::grapheme_substr_workaround55562($c,  2, 2147483647) );
+        $this->assertSame( "jà", p::grapheme_substr_workaround55562($c, -2, 2147483647) );
+        $this->assertSame( "jà", p::grapheme_substr_workaround55562($c, -2, 3) );
+        $this->assertSame( "", p::grapheme_substr_workaround55562($c, -1,  0) );
+        $this->assertSame( false, p::grapheme_substr_workaround55562($c,  1, -4) );
+        $this->assertSame( "j", p::grapheme_substr_workaround55562($c, -2, -1) );
+        $this->assertSame( "", p::grapheme_substr_workaround55562($c, -2, -2) );
+        $this->assertSame( false, p::grapheme_substr_workaround55562($c,  5,  0) );
+        $this->assertSame( false, p::grapheme_substr_workaround55562($c, -5,  0) );
     }
 
     /**
