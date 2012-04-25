@@ -66,7 +66,15 @@ namespace Patchwork\PHP\Override;
  */
 class Mbstring
 {
-    protected static $internal_encoding = 'UTF-8';
+    const MB_CASE_FOLD = PHP_INT_MAX;
+
+    protected static
+
+    $internal_encoding = 'UTF-8',
+    $caseFold = array(
+        array('µ','ſ',"\xCD\x85",'ς',"\xCF\x90","\xCF\x91","\xCF\x95","\xCF\x96","\xCF\xB0","\xCF\xB1","\xCF\xB5","\xE1\xBA\x9B","\xE1\xBE\xBE"),
+        array('μ','s','ι',       'σ','β',       'θ',       'φ',       'π',       'κ',       'ρ',       'ε',       "\xE1\xB9\xA1",'ι'           )
+    );
 
 
     static function mb_convert_encoding($s, $to_encoding, $from_encoding = INF)
@@ -124,6 +132,8 @@ class Mbstring
         }
         else
         {
+            if (self::MB_CASE_FOLD === $mode) $s = str_replace(self::$caseFold[0], self::$caseFold[1], $s);
+
             static $lower;
             isset($lower) || $lower = self::getData('lowerCase');
             $map = $lower;
@@ -259,7 +269,9 @@ class Mbstring
     static function mb_stripos($haystack, $needle, $offset = 0, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        return self::mb_strpos(self::mb_strtolower($haystack, $encoding), self::mb_strtolower($needle, $encoding), $offset, $encoding);
+        $haystack = self::mb_convert_case($haystack, self::MB_CASE_FOLD, $encoding);
+        $needle = self::mb_convert_case($needle, self::MB_CASE_FOLD, $encoding);
+        return self::mb_strpos($haystack, $needle, $offset, $encoding);
     }
 
     static function mb_stristr($haystack, $needle, $part = false, $encoding = INF)
@@ -285,7 +297,9 @@ class Mbstring
     static function mb_strripos($haystack, $needle, $offset = 0, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        return self::mb_strrpos(self::mb_strtolower($haystack, $encoding), self::mb_strtolower($needle, $encoding), $offset, $encoding);
+        $haystack = self::mb_convert_case($haystack, self::MB_CASE_FOLD, $encoding);
+        $needle = self::mb_convert_case($needle, self::MB_CASE_FOLD, $encoding);
+        return self::mb_strrpos($haystack, $needle, $offset, $encoding);
     }
 
     static function mb_strstr($haystack, $needle, $part = false, $encoding = INF)

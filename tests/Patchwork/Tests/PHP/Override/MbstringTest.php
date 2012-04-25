@@ -79,6 +79,8 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
         $this->assertSame( false, mb_strrpos('한국어', '') );
         $this->assertSame( 1, mb_strrpos('한국어', '국') );
         $this->assertSame( 3, mb_strripos('DÉJÀ', 'à') );
+        $this->assertSame( 1, mb_stripos('aςσb', 'ΣΣ') );
+        $this->assertSame( 1, mb_strripos('aςσb', 'ΣΣ') );
 
         $this->assertSame( false, @p::mb_strpos('abc', '') );
         $this->assertSame( false, @p::mb_strpos('abc', 'a', -1) );
@@ -89,6 +91,8 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
         $this->assertSame( false, p::mb_strrpos('한국어', '') );
         $this->assertSame( 1, p::mb_strrpos('한국어', '국') );
         $this->assertSame( 3, p::mb_strripos('DÉJÀ', 'à') );
+        $this->assertSame( 1, p::mb_stripos('aςσb', 'ΣΣ') );
+        $this->assertSame( 1, p::mb_strripos('aςσb', 'ΣΣ') );
     }
 
     /**
