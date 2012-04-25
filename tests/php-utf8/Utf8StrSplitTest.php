@@ -2,6 +2,10 @@
 
 use Patchwork\Utf8 as u;
 
+/**
+ * @covers Patchwork\Utf8::str_split
+ * @covers Patchwork\Utf8::<!public>
+ */
 class Utf8StrSplitTest extends PHPUnit_Framework_TestCase
 {
     public function test_split_one_char()

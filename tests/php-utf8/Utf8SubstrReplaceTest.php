@@ -2,6 +2,10 @@
 
 use Patchwork\Utf8 as u;
 
+/**
+ * @covers Patchwork\Utf8::substr_replace
+ * @covers Patchwork\Utf8::<!public>
+ */
 class Utf8SubstrReplaceTest extends PHPUnit_Framework_TestCase
 {
     public function test_replace_start()

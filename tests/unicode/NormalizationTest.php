@@ -3,12 +3,15 @@
 //use Normalizer as n;
 use Patchwork\PHP\Override\Normalizer as n;
 
+/**
+ * @covers Patchwork\PHP\Override\Normalizer::<!public>
+ */
 class NormalizationTest extends \PHPUnit_Framework_TestCase
 {
     public $unicodeVersion = 61;
 
     /**
-     * @covers Patchwork\PHP\Override\Normalizer
+     * @covers Patchwork\PHP\Override\Normalizer::normalize
      */
     function testNormalize()
     {

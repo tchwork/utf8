@@ -5,6 +5,9 @@ namespace Patchwork\Tests;
 use Patchwork\Utf8 as u;
 use Normalizer as n;
 
+/**
+ * @covers Patchwork\Utf8::<!public>
+ */
 class Utf8Test extends \PHPUnit_Framework_TestCase
 {
     static
@@ -49,7 +52,6 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Patchwork\Utf8::bestFit
-     * @covers Patchwork\Utf8::getData
      */
     function testBestFit()
     {

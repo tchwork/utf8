@@ -2,6 +2,10 @@
 
 use Patchwork\Utf8 as u;
 
+/**
+ * @covers Patchwork\Utf8::strcspn
+ * @covers Patchwork\Utf8::<!public>
+ */
 class Utf8StrcspnTest extends PHPUnit_Framework_TestCase
 {
     public function test_no_match_single_byte_search()

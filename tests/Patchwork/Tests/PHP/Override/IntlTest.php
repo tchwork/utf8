@@ -5,6 +5,9 @@ namespace Patchwork\Tests\PHP\Override;
 use Patchwork\PHP\Override\Intl as p;
 use Normalizer as n;
 
+/**
+ * @covers Patchwork\PHP\Override\Intl::<!public>
+ */
 class IntlTest extends \PHPUnit_Framework_TestCase
 {
     /**

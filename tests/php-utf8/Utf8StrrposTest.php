@@ -2,6 +2,10 @@
 
 use Patchwork\Utf8 as u;
 
+/**
+ * @covers Patchwork\Utf8::strrpos
+ * @covers Patchwork\Utf8::<!public>
+ */
 class Utf8StrrposTest extends PHPUnit_Framework_TestCase
 {
     public function test_utf8()

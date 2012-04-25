@@ -2,6 +2,10 @@
 
 use Patchwork\Utf8 as u;
 
+/**
+ * @covers Patchwork\Utf8::stristr
+ * @covers Patchwork\Utf8::<!public>
+ */
 class Utf8StristrTest extends PHPUnit_Framework_TestCase
 {
     public function test_substr()

@@ -2,6 +2,10 @@
 
 use Patchwork\Utf8 as u;
 
+/**
+ * @covers Patchwork\Utf8::str_pad
+ * @covers Patchwork\Utf8::<!public>
+ */
 class Utf8StrPadTest extends PHPUnit_Framework_TestCase
 {
     public function test_str_pad()

@@ -5,6 +5,9 @@ namespace Patchwork\Tests\PHP\Override;
 use Patchwork\PHP\Override\Normalizer as pn;
 use Normalizer as in;
 
+/**
+ * @covers Patchwork\PHP\Override\Normalizer::<!public>
+ */
 class NormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -27,9 +30,6 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Patchwork\PHP\Override\Normalizer::normalize
-     * @covers Patchwork\PHP\Override\Normalizer::decompose
-     * @covers Patchwork\PHP\Override\Normalizer::recompose
-     * @covers Patchwork\PHP\Override\Normalizer::getData
      */
     function testNormalize()
     {

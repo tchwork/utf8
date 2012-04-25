@@ -5,6 +5,9 @@ namespace Patchwork\Tests\PHP\Override;
 use Patchwork\PHP\Override\Mbstring as p;
 use Normalizer as n;
 
+/**
+ * @covers Patchwork\PHP\Override\Mbstring::<!public>
+ */
 class MbstringTest extends \PHPUnit_Framework_TestCase
 {
     /**
