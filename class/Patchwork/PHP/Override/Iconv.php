@@ -50,6 +50,7 @@ class Iconv
 
     $translit_map = array(),
     $convert_map = array(),
+    $error_handler,
     $last_error,
 
     $ulen_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4),
@@ -383,21 +384,31 @@ class Iconv
 
     static function iconv_workaround52211($in_charset, $out_charset, $str)
     {
-        self::$last_error = $h = set_error_handler(array(__CLASS__, 'iconv_workaround52211_error_handler'));
+        self::$last_error = false;
+        self::$error_handler = set_error_handler(array(__CLASS__, 'iconv_workaround52211_error_handler'));
         $str = iconv($in_charset, $out_charset, $str);
         restore_error_handler();
+        self::$error_handler = null;
 
-        if ($h !== self::$last_error && is_string($str) && false === stripos($out_charset, '//IGNORE')) return false;
+        if (true === self::$last_error && is_string($str) && false === stripos($out_charset, '//IGNORE'))
+        {
+            self::$error_handler = null;
+            return false;
+        }
 
         return $str;
     }
 
-    protected static function iconv_workaround52211_error_handler($no , $msg, $file, $line, &$context)
+    protected static function iconv_workaround52211_error_handler($no, $msg, $file, $line, &$context)
     {
-        $h = self::$last_error;
-        self::$last_error = array($no, $msg);
-        if ($h) return call_user_func_array($h, array($no , $msg, $file, $line, &$context));
-        else return false;
+        if ($h = self::$error_handler)
+        {
+            $no = call_user_func_array($h, array($no, $msg, $file, $line, &$context));
+            self::$error_handler = $h;
+        }
+        else $no = false;
+        self::$last_error = true;
+        return $no;
     }
 
     protected static function loadMap($type, $charset, &$map)
