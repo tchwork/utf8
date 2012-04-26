@@ -16,8 +16,7 @@ Missing are *printf*-family functions and *number_format*.
 Some more functions are also provided to help handling UTF-8 strings:
 
 - *isUtf8()*: checks if a string contains well formed UTF-8
-- *toASCII()*: generic UTF-8 to ASCII transliteration
-- *bestFit()*: UTF-8 to Code Page conversion using best fit mappings
+- *toAscii()*: generic UTF-8 to ASCII transliteration
 - *strtocasefold()*: unicode transformation for caseless matching
 - *strtonatfold()*: generic case sensitive transformation for collation matching
 - *getGraphemeClusters()*: splits a string to an array of grapheme clusters

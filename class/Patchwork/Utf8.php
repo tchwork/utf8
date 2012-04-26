@@ -22,6 +22,14 @@ use Normalizer as n;
  */
 class Utf8
 {
+    protected static
+
+    $commonCaseFold = array(
+        array('µ','ſ',"\xCD\x85",'ς',"\xCF\x90","\xCF\x91","\xCF\x95","\xCF\x96","\xCF\xB0","\xCF\xB1","\xCF\xB5","\xE1\xBA\x9B","\xE1\xBE\xBE"),
+        array('μ','s','ι',       'σ','β',       'θ',       'φ',       'π',       'κ',       'ρ',       'ε',       "\xE1\xB9\xA1",'ι'           )
+    );
+
+
     static function isUtf8($s)
     {
         return (bool) preg_match('//u', $s); // Since PHP 5.2.5, this also excludes invalid five and six bytes sequences
@@ -29,7 +37,7 @@ class Utf8
 
     // Generic UTF-8 to ASCII transliteration
 
-    static function toASCII($s)
+    static function toAscii($s)
     {
         if (preg_match("/[\x80-\xFF]/", $s))
         {
@@ -40,58 +48,6 @@ class Utf8
 
         return $s;
     }
-
-    // UTF-8 to Code Page conversion using best fit mappings
-    // See http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/
-
-    static function bestFit($cp, $s, $placeholder = '?')
-    {
-        if (!$i = strlen($s)) return 0 === $i ? '' : false;
-
-        static $map = array();
-        static $ulen_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
-
-        $cp = (string) (int) $cp;
-        $result = '9' === $cp[0] ? $s . $s : $s;
-
-        if ('932' === $cp && 2 === func_num_args()) $placeholder = "\x81\x45"; // Katakana Middle Dot in CP932
-
-        if (!isset($map[$cp]))
-        {
-            $i = self::getData('bestfit' . $cp);
-            if (false === $i) return false;
-            $map[$cp] = $i;
-        }
-
-        $i = $j = 0;
-        $len = strlen($s);
-        $cp = $map[$cp];
-
-        while ($i < $len)
-        {
-            if ($s[$i] < "\x80") $uchr = $s[$i++];
-            else
-            {
-                $ulen = $ulen_mask[$s[$i] & "\xF0"];
-                $uchr = substr($s, $i, $ulen);
-                $i += $ulen;
-            }
-
-            if (isset($cp[$uchr])) $uchr = $cp[$uchr];
-            else $uchr = $placeholder;
-
-            isset($uchr[0]) && $result[$j++] = $uchr[0];
-            isset($uchr[1]) && $result[$j++] = $uchr[1];
-        }
-
-        return substr($result, 0, $j);
-    }
-
-
-    protected static $commonCaseFold = array(
-        array('µ','ſ',"\xCD\x85",'ς',"\xCF\x90","\xCF\x91","\xCF\x95","\xCF\x96","\xCF\xB0","\xCF\xB1","\xCF\xB5","\xE1\xBA\x9B","\xE1\xBE\xBE"),
-        array('μ','s','ι',       'σ','β',       'θ',       'φ',       'π',       'κ',       'ρ',       'ε',       "\xE1\xB9\xA1",'ι'           )
-    );
 
     // Unicode transformation for caseless matching
     // see http://unicode.org/reports/tr21/tr21-5.html
