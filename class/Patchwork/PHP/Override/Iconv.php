@@ -37,7 +37,7 @@ class Iconv
     ERROR_WRONG_CHARSET     = 'iconv(): Wrong charset, conversion from `%s\' to `%s\' is not allowed';
 
 
-    static protected
+    protected static
 
     $input_encoding = 'UTF-8',
     $output_encoding = 'UTF-8',
@@ -50,6 +50,7 @@ class Iconv
 
     $translit_map = array(),
     $convert_map = array(),
+    $last_error,
 
     $ulen_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4),
     $is_valid_utf8;
@@ -380,6 +381,24 @@ class Iconv
         else return self::iconv('UTF-8', $encoding, $s);
     }
 
+    static function iconv_workaround52211($in_charset, $out_charset, $str)
+    {
+        self::$last_error = $h = set_error_handler(array(__CLASS__, 'iconv_workaround52211_error_handler'));
+        $str = iconv($in_charset, $out_charset, $str);
+        restore_error_handler();
+
+        if ($h !== self::$last_error && is_string($str) && false === stripos($out_charset, '//IGNORE')) return false;
+
+        return $str;
+    }
+
+    protected static function iconv_workaround52211_error_handler($no , $msg, $file, $line, &$context)
+    {
+        $h = self::$last_error;
+        self::$last_error = array($no, $msg);
+        if ($h) return call_user_func_array($h, array($no , $msg, $file, $line, &$context));
+        else return false;
+    }
 
     protected static function loadMap($type, $charset, &$map)
     {
