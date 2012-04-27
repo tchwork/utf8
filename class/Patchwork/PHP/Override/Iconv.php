@@ -475,8 +475,8 @@ class Iconv
         $len = strlen($str);
         for ($i = 0; $i < $len; ++$i)
         {
-            if (isset($map[$str[$i]])) $result .= $map[$str[$i]];
-            else if (isset($map[$str[$i] . $str[$i+1]])) $result .= $map[$str[$i] . $str[++$i]];
+            if (isset($str[$i+1], $map[$str[$i] . $str[$i+1]])) $result .= $map[$str[$i] . $str[++$i]];
+            else if (isset($map[$str[$i]])) $result .= $map[$str[$i]];
             else if (!$IGNORE)
             {
                 user_error(self::ERROR_ILLEGAL_CHARACTER);

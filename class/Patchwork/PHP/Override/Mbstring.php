@@ -91,7 +91,7 @@ class Mbstring
 
         if ('html-entities' === $to_encoding)
         {
-            'html-entities' === $from_encoding && $from_encoding = 'ISO-8859-1';
+            'html-entities' === $from_encoding && $from_encoding = 'Windows-1252';
             'utf-8' === $from_encoding || $s = iconv($from_encoding, 'UTF-8//IGNORE', $s);
             return preg_replace_callback('/[\x80-\xFF]+/', array(__CLASS__, 'html_encoding_callback'), $s);
         }
