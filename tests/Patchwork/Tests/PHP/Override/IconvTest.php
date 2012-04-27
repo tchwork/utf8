@@ -30,4 +30,14 @@ class IconvTest extends \PHPUnit_Framework_TestCase
         $this->assertSame( 'nud', @p::iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
         $this->assertSame( 'nud', @p::iconv_workaround52211('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
     }
+
+    /**
+     * @covers Patchwork\PHP\Override\Iconv::bestFit
+     */
+    function testBestFit()
+    {
+        $this->assertSame( '', p::bestFit(-1, '') );
+        $this->assertSame( iconv('UTF-8', 'CP1252', 'déjà vu'), p::bestFit(1252, 'déjà vu') );
+        $this->assertSame( iconv('UTF-8', 'CP936', 'déjà vu'), p::bestFit(936, 'déjà vu') );
+    }
 }

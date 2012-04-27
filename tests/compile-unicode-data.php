@@ -9,7 +9,7 @@ require_once $dir . '/class/Patchwork/Utf8/Compiler.php';
 
 c::charsetMaps($dir . '/class/Patchwork/PHP/Override/charset/');
 c::translitMap($dir . '/class/Patchwork/PHP/Override/charset/');
-c::bestFit($dir . '/class/Patchwork/Utf8/data/');
+c::bestFit($dir . '/class/Patchwork/PHP/Override/charset/');
 
 c::unicodeMaps($dir . '/class/Patchwork/PHP/Override/unidata/');
 

@@ -382,6 +382,52 @@ class Iconv
         else return self::iconv('UTF-8', $encoding, $s);
     }
 
+    // UTF-8 to Code Page conversion using best fit mappings
+    // See http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/
+
+    static function bestFit($cp, $s, $placeholder = '?')
+    {
+        if (!$i = strlen($s)) return 0 === $i ? '' : false;
+
+        static $map = array();
+        static $ulen_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
+
+        $cp = (string) (int) $cp;
+        $result = '9' === $cp[0] ? $s . $s : $s;
+
+        if ('932' === $cp && 2 === func_num_args()) $placeholder = "\x81\x45"; // Katakana Middle Dot in CP932
+
+        if (!isset($map[$cp]))
+        {
+            $i = self::getData('to.bestfit' . $cp);
+            if (false === $i) return false;
+            $map[$cp] = $i;
+        }
+
+        $i = $j = 0;
+        $len = strlen($s);
+        $cp = $map[$cp];
+
+        while ($i < $len)
+        {
+            if ($s[$i] < "\x80") $uchr = $s[$i++];
+            else
+            {
+                $ulen = $ulen_mask[$s[$i] & "\xF0"];
+                $uchr = substr($s, $i, $ulen);
+                $i += $ulen;
+            }
+
+            if (isset($cp[$uchr])) $uchr = $cp[$uchr];
+            else $uchr = $placeholder;
+
+            isset($uchr[0]) && $result[$j++] = $uchr[0];
+            isset($uchr[1]) && $result[$j++] = $uchr[1];
+        }
+
+        return substr($result, 0, $j);
+    }
+
     static function iconv_workaround52211($in_charset, $out_charset, $str)
     {
         self::$last_error = false;

@@ -92,46 +92,56 @@ class Compiler
 
     static function bestFit($out_dir, $map_dir = null)
     {
-        // FIXME: for multibyte encodings, see ftp://ftp.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/readme.txt
-
         isset($map_dir) || $map_dir = __DIR__ . '/unicode/charset/';
-        $h = opendir($map_dir);
-        while (false !== $f = readdir($h)) if (0 === strpos($f, 'bestfit') && preg_match('/^bestfit\d+\.txt$/D', $f))
+        $dh = opendir($map_dir);
+        while (false !== $f = readdir($dh)) if (0 === strpos($f, 'bestfit') && preg_match('/^bestfit\d+\.txt$/D', $f))
         {
-            $map = array();
-            $out = substr($f, 0, -3) .'ser';
+            $from = array();
+            $to = array();
+            $lead = '';
 
-            $f = fopen($map_dir . $f, 'rb');
+            $h = fopen($map_dir . $f, 'rb');
 
-            while (false !== $s = fgets($f)) if (0 === strpos($s, 'WCTABLE'))
+            while (false !== $s = fgets($h))
             {
-                while (false !== $s = fgets($f))
+                if (0 === strpos($s, 'WCTABLE')) break;
+                if (0 === strpos($s, 'DBCSTABLE'))
                 {
-                    if (0 === strpos($s, 'ENDCODEPAGE')) break;
-
-                    $s = explode("\t", rtrim($s));
-
-                    if (isset($s[1]))
-                    {
-                        $s[0] = substr($s[0], 2);
-                        $s[1] = substr($s[1], 2);
-                        $s = array_map('hexdec', $s);
-                        $s[1] = $s[1] > 255
-                            ? chr($s[1]>>8) . chr($s[1]%256)
-                            : chr($s[1]);
-
-                        $map[self::chr($s[0])] = $s[1];
-                    }
+                    $lead = substr(rtrim($s), -2);
+                    $lead = chr(hexdec($lead));
                 }
-
-                break;
+                else if (preg_match("/^0x([0-9a-f]{2})\t0x([0-9a-f]{4})/", $s, $s))
+                {
+                    $s = array_map('hexdec', $s);
+                    $from[$lead . chr($s[1])] = self::chr($s[2]);
+                }
             }
 
-            fclose($f);
+            while (false !== $s = fgets($h))
+            {
+                if (0 === strpos($s, 'ENDCODEPAGE')) break;
 
-            file_put_contents($out_dir . $out, serialize($map));
+                $s = explode("\t", rtrim($s));
+
+                if (isset($s[1]))
+                {
+                    $s[0] = substr($s[0], 2);
+                    $s[1] = substr($s[1], 2);
+                    $s = array_map('hexdec', $s);
+                    $s[1] = $s[1] > 255
+                        ? chr($s[1]>>8) . chr($s[1]%256)
+                        : chr($s[1]);
+
+                    $to[self::chr($s[0])] = $s[1];
+                }
+            }
+
+            fclose($h);
+
+            file_put_contents($out_dir . 'from.' . substr($f, 0, -3) .'ser', serialize($from));
+            file_put_contents($out_dir . 'to.' . substr($f, 0, -3) .'ser', serialize($to));
         }
-        closedir($h);
+        closedir($dh);
     }
 
     // Write unicode data maps to disk
