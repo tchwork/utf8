@@ -32,40 +32,24 @@ class Xml
 {
     static $cp1252, $utf8;
 
-    static function utf8_encode($s)
+    static function cp1252_to_utf8($s)
     {
 /**/    if (function_exists('utf8_encode'))
 /**/    {
             $s = utf8_encode($s);
 /**/    }
-/**/    else if (extension_loaded('iconv') && '§' === @iconv('ISO-8859-1', 'UTF-8', "\xA7"))
-/**/    {
-            $s = iconv('ISO-8859-1', 'UTF-8', $s);
-/**/    }
 /**/    else
+/**/    // @codeCoverageIgnoreStart
 /**/    {
-            $len = strlen($s);
-            $e = $s . $s;
-
-            for ($i = 0, $j = 0; $i < $len; ++$i, ++$j) switch (true)
-            {
-            case $s[$i] < "\x80": $e[$j] = $s[$i]; break;
-            case $s[$i] < "\xC0": $e[$j] = "\xC2"; $e[++$j] = $s[$i]; break;
-            default:              $e[$j] = "\xC3"; $e[++$j] = chr(ord($s[$i]) - 64); break;
-            }
-
-            $s = substr($e, 0, $j);
+            $s = self::utf8_encode($s);
 /**/    }
+/**/    // @codeCoverageIgnoreEnd
 
-        if (false !== strpos($s, "\xC2"))
-        {
-            $s = str_replace(self::$cp1252, self::$utf8, $s);
-        }
-
-        return $s;
+        if (false === strpos($s, "\xC2")) return $s;
+        else return str_replace(self::$cp1252, self::$utf8, $s);
     }
 
-    static function utf8_decode($s)
+    static function utf8_to_cp1252($s)
     {
         $s = str_replace(self::$utf8, self::$cp1252, $s);
 
@@ -74,31 +58,53 @@ class Xml
             return utf8_decode($s);
 /**/    }
 /**/    else
+/**/    // @codeCoverageIgnoreStart
 /**/    {
-            $len = strlen($s);
-
-            for ($i = 0, $j = 0; $i < $len; ++$i, ++$j)
-            {
-                switch ($s[$i] & "\xF0")
-                {
-                case "\xC0":
-                case "\xD0":
-                    $c = (ord($s[$i] & "\x1F") << 6) | ord($s[++$i] & "\x3F");
-                    $s[$j] = $c < 256 ? chr($c) : '?';
-                    break;
-
-                case "\xF0": ++$i;
-                case "\xE0":
-                    $s[$j] = '?';
-                    $i += 2;
-                    break;
-
-                default:
-                    $s[$j] = $s[$i];
-                }
-            }
-
-            return substr($s, 0, $j);
+            return self::utf8_decode($s);
 /**/    }
+/**/    // @codeCoverageIgnoreEnd
+    }
+
+    static function utf8_encode($s)
+    {
+        $len = strlen($s);
+        $e = $s . $s;
+
+        for ($i = 0, $j = 0; $i < $len; ++$i, ++$j) switch (true)
+        {
+        case $s[$i] < "\x80": $e[$j] = $s[$i]; break;
+        case $s[$i] < "\xC0": $e[$j] = "\xC2"; $e[++$j] = $s[$i]; break;
+        default:              $e[$j] = "\xC3"; $e[++$j] = chr(ord($s[$i]) - 64); break;
+        }
+
+        return substr($e, 0, $j);
+    }
+
+    static function utf8_decode($s)
+    {
+        $len = strlen($s);
+
+        for ($i = 0, $j = 0; $i < $len; ++$i, ++$j)
+        {
+            switch ($s[$i] & "\xF0")
+            {
+            case "\xC0":
+            case "\xD0":
+                $c = (ord($s[$i] & "\x1F") << 6) | ord($s[++$i] & "\x3F");
+                $s[$j] = $c < 256 ? chr($c) : '?';
+                break;
+
+            case "\xF0": ++$i;
+            case "\xE0":
+                $s[$j] = '?';
+                $i += 2;
+                break;
+
+            default:
+                $s[$j] = $s[$i];
+            }
+        }
+
+        return substr($s, 0, $j);
     }
 }
