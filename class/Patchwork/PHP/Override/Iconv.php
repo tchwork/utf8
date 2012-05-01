@@ -62,7 +62,7 @@ class Iconv
         'cp1258' => 'windows-1258',
         'shift-jis' => 'cp932',
         'shift_jis' => 'cp932',
-        'latin1' => 'iso-8859-11',
+        'latin1' => 'iso-8859-1',
         'latin2' => 'iso-8859-2',
         'latin3' => 'iso-8859-3',
         'latin4' => 'iso-8859-4',
@@ -210,7 +210,7 @@ class Iconv
         else return $str;
     }
 
-    static function iconv_mime_decode_headers($str, $mode = ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset = INF)
+    static function iconv_mime_decode_headers($str, $mode = 0, $charset = INF)
     {
         INF === $charset && $charset = self::$internal_encoding;
 
@@ -239,16 +239,17 @@ class Iconv
         return $headers;
     }
 
-    static function iconv_mime_decode($str, $mode = ICONV_MIME_DECODE_CONTINUE_ON_ERROR, $charset = INF)
+    static function iconv_mime_decode($str, $mode = 0, $charset = INF)
     {
         INF === $charset && $charset = self::$internal_encoding;
+        if (ICONV_MIME_DECODE_CONTINUE_ON_ERROR & $mode) $charset .= '//IGNORE';
 
         false !== strpos($str, "\r") && $str = strtr(str_replace("\r\n", "\n", $str), "\r", "\n");
         $str = preg_split('/\n(?![ \t])/', rtrim($str), 2);
         $str = preg_replace('/[ \t]*\n[ \t]+/', ' ', rtrim($str[0]));
         $str = preg_split('/=\?([^?]+)\?([bqBQ])\?(.*)\?=/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-        $result = self::iconv('UTF-8', $charset, $str[0]);
+        $result = self::iconv('utf-8', $charset, $str[0]);
 
         $i = 1;
         $len = count($str);
@@ -259,7 +260,7 @@ class Iconv
             else $str[$i+2] = rawurldecode(strtr(str_replace('%', '%25', $str[$i+2]), '=_', '% '));
 
             $str[$i+2] = self::iconv($str[$i], $charset, $str[$i+2]);
-            $str[$i+3] = self::iconv('UTF-8' , $charset, $str[$i+3]);
+            $str[$i+3] = self::iconv('utf-8' , $charset, $str[$i+3]);
 
             $result .= $str[$i+2] . ('' === trim($str[$i+3]) ? '' : $str[$i+3]);
 
@@ -314,10 +315,10 @@ class Iconv
         preg_match('/[\x80-\xFF]/', $field_name) && $field_name = '';
 
         $scheme = strtoupper(substr($pref['scheme'], 0, 1));
-        $in  = strtoupper($pref['input-charset']);
-        $out = strtoupper($pref['output-charset']);
+        $in  = strtolower($pref['input-charset']);
+        $out = strtolower($pref['output-charset']);
 
-        if ('UTF-8' !== $in && false === $field_value = self::iconv($in, 'UTF-8', $field_value)) return false;
+        if ('utf-8' !== $in && false === $field_value = self::iconv($in, 'utf-8', $field_value)) return false;
 
         preg_match_all('/./us', $field_value, $chars);
 
@@ -335,7 +336,7 @@ class Iconv
 
         foreach ($chars as $c)
         {
-            if ('UTF-8' !== $out && false === $c = self::iconv('UTF-8', $out, $c)) return false;
+            if ('utf-8' !== $out && false === $c = self::iconv('utf-8', $out, $c)) return false;
 
             $o = $Q
                 ? $c = preg_replace_callback(
@@ -382,7 +383,7 @@ class Iconv
     static function strlen1($s, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        if (0 !== strncasecmp($encoding, 'UTF-8', 5) && false === $s = self::iconv($encoding, 'UTF-8', $s)) return false;
+        if (0 !== strncasecmp($encoding, 'utf-8', 5) && false === $s = self::iconv($encoding, 'utf-8', $s)) return false;
 
         return strlen(utf8_decode($s));
     }
@@ -390,7 +391,7 @@ class Iconv
     static function strlen2($s, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        if (0 !== strncasecmp($encoding, 'UTF-8', 5) && false === $s = self::iconv($encoding, 'UTF-8', $s)) return false;
+        if (0 !== strncasecmp($encoding, 'utf-8', 5) && false === $s = self::iconv($encoding, 'utf-8', $s)) return false;
 
         $ulen_mask = self::$ulen_mask;
 
@@ -410,30 +411,30 @@ class Iconv
     static function iconv_strpos($haystack, $needle, $offset = 0, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        if (0 !== strncasecmp($encoding, 'UTF-8', 5) && false === $s = self::iconv($encoding, 'UTF-8', $s)) return false;
+        if (0 !== strncasecmp($encoding, 'utf-8', 5) && false === $s = self::iconv($encoding, 'utf-8', $s)) return false;
 
-        if ($offset = (int) $offset) $haystack = self::iconv_substr($haystack, $offset, 2147483647, 'UTF-8');
+        if ($offset = (int) $offset) $haystack = self::iconv_substr($haystack, $offset, 2147483647, 'utf-8');
         $pos = strpos($haystack, $needle);
-        return false === $pos ? false : ($offset + ($pos ? iconv_strlen(substr($haystack, 0, $pos), 'UTF-8') : 0));
+        return false === $pos ? false : ($offset + ($pos ? iconv_strlen(substr($haystack, 0, $pos), 'utf-8') : 0));
     }
 
     static function iconv_strrpos($haystack, $needle, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        if (0 !== strncasecmp($encoding, 'UTF-8', 5) && false === $s = self::iconv($encoding, 'UTF-8', $s)) return false;
+        if (0 !== strncasecmp($encoding, 'utf-8', 5) && false === $s = self::iconv($encoding, 'utf-8', $s)) return false;
 
-        $needle = self::iconv_substr($needle, 0, 1, 'UTF-8');
+        $needle = self::iconv_substr($needle, 0, 1, 'utf-8');
         $pos = strpos(strrev($haystack), strrev($needle));
-        return false === $pos ? false : iconv_strlen($pos ? substr($haystack, 0, -$pos) : $haystack, 'UTF-8');
+        return false === $pos ? false : iconv_strlen($pos ? substr($haystack, 0, -$pos) : $haystack, 'utf-8');
     }
 
     static function iconv_substr($s, $start, $length = 2147483647, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        if (0 === strncasecmp($encoding, 'UTF-8', 5)) $encoding = INF;
-        else if (false === $s = self::iconv($encoding, 'UTF-8', $s)) return false;
+        if (0 === strncasecmp($encoding, 'utf-8', 5)) $encoding = INF;
+        else if (false === $s = self::iconv($encoding, 'utf-8', $s)) return false;
 
-        $slen = iconv_strlen($s, 'UTF-8');
+        $slen = iconv_strlen($s, 'utf-8');
         $start = (int) $start;
 
         if (0 > $start) $start += $slen;
@@ -453,7 +454,7 @@ class Iconv
         $s = preg_match($rx, $s, $s) ? $s[1] : '';
 
         if (INF === $encoding) return $s;
-        else return self::iconv('UTF-8', $encoding, $s);
+        else return self::iconv('utf-8', $encoding, $s);
     }
 
     // UTF-8 to Code Page conversion using best fit mappings
@@ -562,7 +563,7 @@ class Iconv
             if ($str[$i] < "\x80") $u[$j++] = $str[$i++];
             else
             {
-                $ulen = $s[$i] & "\xF0";
+                $ulen = $str[$i] & "\xF0";
                 $ulen = isset($ulen_mask[$ulen]) ? $ulen_mask[$ulen] : 1;
                 $uchr = substr($str, $i, $ulen);
 
