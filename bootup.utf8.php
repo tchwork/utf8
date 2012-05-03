@@ -16,10 +16,7 @@ use Patchwork\PHP\Override as o;
 require __DIR__ . '/class/Patchwork/Utf8.php';
 require __DIR__ . '/class/Patchwork/PHP/Override/Xml.php';
 
-// utf8_encode/decode support enhanced to Windows-1252
-
-function cp1252_utf8($s) {return o\Xml::utf8_encode($s);};
-function utf8_cp1252($s) {return o\Xml::utf8_decode($s);};
+// utf8_encode/decode
 
 if (!extension_loaded('xml'))
 {
@@ -119,7 +116,7 @@ else
     function iconv_set_encoding($type, $charset) {return o\Iconv::iconv_set_encoding($type, $charset);};
     function iconv_mime_encode($name, $value, $pref = INF) {return o\Iconv::iconv_mime_encode($name, $value, $pref);};
     function ob_iconv_handler($buffer, $mode) {return o\Iconv::ob_iconv_handler($buffer, $mode);};
-    function iconv_mime_decode_headers($encoded_headers, $mode = 2, $charset = INF) {return o\Iconv::iconv_mime_decode_headers($encoded_headers, $mode, $charset);};
+    function iconv_mime_decode_headers($encoded_headers, $mode = 0, $charset = INF) {return o\Iconv::iconv_mime_decode_headers($encoded_headers, $mode, $charset);};
 
     if (extension_loaded('mbstring'))
     {
@@ -127,7 +124,7 @@ else
         function iconv_strpos($s, $needle, $offset = 0, $enc = INF) {return mb_strpos($s, $needle, $offset, $enc);};
         function iconv_strrpos($s, $needle, $enc = INF) {return mb_strrpos($s, $needle, $enc);};
         function iconv_substr($s, $start, $length = 2147483647, $enc = INF) {return mb_substr($s, $start, $length, $enc);};
-        function iconv_mime_decode($encoded_headers, $mode = 2, $charset = INF) {return mb_decode_mimeheader($encoded_headers, $mode, $charset);};
+        function iconv_mime_decode($encoded_headers, $mode = 0, $charset = INF) {return mb_decode_mimeheader($encoded_headers, $mode, $charset);};
     }
     else
     {
@@ -143,7 +140,7 @@ else
         function iconv_strpos($s, $needle, $offset = 0, $enc = INF) {return o\Mbstring::mb_strpos($s, $needle, $offset, $enc);};
         function iconv_strrpos($s, $needle, $enc = INF) {return o\Mbstring::mb_strrpos($s, $needle, $enc);};
         function iconv_substr($s, $start, $length = 2147483647, $enc = INF) {return o\Mbstring::mb_substr($s, $start, $length, $enc);};
-        function iconv_mime_decode($encoded_headers, $mode = 2, $charset = INF) {return o\Iconv::iconv_mime_decode($encoded_headers, $mode, $charset);};
+        function iconv_mime_decode($encoded_headers, $mode = 0, $charset = INF) {return o\Iconv::iconv_mime_decode($encoded_headers, $mode, $charset);};
     }
 }
 
