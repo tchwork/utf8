@@ -18,17 +18,20 @@ class IconvTest extends \PHPUnit_Framework_TestCase
         if (PHP_VERSION_ID >= 50400)
         {
             $this->assertSame( false, @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
+            $this->assertSame( false, @iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
         }
         else
         {
             // Expected buggy behavior. See https://bugs.php.net/52211
-            $this->assertSame( 'n', @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
+            $this->assertSame( 'n',   @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
+            $this->assertSame( 'nud', @iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
         }
 
-        $this->assertSame( false, @p::iconv('UTF-8', 'ISO-8859-1', 'nœud') );
         $this->assertSame( false, @p::iconv_workaround52211('UTF-8', 'ISO-8859-1', 'nœud') );
-        $this->assertSame( 'nud', @p::iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
-        $this->assertSame( 'nud', @p::iconv_workaround52211('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
+        $this->assertSame( false, @p::iconv_workaround52211('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
+
+        $this->assertSame( false, @p::iconv('UTF-8', 'ISO-8859-1', 'nœud') );
+        $this->assertSame( false, @p::iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
     }
 
     /**

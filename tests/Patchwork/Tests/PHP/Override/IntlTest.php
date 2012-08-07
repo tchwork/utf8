@@ -75,7 +75,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Patchwork\PHP\Override\Intl::grapheme_substr
-     * @covers Patchwork\PHP\Override\Intl::grapheme_substr_workaround55562
+     * @covers Patchwork\PHP\Override\Intl::grapheme_substr_workaround62759
      */
     function testGrapheme_substr()
     {
@@ -83,19 +83,10 @@ class IntlTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame( "jà", grapheme_substr($c,  2) );
         $this->assertSame( "jà", grapheme_substr($c, -2) );
-        if (PHP_VERSION_ID >= 50400)
-        {
-            $this->assertSame( "jà", grapheme_substr($c, -2,  3) );
-            $this->assertSame( "", grapheme_substr($c, -1,  0) );
-            $this->assertSame( false, grapheme_substr($c,  1, -4) );
-        }
-        else
-        {
-            // Expected fail: this buggy behavior has been fixed in PHP5.4
-            $this->assertSame( false, grapheme_substr($c, -2,  3) );
-            $this->assertSame( false, grapheme_substr($c, -1,  0) );
-            $this->assertSame( 'éjà', grapheme_substr($c,  1, -4) );
-        }
+        // The next 3 tests are disabled due to http://bugs.php.net/62759 and 55562
+        //$this->assertSame( "jà", grapheme_substr($c, -2,  3) );
+        //$this->assertSame( "", grapheme_substr($c, -1,  0) );
+        //$this->assertSame( false, grapheme_substr($c,  1, -4) );
         $this->assertSame( "j", grapheme_substr($c, -2, -1) );
         $this->assertSame( "", grapheme_substr($c, -2, -2) );
         $this->assertSame( false, grapheme_substr($c,  5,  0) );
@@ -111,15 +102,15 @@ class IntlTest extends \PHPUnit_Framework_TestCase
         $this->assertSame( false, p::grapheme_substr($c,  5,  0) );
         $this->assertSame( false, p::grapheme_substr($c, -5,  0) );
 
-        $this->assertSame( "jà", p::grapheme_substr_workaround55562($c,  2, 2147483647) );
-        $this->assertSame( "jà", p::grapheme_substr_workaround55562($c, -2, 2147483647) );
-        $this->assertSame( "jà", p::grapheme_substr_workaround55562($c, -2, 3) );
-        $this->assertSame( "", p::grapheme_substr_workaround55562($c, -1,  0) );
-        $this->assertSame( false, p::grapheme_substr_workaround55562($c,  1, -4) );
-        $this->assertSame( "j", p::grapheme_substr_workaround55562($c, -2, -1) );
-        $this->assertSame( "", p::grapheme_substr_workaround55562($c, -2, -2) );
-        $this->assertSame( false, p::grapheme_substr_workaround55562($c,  5,  0) );
-        $this->assertSame( false, p::grapheme_substr_workaround55562($c, -5,  0) );
+        $this->assertSame( "jà", p::grapheme_substr_workaround62759($c,  2, 2147483647) );
+        $this->assertSame( "jà", p::grapheme_substr_workaround62759($c, -2, 2147483647) );
+        $this->assertSame( "jà", p::grapheme_substr_workaround62759($c, -2, 3) );
+        $this->assertSame( "", p::grapheme_substr_workaround62759($c, -1,  0) );
+        $this->assertSame( false, p::grapheme_substr_workaround62759($c,  1, -4) );
+        $this->assertSame( "j", p::grapheme_substr_workaround62759($c, -2, -1) );
+        $this->assertSame( "", p::grapheme_substr_workaround62759($c, -2, -2) );
+        $this->assertSame( false, p::grapheme_substr_workaround62759($c,  5,  0) );
+        $this->assertSame( false, p::grapheme_substr_workaround62759($c, -5,  0) );
     }
 
     /**

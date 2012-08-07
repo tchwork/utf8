@@ -508,7 +508,7 @@ class Iconv
         restore_error_handler();
         self::$error_handler = null;
 
-        if (true === self::$last_error && is_string($str) && false === stripos($out_charset, '//IGNORE'))
+        if (true === self::$last_error && is_string($str))
         {
             self::$error_handler = null;
             return false;
@@ -651,7 +651,7 @@ class Iconv
                     return false;
                 }
             }
-            else if (!$IGNORE)
+            else
             {
                 user_error(self::ERROR_ILLEGAL_CHARACTER);
                 return false;

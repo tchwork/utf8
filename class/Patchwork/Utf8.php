@@ -82,9 +82,9 @@ class Utf8
 
     static function substr($s, $start, $len = 2147483647)
     {
-/**/    if (extension_loaded('intl') && PHP_VERSION_ID < 50400)
+/**/    if (extension_loaded('intl') && 'à' === grapheme_substr('éà', 1, -2))
 /**/    {
-            return PHP\Override\Intl::grapheme_substr_workaround55562($s, $start, $len);
+            return PHP\Override\Intl::grapheme_substr_workaround62759($s, $start, $len);
 /**/    }
 /**/    else
 /**/    {
@@ -93,11 +93,12 @@ class Utf8
     }
 
     static function strlen($s) {return grapheme_strlen($s);}
-    static function strpos  ($s, $needle, $offset = 0) {return grapheme_strpos  ($s, $needle, $offset);}
-    static function strrpos ($s, $needle, $offset = 0) {return grapheme_strrpos ($s, $needle, $offset);}
+    static function strpos ($s, $needle, $offset = 0) {return grapheme_strpos ($s, $needle, $offset);}
+    static function strrpos($s, $needle, $offset = 0) {return grapheme_strrpos($s, $needle, $offset);}
 
-    static function stripos ($s, $needle, $offset = 0)
+    static function stripos($s, $needle, $offset = 0)
     {
+        // Don't use grapheme_stripos because of https://bugs.php.net/61860
         if ($offset < 0) $offset = 0;
         if (!$needle = mb_stripos($s, $needle, $offset, 'UTF-8')) return $needle;
         return grapheme_strlen(iconv_substr($s, 0, $needle, 'UTF-8'));
@@ -105,18 +106,19 @@ class Utf8
 
     static function strripos($s, $needle, $offset = 0)
     {
+        // Don't use grapheme_strripos because of https://bugs.php.net/61860
         if ($offset < 0) $offset = 0;
         if (!$needle = mb_strripos($s, $needle, $offset, 'UTF-8')) return $needle;
         return grapheme_strlen(iconv_substr($s, 0, $needle, 'UTF-8'));
     }
 
-    static function stristr ($s, $needle, $before_needle = false)
+    static function stristr($s, $needle, $before_needle = false)
     {
         if ('' == (string) $needle) return false;
         return mb_stristr($s, $needle, $before_needle, 'UTF-8');
     }
 
-    static function strstr  ($s, $needle, $before_needle = false) {return grapheme_strstr ($s, $needle, $before_needle);}
+    static function strstr  ($s, $needle, $before_needle = false) {return grapheme_strstr($s, $needle, $before_needle);}
     static function strrchr ($s, $needle, $before_needle = false) {return mb_strrchr ($s, $needle, $before_needle, 'UTF-8');}
     static function strrichr($s, $needle, $before_needle = false) {return mb_strrichr($s, $needle, $before_needle, 'UTF-8');}
 

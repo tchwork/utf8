@@ -87,9 +87,9 @@ class Intl
         return implode('', array_slice($s[0], $start, $len));
     }
 
-    static function grapheme_substr_workaround55562($s, $start, $len)
+    static function grapheme_substr_workaround62759($s, $start, $len)
     {
-        // Intl based http://bugs.php.net/55562 workaround
+        // Intl based http://bugs.php.net/62759 and 55562 workaround
 
         if (2147483647 == $len) return grapheme_substr($s, $start);
 
