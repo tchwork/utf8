@@ -185,7 +185,10 @@ if (!extension_loaded('intl'))
     function grapheme_strstr($s, $needle, $before_needle = false) {return o\Intl::grapheme_strstr($s, $needle, $before_needle);};
     function grapheme_substr($s, $start, $len = 2147483647) {return o\Intl::grapheme_substr($s, $start, $len);};
 }
-else if (PHP_VERSION_ID < 50400)
+else if ('à' === grapheme_substr('éà', 1, -2))
 {
+    // Load o\Intl::grapheme_substr_workaround62759()
+    // when the native grapheme_substr() is buggy
+    // so that \Patchwork\Utf8::substr() can use it.
     require __DIR__ . '/class/Patchwork/PHP/Override/Intl.php';
 }
