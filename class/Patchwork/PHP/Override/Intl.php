@@ -47,13 +47,11 @@ class Intl
             $next += strlen($s[0]);
             $s = isset($s[1]) ? $s[1] : '';
         }
-        // @codeCoverageIgnoreStart
         else
         {
             //TODO
             return !user_error(__METHOD__ . '() with GRAPHEME_EXTR_MAXBYTES or GRAPHEME_EXTR_MAXCHARS is not implemented', E_USER_WARNING);
         }
-        // @codeCoverageIgnoreEnd
 
         $next += strlen($s);
 

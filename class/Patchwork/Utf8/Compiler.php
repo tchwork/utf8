@@ -17,7 +17,7 @@ namespace Patchwork\Utf8;
  * See http://unicode.org/Public/UNIDATA/ for unicode data
  * See http://unicode.org/Public/MAPPINGS/ for charset conversion maps
  * See http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/ for mappings
- * See http://www.gnu.org/software/libiconv/ for translit.def
+ * See http://unicode.org/repos/cldr/trunk/common/transforms/ for Latin-ASCII.xml
  */
 class Compiler
 {
@@ -75,14 +75,65 @@ class Compiler
         closedir($h);
     }
 
-    static function translitMap($out_dir, $translit_def = null)
+    static function translitMap($out_dir)
     {
-        isset($translit_def) || $translit_def = __DIR__ . '/unicode/charset/translit.def';
-        $data = file_get_contents($translit_def);
-        preg_match_all('/^([0-9A-F]+)\t([^\t]+)\t/mi', $data, $data, PREG_SET_ORDER);
-
         $map = array();
-        foreach ($data as $data) $map[self::chr(hexdec($data[1]))] = $data[2];
+
+        $h = fopen(self::getFile('UnicodeData.txt'), 'rt');
+        while (false !== $line = fgets($h))
+        {
+            $m = array();
+
+            if (preg_match('/^([^;]*);[^;]*;[^;]*;[^;]*;[^;]*;<(circle|compat|font|fraction|narrow|small|square|wide)> ([^;]*);/', $line, $m))
+            {
+                $m[1] = self::chr(hexdec($m[1]));
+
+                $m[3] = explode(' ', $m[3]);
+                $m[3] = array_map('hexdec', $m[3]);
+                $m[3] = array_map(array(__CLASS__, 'chr'), $m[3]);
+                $m[3] = implode('', $m[3]);
+
+
+                switch ($m[2])
+                {
+                case 'compat': if (' ' === $m[3][0]) continue 2; break;
+                case 'circle':   $m[3] = '(' . $m[3] . ')'; break;
+                case 'fraction': $m[3] = ' ' . $m[3] . ' '; break;
+                }
+
+                $m = array($m[1], $m[3]);
+            }
+            else if (preg_match('/^([^;]*);CJK COMPATIBILITY IDEOGRAPH-[^;]*;[^;]*;[^;]*;[^;]*;([^;]*);/', $line, $m))
+            {
+                $m = array(
+                    self::chr(hexdec($m[1])),
+                    self::chr(hexdec($m[2]))
+                );
+            }
+
+            if (!$m) continue;
+
+            $map[$m[0]] = $m[1];
+        }
+        fclose($h);
+
+        foreach (file(self::getFile('Latin-ASCII.xml')) as $line)
+        {
+            if (preg_match('/<tRule>(.) → (.*?) ;/u', $line, $m))
+            {
+                if ('\u' === $m[1][0]) $m[1] = self::chr(hexdec(substr($m[1], 2)));
+
+                $m[2] = htmlspecialchars_decode($m[2]);
+
+                switch ($m[2][0])
+                {
+                case '\\': $m[2] = substr($m[2], 1); break;
+                case "'":  $m[2] = substr($m[2], 1, -1); break;
+                }
+
+                isset($map[$m[1]]) or $map[$m[1]] = $m[2];
+            }
+        }
 
         file_put_contents($out_dir . 'translit.ser', serialize($map));
     }
