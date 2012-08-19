@@ -10,24 +10,16 @@
 
 namespace Patchwork\PHP\Override;
 
-/**/$map = array(
-/**/    "\x80 \x82 \x83 \x84 \x85 \x86 \x87 \x88 \x89 \x8A \x8B \x8C \x8E \x91 \x92 \x93 \x94 \x95 \x96 \x97 \x98 \x99 \x9A \x9B \x9C \x9E \x9F",
-/**/     '€    ‚    ƒ    „    …    †    ‡    ˆ    ‰    Š    ‹    Œ    Ž    ‘    ’    “    ”    •    –    —    ˜    ™    š    ›    œ    ž    Ÿ'
-/**/);
-/**/
-/**/$map[0] = explode('-', "\xC2" . str_replace(' ', "-\xC2", $map[0]));
-/**/$map[1] = explode('    ', $map[1]);
-
-Xml::$cp1252 = /*<*/$map[0]/*>*/;
-Xml::$utf8   = /*<*/$map[1]/*>*/;
-
-
 /**
  * utf8_encode/decode enhanced to Windows-1252.
  */
 class Xml
 {
-    static $cp1252, $utf8;
+    protected static
+
+    $cp1252 = array('','','','','','','','','','','','','','','','','','','','','','','','','','',''),
+    $utf8   = array('€','‚','ƒ','„','…','†','‡','ˆ','‰','Š','‹','Œ','Ž','‘','’','“','”','•','–','—','˜','™','š','›','œ','ž','Ÿ');
+
 
     static function cp1252_to_utf8($s)
     {
