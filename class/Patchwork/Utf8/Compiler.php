@@ -334,46 +334,6 @@ class Compiler
         file_put_contents($out_dir . 'compatibilityDecomposition.ser', $compatibilityDecomposition);
     }
 
-    protected static function optimizeRx($rx)
-    {
-        $rx = preg_replace_callback('/\\\\x\\{([0-9A-Fa-f]+)\\}-\\\\x\\{([0-9A-Fa-f]+)\\}/', array(__CLASS__, 'chr_range_callback'), $rx);
-
-        preg_match_all('/[0-9A-Fa-f]+/', $rx, $rx);
-
-        $rx = array_map('hexdec', $rx[0]);
-        $rx = array_unique($rx);
-        sort($rx);
-
-        $a = '';
-        $last = 0;
-        $interval = 0;
-
-        foreach ($rx as $rx)
-        {
-            if ($last+1 == $rx)
-            {
-                ++$last;
-                ++$interval;
-            }
-            else
-            {
-                $interval && $a .= ($interval > 1 ? '-' : '') . '\x{' . dechex($last) . '}';
-
-                $last = $rx;
-                $interval = 0;
-
-                $a .= '\x{' . dechex($rx) . '}';
-            }
-        }
-
-        $interval && $a .= ($interval > 1 ? '-' : '') . '\x{' . dechex($last) . '}';
-
-        return $a;
-    }
-
-    protected static function chr_callback($m) {return self::chr(hexdec($m[1]));}
-    protected static function chr_range_callback($m) {return '\x{' . implode('}\x{', array_map('dechex', range(hexdec($m[1]), hexdec($m[2])))) . '}';}
-
     protected static function chr($c)
     {
         $c %= 0x200000;
@@ -388,10 +348,5 @@ class Compiler
     protected static function getFile($file)
     {
         return __DIR__ . '/unicode/data/' . $file;
-    }
-
-    protected static function cmpByLength($a, $b)
-    {
-        return strlen($b) - strlen($a);
     }
 }

@@ -81,18 +81,14 @@ You should also get familar with the concept of
 [Unicode Normalization](http://en.wikipedia.org/wiki/Unicode_equivalence) and
 [Grapheme Clusters](http://unicode.org/reports/tr29/).
 
-In particular, do not blindly replace all use of PHP's string functions. Most of
-the time you will not need to, and you will be introducing a significant
-performance overhead to your application.
+Do not blindly replace all use of PHP's string functions. Most of the time you
+will not need to, and you will be introducing a significant performance overhead
+to your application.
 
-Most of the functions here are not operating defensively, mainly for performance
-reasons. For example there is no extensive parameter checking and it is assumed
-that well formed UTF-8 is fed. You should screen input on the *outer perimeter*
-with help from functions like `Patchwork\Utf8::isUtf8()`.
-
-When dealing with badly formed UTF-8, you should not to try to fix it.
+Screen your input on the *outer perimeter* so that only well formed UTF-8 pass
+through. When dealing with badly formed UTF-8, you should not try to fix it.
 Instead, consider it as ISO-8859-1 and use `utf8_encode()` to get an UTF-8
-string. Don't forget also to choose one unicode normalization form at stick to
+string. Don't forget also to choose one unicode normalization form and stick to
 it. NFC is the most in use today.
 
 Licensing
