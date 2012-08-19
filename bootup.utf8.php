@@ -21,6 +21,51 @@ if (!extension_loaded('xml'))
     function utf8_decode($s) {return o\Xml::utf8_decode($s);};
 }
 
+// Cleanup input data
+
+call_user_func(function()
+{
+    // Ensures the URL is well formed UTF-8
+    // When not, assumes ISO-8859-1 and redirects to the corresponding UTF-8 encoded URL
+
+    if (isset($_SERVER['REQUEST_URI']) && !preg_match('//u', urldecode($a = $_SERVER['REQUEST_URI'])))
+    {
+        if ($a === utf8_decode($a))
+        {
+            $a = preg_replace_callback(
+                '/(?:%[89A-F][0-9A-F])+/i',
+                function($m) {return urlencode(utf8_encode(urldecode($m[0])));},
+                $a
+            );
+        }
+        else $a = '/';
+
+        header('HTTP/1.1 301 Moved Permanently');
+        header('Location: ' . $a);
+
+        exit;
+    }
+
+    // Ensures inputs are well formed UTF-8
+    // When not, assumes ISO-8859-1 and converts to UTF-8
+    // Tests only values, not keys
+
+    $a = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST, &$_ENV);
+    foreach ($_FILES as &$v) $a[] = array(&$v['name'], &$v['type']);
+
+    $len = count($a);
+    for ($i = 0; $i < $len; ++$i)
+    {
+        foreach ($a[$i] as &$v)
+        {
+            if (is_array($v)) $a[$len++] =& $v;
+            else if (!preg_match('//u', $v)) $v = utf8_encode($v);
+        }
+
+        reset($a[$i]);
+        unset($a[$i]);
+    }
+});
 
 // mbstring configuration
 
@@ -187,7 +232,7 @@ if (!extension_loaded('intl'))
 }
 else if ('à' === grapheme_substr('éà', 1, -2))
 {
-    // Load o\Intl::grapheme_substr_workaround62759()
+    // Loads o\Intl::grapheme_substr_workaround62759()
     // when the native grapheme_substr() is buggy
     // so that \Patchwork\Utf8::substr() can use it.
     require __DIR__ . '/class/Patchwork/PHP/Override/Intl.php';
