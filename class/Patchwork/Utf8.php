@@ -419,7 +419,7 @@ class Utf8
 /**/    }
 /**/    else
 /**/    {
-            preg_match_all('/' . PHP\Override\Intl::GRAPHEME_CLUSTER_RX . '/u', $s, $s);
+            preg_match_all('/' . GRAPHEME_CLUSTER_RX . '/u', $s, $s);
             return $s[0];
 /**/    }
     }
