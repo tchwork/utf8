@@ -1,9 +1,16 @@
 Patchwork UTF-8
 ===============
 
-Patchwork UTF-8 provides both a portability layer for Unicode handling in PHP
-and a class that mirrors the quasi complete set of native string functions,
-enhanced to UTF-8 [grapheme clusters](http://unicode.org/reports/tr29/) awareness.
+Patchwork UTF-8 provides both :
+
+- a portability layer for Unicode handling in PHP, and
+- a class that mirrors the quasi complete set of native string functions,
+  enhanced to UTF-8 [grapheme clusters](http://unicode.org/reports/tr29/)
+  awareness.
+
+It can also serve as a documentation source referencing the practical problems
+that arise when handling UTF-8 in PHP: Unicode concepts, related algorithms,
+bugs in PHP core, workarounds, etc.
 
 Portability
 -----------
