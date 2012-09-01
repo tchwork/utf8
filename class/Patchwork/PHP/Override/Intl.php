@@ -43,7 +43,16 @@ class Intl
 
         if (GRAPHEME_EXTR_COUNT === $type)
         {
-            $s = preg_split('/(' . GRAPHEME_CLUSTER_RX . "{1,{$size}})/u", $s, 2, PREG_SPLIT_DELIM_CAPTURE);
+            if ($size > 65635)
+            {
+                // Workaround PCRE limiting quantifiers to 65635.
+                $rx = floor(sqrt($size));
+                $size -= $rx * $rx; // This can't be greather than 65635: the native intl is limited to 2Gio strings
+                $rx = '(?:' . GRAPHEME_CLUSTER_RX . "{{$rx}}){{$rx}}" . GRAPHEME_CLUSTER_RX . "{1,{$size}}";
+            }
+            else $rx = GRAPHEME_CLUSTER_RX . "{1,{$size}}";
+
+            $s = preg_split("/({$rx})/u", $s, 2, PREG_SPLIT_DELIM_CAPTURE);
             $next += strlen($s[0]);
             $s = isset($s[1]) ? $s[1] : '';
         }
