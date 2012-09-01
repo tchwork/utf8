@@ -7,7 +7,6 @@ use Normalizer as n;
 
 /**
  * @covers Patchwork\Utf8::<!public>
- * @covers Patchwork\Utf8::getGraphemeClusters
  */
 class Utf8Test extends \PHPUnit_Framework_TestCase
 {

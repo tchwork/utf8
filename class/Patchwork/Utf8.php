@@ -405,7 +405,8 @@ class Utf8
         return mb_convert_case($s, MB_CASE_TITLE, 'UTF-8');
     }
 
-    static function getGraphemeClusters($s)
+
+    protected static function getGraphemeClusters($s)
     {
 /**/    if (extension_loaded('intl'))
 /**/    {
@@ -423,7 +424,6 @@ class Utf8
             return $s[0];
 /**/    }
     }
-
 
     protected static function rxClass($s, $class = '')
     {
