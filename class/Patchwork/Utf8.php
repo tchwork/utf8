@@ -164,7 +164,7 @@ class Utf8
 
                     if ($cut && $wLen > $width)
                     {
-                        $w = self::getGraphemeClusters($w);
+                        $w = self::str_split($w);
 
                         do
                         {
@@ -202,7 +202,7 @@ class Utf8
     static function count_chars($s, $mode = 0)
     {
         if (1 != $mode) user_error(__METHOD__ . '(): the only allowed $mode is 1', E_USER_WARNING);
-        $s = self::getGraphemeClusters($s);
+        $s = self::str_split($s);
         return array_count_values($s);
     }
 
@@ -269,29 +269,45 @@ class Utf8
 
     static function str_shuffle($s)
     {
-        $s = self::getGraphemeClusters($s);
+        $s = self::str_split($s);
         shuffle($s);
         return implode('', $s);
     }
 
     static function str_split($s, $len = 1)
     {
-        $len = (int) $len;
-        if ($len < 1) return str_split($s, $len);
-
-        $s = self::getGraphemeClusters($s);
-        if (1 === $len) return $s;
-
-        $a = array();
-        $j = -1;
-
-        foreach ($s as $i => $s)
+        if (1 > $len = (int) $len)
         {
-            if ($i % $len) $a[$j] .= $s;
-            else $a[++$j] = $s;
+            $len = func_get_arg(1);
+            return str_split($s, $len);
         }
 
-        return $a;
+/**/    if (extension_loaded('intl'))
+/**/    {
+            $a = array();
+            $p = 0;
+            $l = strlen($s);
+
+            while ($p < $l) $a[] = grapheme_extract($s, 1, GRAPHEME_EXTR_COUNT, $p, $p);
+/**/    }
+/**/    else
+/**/    {
+            preg_match_all('/' . GRAPHEME_CLUSTER_RX . '/u', $s, $a);
+            $a = $a[0];
+/**/    }
+
+        if (1 == $len) return $a;
+
+        $s = array();
+        $p = -1;
+
+        foreach ($a as $l => $a)
+        {
+            if ($l % $len) $s[$p] .= $a;
+            else $s[++$p] = $a;
+        }
+
+        return $s;
     }
 
     static function str_word_count($s, $format = 0, $charlist = '')
@@ -340,7 +356,7 @@ class Utf8
 
     static function strrev($s)
     {
-        $s = self::getGraphemeClusters($s);
+        $s = self::str_split($s);
         return implode('', array_reverse($s));
     }
 
@@ -354,8 +370,8 @@ class Utf8
     {
         if (INF !== $to)
         {
-            $from = self::getGraphemeClusters($from);
-            $to   = self::getGraphemeClusters($to);
+            $from = self::str_split($from);
+            $to   = self::str_split($to);
 
             $a = count($from);
             $b = count($to);
@@ -382,8 +398,8 @@ class Utf8
 
     static function substr_replace($s, $replace, $start, $len = 2147483647)
     {
-        $s       = self::getGraphemeClusters($s);
-        $replace = self::getGraphemeClusters($replace);
+        $s       = self::str_split($s);
+        $replace = self::str_split($replace);
         array_splice($s, $start, $len, $replace);
         return implode('', $s);
     }
@@ -406,30 +422,11 @@ class Utf8
     }
 
 
-    protected static function getGraphemeClusters($s)
-    {
-/**/    if (extension_loaded('intl'))
-/**/    {
-            $gca = array();
-            $pos = 0;
-            $len = strlen($s);
-
-            while ($pos < $len) $gca[] = grapheme_extract($s, 1, GRAPHEME_EXTR_COUNT, $pos, $pos);
-
-            return $gca;
-/**/    }
-/**/    else
-/**/    {
-            preg_match_all('/' . GRAPHEME_CLUSTER_RX . '/u', $s, $s);
-            return $s[0];
-/**/    }
-    }
-
     protected static function rxClass($s, $class = '')
     {
         $class = array($class);
 
-        foreach (self::getGraphemeClusters($s) as $s)
+        foreach (self::str_split($s) as $s)
         {
             if ('-' === $s) $class[0] = '-' . $class[0];
             else if (!isset($s[2])) $class[0] .= preg_quote($s, '/');
