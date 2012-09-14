@@ -1,19 +1,19 @@
 <?php
 
-namespace Patchwork\Tests\PHP\Override;
+namespace Patchwork\Tests\PHP\Shim;
 
-use Patchwork\PHP\Override\Mbstring as p;
+use Patchwork\PHP\Shim\Mbstring as p;
 use Normalizer as n;
 
 /**
- * @covers Patchwork\PHP\Override\Mbstring::<!public>
+ * @covers Patchwork\PHP\Shim\Mbstring::<!public>
  */
 class MbstringTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Patchwork\PHP\Override\Mbstring::mb_strtolower
-     * @covers Patchwork\PHP\Override\Mbstring::mb_strtoupper
-     * @covers Patchwork\PHP\Override\Mbstring::mb_convert_case
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strtolower
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strtoupper
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_convert_case
      */
     function testStrCase()
     {
@@ -23,7 +23,7 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Mbstring::mb_strlen
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strlen
      */
     function testmb_strlen()
     {
@@ -35,7 +35,7 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Mbstring::mb_substr
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_substr
      */
     function testmb_substr()
     {
@@ -63,10 +63,10 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Mbstring::mb_strpos
-     * @covers Patchwork\PHP\Override\Mbstring::mb_stripos
-     * @covers Patchwork\PHP\Override\Mbstring::mb_strrpos
-     * @covers Patchwork\PHP\Override\Mbstring::mb_strripos
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strpos
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_stripos
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strrpos
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strripos
      */
     function testmb_strpos()
     {
@@ -96,7 +96,7 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Mbstring::mb_strpos
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strpos
      * @expectedException PHPUnit_Framework_Error_Warning
      */
     function testmb_strpos_empty_delimiter()
@@ -114,7 +114,7 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Mbstring::mb_strpos
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strpos
      * @expectedException PHPUnit_Framework_Error_Warning
      */
     function testmb_strpos_negative_offset()
@@ -132,8 +132,8 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Mbstring::mb_strstr
-     * @covers Patchwork\PHP\Override\Mbstring::mb_stristr
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strstr
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_stristr
      */
     function testmb_strstr()
     {

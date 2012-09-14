@@ -1,18 +1,18 @@
 <?php
 
-namespace Patchwork\Tests\PHP\Override;
+namespace Patchwork\Tests\PHP\Shim;
 
-use Patchwork\PHP\Override\Intl as p;
+use Patchwork\PHP\Shim\Intl as p;
 use Normalizer as n;
 
 /**
- * @covers Patchwork\PHP\Override\Intl::<!public>
+ * @covers Patchwork\PHP\Shim\Intl::<!public>
  */
 class IntlTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException PHPUnit_Framework_Error_Warning
-     * @covers Patchwork\PHP\Override\Intl::grapheme_extract
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_extract
      */
     function testGrapheme_extract_arrayWarning()
     {
@@ -20,7 +20,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Intl::grapheme_extract
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_extract
      */
     function testGrapheme_extract()
     {
@@ -44,7 +44,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Intl::grapheme_extract
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_extract
      */
     function testGrapheme_extract_todo()
     {
@@ -62,7 +62,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Intl::grapheme_strlen
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_strlen
      */
     function testGrapheme_strlen()
     {
@@ -74,8 +74,8 @@ class IntlTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Intl::grapheme_substr
-     * @covers Patchwork\PHP\Override\Intl::grapheme_substr_workaround62759
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_substr
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_substr_workaround62759
      */
     function testGrapheme_substr()
     {
@@ -114,11 +114,11 @@ class IntlTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Intl::grapheme_strpos
-     * @covers Patchwork\PHP\Override\Intl::grapheme_stripos
-     * @covers Patchwork\PHP\Override\Intl::grapheme_strrpos
-     * @covers Patchwork\PHP\Override\Intl::grapheme_strripos
-     * @covers Patchwork\PHP\Override\Intl::grapheme_position
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_strpos
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_stripos
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_strrpos
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_strripos
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_position
      */
     function testGrapheme_strpos()
     {
@@ -145,8 +145,8 @@ class IntlTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Intl::grapheme_strstr
-     * @covers Patchwork\PHP\Override\Intl::grapheme_stristr
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_strstr
+     * @covers Patchwork\PHP\Shim\Intl::grapheme_stristr
      */
     function testGrapheme_strstr()
     {

@@ -9,9 +9,9 @@
  */
 
 /**
- * Normalizer plugs Patchwork\PHP\Override\Normalizer as a PHP implementation
+ * Normalizer plugs Patchwork\PHP\Shim\Normalizer as a PHP implementation
  * of intl's Normalizer when the intl extension in not enabled.
  */
-class Normalizer extends Patchwork\PHP\Override\Normalizer
+class Normalizer extends Patchwork\PHP\Shim\Normalizer
 {
 }

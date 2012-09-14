@@ -1,17 +1,17 @@
 <?php
 
 //use Normalizer as n;
-use Patchwork\PHP\Override\Normalizer as n;
+use Patchwork\PHP\Shim\Normalizer as n;
 
 /**
- * @covers Patchwork\PHP\Override\Normalizer::<!public>
+ * @covers Patchwork\PHP\Shim\Normalizer::<!public>
  */
 class NormalizationTest extends \PHPUnit_Framework_TestCase
 {
     public $unicodeVersion = 61;
 
     /**
-     * @covers Patchwork\PHP\Override\Normalizer::normalize
+     * @covers Patchwork\PHP\Shim\Normalizer::normalize
      */
     function testNormalize()
     {

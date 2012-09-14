@@ -1,17 +1,17 @@
 <?php
 
-namespace Patchwork\Tests\PHP\Override;
+namespace Patchwork\Tests\PHP\Shim;
 
-use Patchwork\PHP\Override\Iconv as p;
+use Patchwork\PHP\Shim\Iconv as p;
 
 /**
- * @covers Patchwork\PHP\Override\Iconv::<!public>
+ * @covers Patchwork\PHP\Shim\Iconv::<!public>
  */
 class IconvTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Patchwork\PHP\Override\Iconv::iconv
-     * @covers Patchwork\PHP\Override\Iconv::iconv_workaround52211
+     * @covers Patchwork\PHP\Shim\Iconv::iconv
+     * @covers Patchwork\PHP\Shim\Iconv::iconv_workaround52211
      */
     function testIconv()
     {
@@ -35,7 +35,7 @@ class IconvTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Iconv::bestFit
+     * @covers Patchwork\PHP\Shim\Iconv::bestFit
      */
     function testBestFit()
     {
@@ -45,7 +45,7 @@ class IconvTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Iconv::iconv_strpos
+     * @covers Patchwork\PHP\Shim\Iconv::iconv_strpos
      */
     function testIconvStrPos()
     {
@@ -54,7 +54,7 @@ class IconvTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Iconv::iconv_substr
+     * @covers Patchwork\PHP\Shim\Iconv::iconv_substr
      */
     function testIconvSubstr()
     {
@@ -62,7 +62,7 @@ class IconvTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Iconv::iconv_mime_encode
+     * @covers Patchwork\PHP\Shim\Iconv::iconv_mime_encode
      */
     function testIconvMimeEncode()
     {
@@ -81,7 +81,7 @@ class IconvTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Iconv::iconv_mime_decode
+     * @covers Patchwork\PHP\Shim\Iconv::iconv_mime_decode
      */
     function testIconvMimeDecode()
     {
@@ -102,7 +102,7 @@ class IconvTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Iconv::iconv_mime_decode_headers
+     * @covers Patchwork\PHP\Shim\Iconv::iconv_mime_decode_headers
      */
     function testIconvMimeDecodeHeaders()
     {

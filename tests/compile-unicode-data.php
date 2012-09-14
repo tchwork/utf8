@@ -7,10 +7,10 @@ $dir = dirname(dirname(__FILE__));
 
 require_once $dir . '/class/Patchwork/Utf8/Compiler.php';
 
-c::charsetMaps($dir . '/class/Patchwork/PHP/Override/charset/');
-c::translitMap($dir . '/class/Patchwork/PHP/Override/charset/');
-c::bestFit($dir . '/class/Patchwork/PHP/Override/charset/');
+c::charsetMaps($dir . '/class/Patchwork/PHP/Shim/charset/');
+c::translitMap($dir . '/class/Patchwork/PHP/Shim/charset/');
+c::bestFit($dir . '/class/Patchwork/PHP/Shim/charset/');
 
-c::unicodeMaps($dir . '/class/Patchwork/PHP/Override/unidata/');
+c::unicodeMaps($dir . '/class/Patchwork/PHP/Shim/unidata/');
 
-rename($dir . '/class/Patchwork/PHP/Override/unidata/caseFolding_full.ser', $dir . '/class/Patchwork/Utf8/data/caseFolding_full.ser');
+rename($dir . '/class/Patchwork/PHP/Shim/unidata/caseFolding_full.ser', $dir . '/class/Patchwork/Utf8/data/caseFolding_full.ser');

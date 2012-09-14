@@ -1,17 +1,17 @@
 <?php
 
-namespace Patchwork\Tests\PHP\Override;
+namespace Patchwork\Tests\PHP\Shim;
 
-use Patchwork\PHP\Override\Normalizer as pn;
+use Patchwork\PHP\Shim\Normalizer as pn;
 use Normalizer as in;
 
 /**
- * @covers Patchwork\PHP\Override\Normalizer::<!public>
+ * @covers Patchwork\PHP\Shim\Normalizer::<!public>
  */
 class NormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers Patchwork\PHP\Override\Normalizer::isNormalized
+     * @covers Patchwork\PHP\Shim\Normalizer::isNormalized
      */
     function testIsNormalized()
     {
@@ -29,7 +29,7 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Override\Normalizer::normalize
+     * @covers Patchwork\PHP\Shim\Normalizer::normalize
      */
     function testNormalize()
     {

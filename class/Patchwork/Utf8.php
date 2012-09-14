@@ -84,7 +84,7 @@ class Utf8
     {
 /**/    if (extension_loaded('intl') && 'à' === grapheme_substr('éà', 1, -2))
 /**/    {
-            return PHP\Override\Intl::grapheme_substr_workaround62759($s, $start, $len);
+            return PHP\Shim\Intl::grapheme_substr_workaround62759($s, $start, $len);
 /**/    }
 /**/    else
 /**/    {

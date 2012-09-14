@@ -8,10 +8,10 @@
  * GNU General Public License v2.0 (http://gnu.org/licenses/gpl-2.0.txt).
  */
 
-use Patchwork\PHP\Override as o;
+use Patchwork\PHP\Shim as o;
 
 require __DIR__ . '/class/Patchwork/Utf8.php';
-require __DIR__ . '/class/Patchwork/PHP/Override/Xml.php';
+require __DIR__ . '/class/Patchwork/PHP/Shim/Xml.php';
 
 // utf8_encode/decode
 
@@ -92,7 +92,7 @@ if (extension_loaded('mbstring'))
 }
 else
 {
-    require __DIR__ . '/class/Patchwork/PHP/Override/Mbstring.php';
+    require __DIR__ . '/class/Patchwork/PHP/Shim/Mbstring.php';
 
     define('MB_OVERLOAD_MAIL', 1);
     define('MB_OVERLOAD_STRING', 2);
@@ -146,7 +146,7 @@ if (extension_loaded('iconv'))
 }
 else
 {
-    require __DIR__ . '/class/Patchwork/PHP/Override/Iconv.php';
+    require __DIR__ . '/class/Patchwork/PHP/Shim/Iconv.php';
 
     define('ICONV_IMPL', 'Patchwork');
     define('ICONV_VERSION', '1.0');
@@ -208,8 +208,8 @@ if (!preg_match('/^.$/u', '§')) throw new Exception('PCRE is not compiled with 
 
 if (!extension_loaded('intl'))
 {
-    require __DIR__ . '/class/Patchwork/PHP/Override/Normalizer.php';
-    require __DIR__ . '/class/Patchwork/PHP/Override/Intl.php';
+    require __DIR__ . '/class/Patchwork/PHP/Shim/Normalizer.php';
+    require __DIR__ . '/class/Patchwork/PHP/Shim/Intl.php';
 
     class Normalizer extends o\Normalizer {}
 
@@ -235,7 +235,7 @@ else if ('à' === grapheme_substr('éà', 1, -2))
     // Loads o\Intl::grapheme_substr_workaround62759()
     // when the native grapheme_substr() is buggy
     // so that \Patchwork\Utf8::substr() can use it.
-    require __DIR__ . '/class/Patchwork/PHP/Override/Intl.php';
+    require __DIR__ . '/class/Patchwork/PHP/Shim/Intl.php';
 }
 
 if (PCRE_VERSION < '8.32')

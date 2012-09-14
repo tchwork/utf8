@@ -8,7 +8,7 @@
  * GNU General Public License v2.0 (http://gnu.org/licenses/gpl-2.0.txt).
  */
 
-namespace Patchwork\PHP\Override;
+namespace Patchwork\PHP\Shim;
 
 /**
  * Partial mbstring implementation in PHP, iconv based, UTF-8 centric.
