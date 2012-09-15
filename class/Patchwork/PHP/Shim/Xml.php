@@ -23,16 +23,7 @@ class Xml
 
     static function cp1252_to_utf8($s)
     {
-/**/    if (function_exists('utf8_encode'))
-/**/    {
-            $s = utf8_encode($s);
-/**/    }
-/**/    else
-/**/    // @codeCoverageIgnoreStart
-/**/    {
-            $s = self::utf8_encode($s);
-/**/    }
-/**/    // @codeCoverageIgnoreEnd
+        $s = utf8_encode($s);
 
         if (false === strpos($s, "\xC2")) return $s;
         else return str_replace(self::$cp1252, self::$utf8, $s);
@@ -42,16 +33,7 @@ class Xml
     {
         $s = str_replace(self::$utf8, self::$cp1252, $s);
 
-/**/    if (function_exists('utf8_decode'))
-/**/    {
-            return utf8_decode($s);
-/**/    }
-/**/    else
-/**/    // @codeCoverageIgnoreStart
-/**/    {
-            return self::utf8_decode($s);
-/**/    }
-/**/    // @codeCoverageIgnoreEnd
+        return utf8_decode($s);
     }
 
     static function utf8_encode($s)
