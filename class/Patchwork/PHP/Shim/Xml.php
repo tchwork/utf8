@@ -23,7 +23,10 @@ class Xml
 
     static function cp1252_to_utf8($s)
     {
-        $s = utf8_encode($s);
+/**/    if (extension_loaded('xml'))
+            $s = utf8_encode($s);
+/**/    else
+            $s = self::utf8_encode($s);
 
         if (false === strpos($s, "\xC2")) return $s;
         else return str_replace(self::$cp1252, self::$utf8, $s);
@@ -33,7 +36,10 @@ class Xml
     {
         $s = str_replace(self::$utf8, self::$cp1252, $s);
 
-        return utf8_decode($s);
+/**/    if (extension_loaded('xml'))
+            return utf8_decode($s);
+/**/    else
+            return self::utf8_decode($s);
     }
 
     static function utf8_encode($s)
