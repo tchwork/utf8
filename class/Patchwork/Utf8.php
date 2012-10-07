@@ -15,7 +15,7 @@ use Normalizer as n;
 /**
  * UTF-8 Grapheme Cluster aware string manipulations implementing the quasi complete
  * set of native PHP string functions that need UTF-8 awareness and more.
- * Missing are printf-family functions and number_format.
+ * Missing are printf-family functions.
  */
 class Utf8
 {
@@ -419,6 +419,23 @@ class Utf8
     static function ucwords($s)
     {
         return mb_convert_case($s, MB_CASE_TITLE, 'UTF-8');
+    }
+
+    static function number_format($number, $decimals = 0, $dec_point = '.', $thousands_sep = ',')
+    {
+/**/    if (PHP_VERSION_ID < 50400)
+/**/    {
+            if (isset($thousands_sep[1]) || isset($dec_point[1]))
+            {
+                return str_replace(
+                    array('.', ','),
+                    array($dec_point, $thousands_sep),
+                    number_format($number, $decimals, '.', ',')
+                );
+            }
+/**/    }
+
+        return number_format($number, $decimals, $dec_point, $thousands_sep);
     }
 
 

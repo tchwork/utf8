@@ -61,7 +61,7 @@ trim, str_ireplace, str_pad, str_shuffle, str_split, str_word_count, strcmp,
 strnatcmp, strcasecmp, strnatcasecmp, strncasecmp, strncmp, strcspn, strpbrk,
 strrev, strspn, strtr, substr_compare, substr_count, substr_replace, ucfirst,
 lcfirst, ucwords*.
-Missing are *printf*-family functions and *number_format*.
+Missing are *printf*-family functions.
 
 Usage
 -----
