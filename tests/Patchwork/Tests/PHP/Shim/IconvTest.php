@@ -35,16 +35,6 @@ class IconvTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\PHP\Shim\Iconv::bestFit
-     */
-    function testBestFit()
-    {
-        $this->assertSame( '', p::bestFit(-1, '') );
-        $this->assertSame( iconv('UTF-8', 'CP1252', 'déjà vu'), p::bestFit(1252, 'déjà vu') );
-        $this->assertSame( iconv('UTF-8', 'CP936', 'déjà vu'), p::bestFit(936, 'déjà vu') );
-    }
-
-    /**
      * @covers Patchwork\PHP\Shim\Iconv::iconv_strpos
      */
     function testIconvStrPos()
