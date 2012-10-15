@@ -11,37 +11,10 @@
 namespace Patchwork\PHP\Shim;
 
 /**
- * utf8_encode/decode enhanced to Windows-1252.
+ * utf8_encode/decode
  */
 class Xml
 {
-    protected static
-
-    $cp1252 = array('','','','','','','','','','','','','','','','','','','','','','','','','','',''),
-    $utf8   = array('€','‚','ƒ','„','…','†','‡','ˆ','‰','Š','‹','Œ','Ž','‘','’','“','”','•','–','—','˜','™','š','›','œ','ž','Ÿ');
-
-
-    static function cp1252_to_utf8($s)
-    {
-/**/    if (extension_loaded('xml'))
-            $s = utf8_encode($s);
-/**/    else
-            $s = self::utf8_encode($s);
-
-        if (false === strpos($s, "\xC2")) return $s;
-        else return str_replace(self::$cp1252, self::$utf8, $s);
-    }
-
-    static function utf8_to_cp1252($s)
-    {
-        $s = str_replace(self::$utf8, self::$cp1252, $s);
-
-/**/    if (extension_loaded('xml'))
-            return utf8_decode($s);
-/**/    else
-            return self::utf8_decode($s);
-    }
-
     static function utf8_encode($s)
     {
         $len = strlen($s);

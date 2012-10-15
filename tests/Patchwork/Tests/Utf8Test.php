@@ -287,4 +287,18 @@ oooooooooooooooooooooo",
     {
         $this->assertSame( array(0 => 'déjà', 5 => 'vu'), u::str_word_count('déjà vu', 2) );
     }
+
+    /**
+     * @covers Patchwork\Utf8::utf8_encode
+     * @covers Patchwork\Utf8::utf8_decode
+     */
+    function testUtf8EncodeDecode()
+    {
+        $s = array_map('chr', range(0, 255));
+        $s = implode('', $s);
+        $e = u::utf8_encode($s);
+
+        $this->assertSame( 1, preg_match('//u', $e) );
+        $this->assertSame( $s, u::utf8_decode($e) );
+    }
 }

@@ -24,7 +24,9 @@ class Utf8
     $commonCaseFold = array(
         array('µ','ſ',"\xCD\x85",'ς',"\xCF\x90","\xCF\x91","\xCF\x95","\xCF\x96","\xCF\xB0","\xCF\xB1","\xCF\xB5","\xE1\xBA\x9B","\xE1\xBE\xBE"),
         array('μ','s','ι',       'σ','β',       'θ',       'φ',       'π',       'κ',       'ρ',       'ε',       "\xE1\xB9\xA1",'ι'           )
-    );
+    ),
+    $cp1252 = array('','','','','','','','','','','','','','','','','','','','','','','','','','',''),
+    $utf8   = array('€','‚','ƒ','„','…','†','‡','ˆ','‰','Š','‹','Œ','Ž','‘','’','“','”','•','–','—','˜','™','š','›','œ','ž','Ÿ');
 
 
     static function isUtf8($s)
@@ -436,6 +438,19 @@ class Utf8
 /**/    }
 
         return number_format($number, $decimals, $dec_point, $thousands_sep);
+    }
+
+    static function utf8_encode($s)
+    {
+        $s = utf8_encode($s);
+        if (false === strpos($s, "\xC2")) return $s;
+        else return str_replace(self::$cp1252, self::$utf8, $s);
+    }
+
+    static function utf8_decode($s)
+    {
+        $s = str_replace(self::$utf8, self::$cp1252, $s);
+        return utf8_decode($s);
     }
 
 
