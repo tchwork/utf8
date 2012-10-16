@@ -186,7 +186,7 @@ class Compiler
 
             fclose($h);
 
-            file_put_contents($out_dir . 'from.' . substr($f, 0, -3) .'ser', serialize($from));
+//            file_put_contents($out_dir . 'from.' . substr($f, 0, -3) .'ser', serialize($from));
             file_put_contents($out_dir . 'to.' . substr($f, 0, -3) .'ser', serialize($to));
         }
         closedir($dh);
