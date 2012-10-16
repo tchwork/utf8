@@ -30,12 +30,18 @@ if (!extension_loaded('xml'))
 }
 
 
-// Tries to set an UTF-8 locale for LC_CTYPE,
-// so that basename() and related functions work as expected
+// Tries to set an UTF-8 compatible locale, so that strcoll(),
+// basename() and related functions work as expected
 
 if ('' === basename('§'))
 {
-    setlocale(LC_CTYPE, 'C.UTF-8', 'en_US.UTF-8', 'en_US.utf8');
+    if ( 'C.UTF-8' === setlocale(LC_ALL, 'C.UTF-8', 'C')
+      || 'en_US.UTF-8' === setlocale(LC_CTYPE, 'en_US.UTF-8') )
+        setlocale(LC_COLLATE, 'en_US.UTF-8');
+}
+else if ('\\' !== DIRECTORY_SEPARATOR)
+{
+    setlocale(LC_COLLATE, setlocale(LC_CTYPE, 0));
 }
 
 
