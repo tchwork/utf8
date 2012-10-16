@@ -192,13 +192,10 @@ class Utf8
 
     static function chr($c)
     {
-        $c %= 0x200000;
-
-        return $c < 0x80    ? chr($c) : (
-               $c < 0x800   ? chr(0xC0 | $c>> 6) . chr(0x80 | $c     & 0x3F) : (
-               $c < 0x10000 ? chr(0xE0 | $c>>12) . chr(0x80 | $c>> 6 & 0x3F) . chr(0x80 | $c    & 0x3F) : (
-                              chr(0xF0 | $c>>18) . chr(0x80 | $c>>12 & 0x3F) . chr(0x80 | $c>>6 & 0x3F) . chr(0x80 | $c & 0x3F)
-        )));
+        if (0x80 > $c %= 0x200000) return chr($c);
+        if (0x800 > $c) return chr(0xC0 | $c>>6) . chr(0x80 | $c & 0x3F);
+        if (0x10000 > $c) return chr(0xE0 | $c>>12) . chr(0x80 | $c>>6 & 0x3F) . chr(0x80 | $c & 0x3F);
+        return chr(0xF0 | $c>>18) . chr(0x80 | $c>>12 & 0x3F) . chr(0x80 | $c>>6 & 0x3F) . chr(0x80 | $c & 0x3F);
     }
 
     static function count_chars($s, $mode = 0)
@@ -216,13 +213,11 @@ class Utf8
 
     static function ord($s)
     {
-        $s = unpack('C*', substr($s, 0, 6));
-        $a = $s ? $s[1] : 0;
-
-        return 240 <= $a && $a <= 255 ? (($a-240) << 18) + (($s[2]-128) << 12) + (($s[3]-128) << 6) + $s[4]-128 : (
-               224 <= $a && $a <= 239 ? (($a-224) << 12) + (($s[2]-128) <<  6) +   $s[3]-128 : (
-               192 <= $a && $a <= 223 ? (($a-192) <<  6) +   $s[2]-128 : (
-               $a)));
+        $a = ($s = unpack('C*', substr($s, 0, 4))) ? $s[1] : 0;
+        if (0xF0 <= $a) return (($a - 0xF0)<<18) + (($s[2] - 0x80)<<12) + (($s[3] - 0x80)<<6) + $s[4] - 0x80;
+        if (0xE0 <= $a) return (($a - 0xE0)<<12) + (($s[2] - 0x80)<<6) + $s[3] - 0x80;
+        if (0xC0 <= $a) return (($a - 0xC0)<<6) + $s[2] - 0x80;
+        return $a;
     }
 
     static function rtrim($s, $charlist = INF)
