@@ -97,6 +97,9 @@ Instead, consider it as ISO-8859-1 and use `utf8_encode()` to get an UTF-8
 string. Don't forget also to choose one unicode normalization form and stick to
 it. NFC is the most in use today.
 
+This library is orthogonal to `mbstring.func_overload` and will not work if the
+php.ini setting is enabled.
+
 Licensing
 ---------
 
