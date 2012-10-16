@@ -13,9 +13,11 @@ use Patchwork\PHP\Shim as s;
 
 require __DIR__ . '/class/Patchwork/Utf8.php';
 
+
 // Check PCRE
 
 preg_match('/^.$/u', '§') or user_error('PCRE is compiled without UTF-8 support', E_USER_WARNING);
+
 
 // utf8_encode/decode
 
@@ -26,6 +28,16 @@ if (!extension_loaded('xml'))
     function utf8_encode($s) {return s\Xml::utf8_encode($s);};
     function utf8_decode($s) {return s\Xml::utf8_decode($s);};
 }
+
+
+// Tries to set an UTF-8 locale for LC_CTYPE,
+// so that basename() and related functions work as expected
+
+if ('' === basename('§'))
+{
+    setlocale(LC_CTYPE, 'C.UTF-8', 'en_US.UTF-8', 'en_US.utf8');
+}
+
 
 // Cleanup input data
 
@@ -72,6 +84,7 @@ call_user_func(function()
         unset($a[$i]);
     }
 });
+
 
 // mbstring configuration
 
