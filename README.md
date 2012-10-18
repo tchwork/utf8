@@ -66,7 +66,17 @@ Missing are *printf*-family functions.
 Usage
 -----
 
-Including the `bootup.utf8.php` file is the easiest way to enable the
+The recommended way to install Patchwork UTF-8 is [through
+composer](http://getcomposer.org). Just create a `composer.json` file and run
+the `php composer.phar install` command to install it:
+
+    {
+        "require": {
+            "patchwork/utf8": "1.0.*"
+        }
+    }
+
+Otherwise, including the `bootup.utf8.php` file is the easiest way to enable the
 portability layer and configure PHP for an UTF-8 aware and portable application.
 
 Classes are named following PSR-0 autoloader interoperability recommandations,
