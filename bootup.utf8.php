@@ -245,14 +245,14 @@ else
 require __DIR__ . '/class/Patchwork/Utf8.php';
 
 
-// Tries to set an UTF-8 compatible locale, so that basename() and related functions work as expected
+// With non-UTF-8 locale, basename() bugs.
+// Be aware that setlocale() can be slow.
+// You'd better properly configure your LANG environment variable to an UTF-8 locale.
 
 if ('' === basename('§'))
 {
-    if ('C.UTF-8' !== setlocale(LC_ALL, 'C.UTF-8', 'C'))
-    {
-        setlocale(LC_CTYPE, 'en_US.UTF-8', 'en_US.utf8');
-    }
+    setlocale(LC_ALL, 'C.UTF-8', 'C');
+    setlocale(LC_CTYPE, 'en_US.UTF-8', 'fr_FR.UTF-8', 'es_ES.UTF-8', 'de_DE.UTF-8', 'ru_RU.UTF-8', 'pt_BR.UTF-8', 'it_IT.UTF-8', 'ja_JP.UTF-8', 'zh_CN.UTF-8', 0);
 }
 
 
