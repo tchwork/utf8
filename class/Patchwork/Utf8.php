@@ -116,7 +116,7 @@ class Utf8
 
     static function stristr($s, $needle, $before_needle = false)
     {
-        if ('' == (string) $needle) return false;
+        if ('' === (string) $needle) return false;
         return mb_stristr($s, $needle, $before_needle, 'UTF-8');
     }
 

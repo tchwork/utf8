@@ -11,8 +11,6 @@
 use Patchwork\Utf8 as u;
 use Patchwork\PHP\Shim as s;
 
-require __DIR__ . '/class/Patchwork/Utf8.php';
-
 
 // Check PCRE
 
@@ -28,64 +26,6 @@ if (!extension_loaded('xml'))
     function utf8_encode($s) {return s\Xml::utf8_encode($s);};
     function utf8_decode($s) {return s\Xml::utf8_decode($s);};
 }
-
-
-// Tries to set an UTF-8 compatible locale, so that basename() and related functions work as expected
-
-if ('' === basename('§'))
-{
-    if ('C.UTF-8' !== setlocale(LC_ALL, 'C.UTF-8', 'C'))
-    {
-        setlocale(LC_CTYPE, 'en_US.UTF-8', 'en_US.utf8');
-    }
-}
-
-
-// Cleanup input data
-
-call_user_func(function()
-{
-    // Ensures the URL is well formed UTF-8
-    // When not, assumes ISO-8859-1 and redirects to the corresponding UTF-8 encoded URL
-
-    if (isset($_SERVER['REQUEST_URI']) && !preg_match('//u', urldecode($a = $_SERVER['REQUEST_URI'])))
-    {
-        if ($a === u::utf8_decode($a))
-        {
-            $a = preg_replace_callback(
-                '/(?:%[89A-F][0-9A-F])+/i',
-                function($m) {return urlencode(u::utf8_encode(urldecode($m[0])));},
-                $a
-            );
-        }
-        else $a = '/';
-
-        header('HTTP/1.1 301 Moved Permanently');
-        header('Location: ' . $a);
-
-        exit;
-    }
-
-    // Ensures inputs are well formed UTF-8
-    // When not, assumes ISO-8859-1 and converts to UTF-8
-    // Tests only values, not keys
-
-    $a = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST, &$_ENV);
-    foreach ($_FILES as &$v) $a[] = array(&$v['name'], &$v['type']);
-
-    $len = count($a);
-    for ($i = 0; $i < $len; ++$i)
-    {
-        foreach ($a[$i] as &$v)
-        {
-            if (is_array($v)) $a[$len++] =& $v;
-            else if (!preg_match('//u', $v)) $v = u::utf8_encode($v);
-        }
-
-        reset($a[$i]);
-        unset($a[$i]);
-    }
-});
 
 
 // mbstring configuration
@@ -167,9 +107,9 @@ else
 
 // iconv configuration
 
- // See http://php.net/manual/en/function.iconv.php#47428
 if (!function_exists('iconv') && function_exists('libiconv'))
 {
+    // See http://php.net/manual/en/function.iconv.php#47428
     function iconv($from, $to, $s) {return libiconv($from, $to, $s);};
 }
 
@@ -298,3 +238,66 @@ else
 {
     define('GRAPHEME_CLUSTER_RX', '\X');
 }
+
+
+// Load Patchwork\Utf8
+
+require __DIR__ . '/class/Patchwork/Utf8.php';
+
+
+// Tries to set an UTF-8 compatible locale, so that basename() and related functions work as expected
+
+if ('' === basename('§'))
+{
+    if ('C.UTF-8' !== setlocale(LC_ALL, 'C.UTF-8', 'C'))
+    {
+        setlocale(LC_CTYPE, 'en_US.UTF-8', 'en_US.utf8');
+    }
+}
+
+
+// Cleanup input data
+
+call_user_func(function()
+{
+    // Ensures the URL is well formed UTF-8
+    // When not, assumes Windows-1252 and redirects to the corresponding UTF-8 encoded URL
+
+    if (isset($_SERVER['REQUEST_URI']) && !preg_match('//u', urldecode($a = $_SERVER['REQUEST_URI'])))
+    {
+        if ($a === u::utf8_decode($a))
+        {
+            $a = preg_replace_callback(
+                '/(?:%[89A-F][0-9A-F])+/i',
+                function($m) {return urlencode(u::utf8_encode(urldecode($m[0])));},
+                $a
+            );
+        }
+        else $a = '/';
+
+        header('HTTP/1.1 301 Moved Permanently');
+        header('Location: ' . $a);
+
+        exit;
+    }
+
+    // Ensures inputs are well formed UTF-8
+    // When not, assumes Windows-1252 and converts to UTF-8
+    // Tests only values, not keys
+
+    $a = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST, &$_ENV);
+    foreach ($_FILES as &$v) $a[] = array(&$v['name'], &$v['type']);
+
+    $len = count($a);
+    for ($i = 0; $i < $len; ++$i)
+    {
+        foreach ($a[$i] as &$v)
+        {
+            if (is_array($v)) $a[$len++] =& $v;
+            else if (!preg_match('//u', $v)) $v = u::utf8_encode($v);
+        }
+
+        reset($a[$i]);
+        unset($a[$i]);
+    }
+});
