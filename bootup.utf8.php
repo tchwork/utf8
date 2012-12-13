@@ -8,6 +8,7 @@
  * GNU General Public License v2.0 (http://gnu.org/licenses/gpl-2.0.txt).
  */
 
+use Normalizer as n;
 use Patchwork\Utf8 as u;
 use Patchwork\PHP\Shim as s;
 
@@ -294,7 +295,11 @@ call_user_func(function()
         foreach ($a[$i] as &$v)
         {
             if (is_array($v)) $a[$len++] =& $v;
-            else if (!preg_match('//u', $v)) $v = u::utf8_encode($v);
+            else if (!n::isNormalized($v))
+            {
+                if (preg_match('//u', $v)) $v = n::normalize($v);
+                else $v = u::utf8_encode($v);
+            }
         }
 
         reset($a[$i]);
