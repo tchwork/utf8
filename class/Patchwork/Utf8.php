@@ -41,6 +41,11 @@ class Utf8
         if (preg_match("/[\x80-\xFF]/", $s))
         {
             $s = n::normalize($s, n::NFKD);
+
+            // Temporary fix for Turkish "small dotless i" issue until Unicode fix this
+            // see http://unicode.org/cldr/trac/ticket/2970 and http://unicode.org/cldr/trac/ticket/3335
+            $s = preg_replace('#\x{0131}#u', 'i', $s);
+
             $s = preg_replace('/\p{Mn}+/u', '', $s);
             $s = iconv('UTF-8', 'ASCII' . ('glibc' !== ICONV_IMPL ? '//IGNORE' : '') . '//TRANSLIT', $s);
         }
