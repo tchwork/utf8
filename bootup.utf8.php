@@ -12,6 +12,11 @@ use Normalizer as n;
 use Patchwork\Utf8 as u;
 use Patchwork\PHP\Shim as s;
 
+// Don't bootup multiple times
+
+if (defined('PATCHWORK-UTF8_LOADED')) return;
+define('PATCHWORK-UTF8_LOADED', true);
+
 
 // Check PCRE
 
