@@ -19,19 +19,19 @@ function initAll()
 {
     preg_match('/^.$/u', '§') or user_error('PCRE is compiled without UTF-8 support', E_USER_WARNING);
 
-    require __DIR__ . '.php';
-
-    u\initXml();
+    u\initUtf8Encode();
     u\initMbstring();
     u\initIconv();
     u\initExif();
     u\initIntl();
     u\initLocale();
+
+    require __DIR__ . '.php';
 }
 
-function initXml()
+function initUtf8Encode()
 {
-    if (!extension_loaded('xml'))
+    if (!function_exists('utf8_encode'))
     {
         require dirname(__DIR__) . '/PHP/Shim/Xml.php';
 
@@ -82,7 +82,7 @@ function initMbstring()
             ini_set('mbstring.language', 'uni');
         }
     }
-    else
+    else if (!defined('MB_OVERLOAD_MAIL'))
     {
         require dirname(__DIR__) . '/PHP/Shim/Mbstring.php';
 
@@ -145,7 +145,7 @@ function initIconv()
             ini_set('iconv.output_encoding', 'UTF-8');
         }
     }
-    else
+    else if (!defined('ICONV_IMPL'))
     {
         require dirname(__DIR__) . '/PHP/Shim/Iconv.php';
 
@@ -206,6 +206,8 @@ function initExif()
 
 function initIntl()
 {
+    if (defined('GRAPHEME_CLUSTER_RX')) return;
+
     if (!extension_loaded('intl'))
     {
         require dirname(__DIR__) . '/PHP/Shim/Normalizer.php';

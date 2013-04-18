@@ -10,6 +10,8 @@
 
 use Patchwork\Utf8 as u;
 
+if (function_exists('Patchwork\Utf8\initAll')) return;
+
 require __DIR__ . '/class/Patchwork/Utf8/bootup.php';
 
 u\initAll();
