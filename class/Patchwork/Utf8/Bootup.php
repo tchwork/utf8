@@ -17,6 +17,16 @@ use Patchwork\PHP\Shim as s;
 
 class Bootup
 {
+    static function initAll()
+    {
+        self::initUtf8Encode();
+        self::initMbstring();
+        self::initIconv();
+        self::initExif();
+        self::initIntl();
+        self::initLocale();
+    }
+
     static function initUtf8Encode()
     {
         if (!function_exists('utf8_encode'))
@@ -263,7 +273,7 @@ class Bootup
         }
     }
 
-    static function filterRequestInputs($normalization_form = n::NFC)
+    static function filterRequestInputs($normalization_form = /* n::NFC = */ 4)
     {
         // Ensures inputs are well formed UTF-8
         // When not, assumes Windows-1252 and converts to UTF-8
@@ -278,7 +288,7 @@ class Bootup
             foreach ($a[$i] as &$v)
             {
                 if (is_array($v)) $a[$len++] =& $v;
-                else if (!n::isNormalized($v, $normalization_form))
+                else if (preg_match('/[\x80-\xFF]/') && !n::isNormalized($v, $normalization_form))
                 {
                     if (preg_match('//u', $v)) $v = n::normalize($v, $normalization_form);
                     else $v = u::utf8_encode($v);

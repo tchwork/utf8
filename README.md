@@ -77,15 +77,13 @@ the `php composer.phar install` command to install it:
         }
     }
 
-Then, early in your bootstrap sequence, you have to configure your environment.
-The easiest way to do so is by taking inspiration from or just including the
-`bootup.utf8.php` file. This will enable the portability layer and configure PHP
-for an UTF-8 aware and portable application.
+Then, early in your bootstrap sequence, you have to configure your environment:
 
-The `Patchwork\Utf8` class exposes its features through static methods. Just
-add a `use Patchwork\Utf8 as u;` at the beginning of your files, then when UTF-8
-awareness is required, prefix the string function by `u::`:
-`echo strlen("déjà");` may become `echo u::strlen("déjà");` eg.
+```php
+\Patchwork\Utf8\Bootup::initAll(); // Enables the portablity layer and configures PHP for UTF-8
+\Patchwork\Utf8\Bootup::filterRequestUri(); // Redirects to an UTF-8 encoded URL it's not already the case
+\Patchwork\Utf8\Bootup::filterRequestInputs(); // Sanitizes HTTP inputs to UTF-8 NFC
+```
 
 Run `phpunit` in the `tests/` directory to see the code in action.
 
