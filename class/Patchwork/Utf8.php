@@ -40,8 +40,12 @@ class Utf8
     {
         if (preg_match("/[\x80-\xFF]/", $s))
         {
+            static $translitExtra = false;
+            $translitExtra or $translitExtra = self::getData('translit_extra');
+
             $s = n::normalize($s, n::NFKD);
             $s = preg_replace('/\p{Mn}+/u', '', $s);
+            $s = str_replace($translitExtra[0], $translitExtra[1], $s);
             $s = iconv('UTF-8', 'ASCII' . ('glibc' !== ICONV_IMPL ? '//IGNORE' : '') . '//TRANSLIT', $s);
         }
 

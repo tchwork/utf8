@@ -48,6 +48,7 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame( '', u::toAscii('') );
         $this->assertSame( 'deja vu', u::toAscii('déjà vu') );
+        $this->assertSame( 'i', u::toAscii('ı') );
     }
 
     /**
