@@ -8,12 +8,14 @@
  * GNU General Public License v2.0 (http://gnu.org/licenses/gpl-2.0.txt).
  */
 
-use Patchwork\Utf8 as u;
+use Patchwork\Utf8\Bootup as b;
 
-if (function_exists('Patchwork\Utf8\initAll')) return;
+b::initUtf8Encode();
+b::initMbstring();
+b::initIconv();
+b::initExif();
+b::initIntl();
+b::initLocale();
 
-require __DIR__ . '/class/Patchwork/Utf8/bootup.php';
-
-u\initAll();
-u\filterRequestUri();
-u\filterRequestInputs();
+b::filterRequestUri();
+b::filterRequestInputs();

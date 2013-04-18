@@ -16,6 +16,8 @@
         "php": ">=5.3.0"
     },
     "autoload": {
-        "files": ["bootup.utf8.php"]
+        "psr-0": {
+            "Patchwork": "class/"
+        }
     }
 }
