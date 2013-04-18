@@ -8,10 +8,7 @@
  * GNU General Public License v2.0 (http://gnu.org/licenses/gpl-2.0.txt).
  */
 
-/**
- * Normalizer plugs Patchwork\PHP\Shim\Normalizer as a PHP implementation
- * of intl's Normalizer when the intl extension in not enabled.
- */
-class Normalizer extends Patchwork\PHP\Shim\Normalizer
-{
-}
+use Patchwork\PHP\Shim as s;
+
+function utf8_encode($s) {return s\Xml::utf8_encode($s);};
+function utf8_decode($s) {return s\Xml::utf8_decode($s);};

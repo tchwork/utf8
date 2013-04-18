@@ -12,4 +12,4 @@ require $dir . '/class/Patchwork/PHP/Shim/Normalizer.php';
 
 class_exists('Normalizer', false) or require $dir . '/class/Normalizer.php';
 
-require $dir . '/bootup.utf8.php';
+\Patchwork\Utf8\Bootup::initAll();
