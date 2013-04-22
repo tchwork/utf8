@@ -31,13 +31,7 @@ function initAll()
 
 function initUtf8Encode()
 {
-    if (!function_exists('utf8_encode'))
-    {
-        require dirname(__DIR__) . '/PHP/Shim/Xml.php';
-
-        function utf8_encode($s) {return s\Xml::utf8_encode($s);};
-        function utf8_decode($s) {return s\Xml::utf8_decode($s);};
-    }
+    function_exists('utf8_encode') or require __DIR__ . '/bootup/utf8_encode.php';
 }
 
 function initMbstring()
@@ -84,36 +78,7 @@ function initMbstring()
     }
     else if (!defined('MB_OVERLOAD_MAIL'))
     {
-        require dirname(__DIR__) . '/PHP/Shim/Mbstring.php';
-
-        define('MB_OVERLOAD_MAIL', 1);
-        define('MB_OVERLOAD_STRING', 2);
-        define('MB_OVERLOAD_REGEX', 4);
-        define('MB_CASE_UPPER', 0);
-        define('MB_CASE_LOWER',1);
-        define('MB_CASE_TITLE', 2);
-
-        function mb_convert_encoding($s, $to, $from = INF) {return s\Mbstring::mb_convert_encoding($s, $to, $from);};
-        function mb_decode_mimeheader($s) {return s\Mbstring::mb_decode_mimeheader($s);};
-        function mb_encode_mimeheader($s, $charset = INF, $transfer_enc = INF, $lf = INF, $indent = INF) {return s\Mbstring::mb_encode_mimeheader($s, $charset, $transfer_enc, $lf, $indent);};
-        function mb_convert_case($s, $mode, $enc = INF) {return s\Mbstring::mb_convert_case($s, $mode, $enc);};
-        function mb_internal_encoding($enc = INF) {return s\Mbstring::mb_internal_encoding($enc);};
-        function mb_list_encodings() {return s\Mbstring::mb_list_encodings();};
-        function mb_parse_str($s, &$result = array()) {return parse_str($s, $result);};
-        function mb_strlen($s, $enc = INF) {return s\Mbstring::mb_strlen($s, $enc);};
-        function mb_strpos($s, $needle, $offset = 0, $enc = INF) {return s\Mbstring::mb_strpos($s, $needle, $offset, $enc);};
-        function mb_strtolower($s, $enc = INF) {return s\Mbstring::mb_strtolower($s, $enc);};
-        function mb_strtoupper($s, $enc = INF) {return s\Mbstring::mb_strtoupper($s, $enc);};
-        function mb_substitute_character($char = INF) {return s\Mbstring::mb_substitute_character($char);};
-        function mb_substr_count($s, $needle) {return substr_count($s, $needle);};
-        function mb_substr($s, $start, $length = 2147483647, $enc = INF) {return s\Mbstring::mb_substr($s, $start, $length, $enc);};
-        function mb_stripos($s, $needle, $offset = 0, $enc = INF) {return s\Mbstring::mb_stripos($s, $needle, $offset, $enc);};
-        function mb_stristr($s, $needle, $part = false, $enc = INF) {return s\Mbstring::mb_stristr($s, $needle, $part, $enc);};
-        function mb_strrchr($s, $needle, $part = false, $enc = INF) {return s\Mbstring::mb_strrchr($s, $needle, $part, $enc);};
-        function mb_strrichr($s, $needle, $part = false, $enc = INF) {return s\Mbstring::mb_strrichr($s, $needle, $part, $enc);};
-        function mb_strripos($s, $needle, $offset = 0, $enc = INF) {return s\Mbstring::mb_strripos($s, $needle, $offset, $enc);};
-        function mb_strrpos($s, $needle, $offset = 0, $enc = INF) {return s\Mbstring::mb_strrpos($s, $needle, $offset, $enc);};
-        function mb_strstr($s, $needle, $part = false, $enc = INF) {return s\Mbstring::mb_strstr($s, $needle, $part, $enc);};
+        require __DIR__ . '/bootup/mbstring.php';
     }
 }
 
@@ -147,44 +112,7 @@ function initIconv()
     }
     else if (!defined('ICONV_IMPL'))
     {
-        require dirname(__DIR__) . '/PHP/Shim/Iconv.php';
-
-        define('ICONV_IMPL', 'Patchwork');
-        define('ICONV_VERSION', '1.0');
-        define('ICONV_MIME_DECODE_STRICT', 1);
-        define('ICONV_MIME_DECODE_CONTINUE_ON_ERROR', 2);
-
-        function iconv($from, $to, $s) {return s\Iconv::iconv($from, $to, $s);};
-        function iconv_get_encoding($type = 'all') {return s\Iconv::iconv_get_encoding($type);};
-        function iconv_set_encoding($type, $charset) {return s\Iconv::iconv_set_encoding($type, $charset);};
-        function iconv_mime_encode($name, $value, $pref = INF) {return s\Iconv::iconv_mime_encode($name, $value, $pref);};
-        function ob_iconv_handler($buffer, $mode) {return s\Iconv::ob_iconv_handler($buffer, $mode);};
-        function iconv_mime_decode_headers($encoded_headers, $mode = 0, $charset = INF) {return s\Iconv::iconv_mime_decode_headers($encoded_headers, $mode, $charset);};
-
-        if (extension_loaded('mbstring'))
-        {
-            function iconv_strlen($s, $enc = INF) {return mb_strlen($s, $enc);};
-            function iconv_strpos($s, $needle, $offset = 0, $enc = INF) {return mb_strpos($s, $needle, $offset, $enc);};
-            function iconv_strrpos($s, $needle, $enc = INF) {return mb_strrpos($s, $needle, $enc);};
-            function iconv_substr($s, $start, $length = 2147483647, $enc = INF) {return mb_substr($s, $start, $length, $enc);};
-            function iconv_mime_decode($encoded_headers, $mode = 0, $charset = INF) {return mb_decode_mimeheader($encoded_headers, $mode, $charset);};
-        }
-        else
-        {
-            if (extension_loaded('xml'))
-            {
-                function iconv_strlen($s, $enc = INF) {return s\Iconv::strlen1($s, $enc);};
-            }
-            else
-            {
-                function iconv_strlen($s, $enc = INF) {return s\Iconv::strlen2($s, $enc);};
-            }
-
-            function iconv_strpos($s, $needle, $offset = 0, $enc = INF) {return s\Mbstring::mb_strpos($s, $needle, $offset, $enc);};
-            function iconv_strrpos($s, $needle, $enc = INF) {return s\Mbstring::mb_strrpos($s, $needle, $enc);};
-            function iconv_substr($s, $start, $length = 2147483647, $enc = INF) {return s\Mbstring::mb_substr($s, $start, $length, $enc);};
-            function iconv_mime_decode($encoded_headers, $mode = 0, $charset = INF) {return s\Iconv::iconv_mime_decode($encoded_headers, $mode, $charset);};
-        }
+        require __DIR__ . '/bootup/iconv.php';
     }
 }
 
@@ -210,27 +138,7 @@ function initIntl()
 
     if (!extension_loaded('intl'))
     {
-        require dirname(__DIR__) . '/PHP/Shim/Normalizer.php';
-        require dirname(__DIR__) . '/PHP/Shim/Intl.php';
-
-        class Normalizer extends s\Normalizer {}
-
-        function normalizer_is_normalized($s, $form = s\Normalizer::NFC) {return s\Normalizer::isNormalized($s, $form);};
-        function normalizer_normalize($s, $form = s\Normalizer::NFC) {return s\Normalizer::normalize($s, $form);};
-
-        define('GRAPHEME_EXTR_COUNT', 0);
-        define('GRAPHEME_EXTR_MAXBYTES', 1);
-        define('GRAPHEME_EXTR_MAXCHARS', 2);
-
-        function grapheme_extract($s, $size, $type = 0, $start = 0, &$next = 0) {return s\Intl::grapheme_extract($s, $size, $type, $start, $next);};
-        function grapheme_stripos($s, $needle, $offset = 0) {return s\Intl::grapheme_stripos($s, $needle, $offset);};
-        function grapheme_stristr($s, $needle, $before_needle = false) {return s\Intl::grapheme_stristr($s, $needle, $before_needle);};
-        function grapheme_strlen($s) {return s\Intl::grapheme_strlen($s);};
-        function grapheme_strpos($s, $needle, $offset = 0) {return s\Intl::grapheme_strpos($s, $needle, $offset);};
-        function grapheme_strripos($s, $needle, $offset = 0) {return s\Intl::grapheme_strripos($s, $needle, $offset);};
-        function grapheme_strrpos($s, $needle, $offset = 0) {return s\Intl::grapheme_strrpos($s, $needle, $offset);};
-        function grapheme_strstr($s, $needle, $before_needle = false) {return s\Intl::grapheme_strstr($s, $needle, $before_needle);};
-        function grapheme_substr($s, $start, $len = 2147483647) {return s\Intl::grapheme_substr($s, $start, $len);};
+        require __DIR__ . '/bootup/intl.php';
     }
     else if ('à' === grapheme_substr('éà', 1, -2))
     {
