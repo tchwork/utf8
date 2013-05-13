@@ -81,7 +81,7 @@ Then, early in your bootstrap sequence, you have to configure your environment:
 
 ```php
 \Patchwork\Utf8\Bootup::initAll(); // Enables the portablity layer and configures PHP for UTF-8
-\Patchwork\Utf8\Bootup::filterRequestUri(); // Redirects to an UTF-8 encoded URL it's not already the case
+\Patchwork\Utf8\Bootup::filterRequestUri(); // Redirects to an UTF-8 encoded URL if it's not already the case
 \Patchwork\Utf8\Bootup::filterRequestInputs(); // Sanitizes HTTP inputs to UTF-8 NFC
 ```
 
@@ -89,7 +89,8 @@ Run `phpunit` in the `tests/` directory to see the code in action.
 
 Make sure that you are confident about using UTF-8 by reading
 [Character Sets / Character Encoding Issues](http://www.phpwact.org/php/i18n/charsets)
-and [Handling UTF-8 with PHP](http://www.phpwact.org/php/i18n/utf-8).
+and [Handling UTF-8 with PHP](http://www.phpwact.org/php/i18n/utf-8),
+or [PHP et UTF-8](http://julp.lescigales.org/articles/3-php-et-utf-8.html) for french readers.
 
 You should also get familar with the concept of
 [Unicode Normalization](http://en.wikipedia.org/wiki/Unicode_equivalence) and
