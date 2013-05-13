@@ -182,7 +182,7 @@ class Bootup
         }
     }
 
-    static function filterRequestInputs($normalization_form = /* n::NFC = */ 4)
+    static function filterRequestInputs($normalization_form = /* n::NFC = */ 4, $pre_lead_comb = '◌')
     {
         // Ensures inputs are well formed UTF-8
         // When not, assumes Windows-1252 and converts to UTF-8
@@ -199,7 +199,11 @@ class Bootup
                 if (is_array($v)) $a[$len++] =& $v;
                 else if (preg_match('/[\x80-\xFF]/') && !n::isNormalized($v, $normalization_form))
                 {
-                    if (preg_match('//u', $v)) $v = n::normalize($v, $normalization_form);
+                    if (preg_match('//u', $v))
+                    {
+                        $v = n::normalize($v, $normalization_form);
+                        if (isset($pre_lead_comb[0]) && preg_match('/^\p{Mn}/u', $v)) $v = $pre_lead_comb . $v; // Prevent leading combining chars
+                    }
                     else $v = u::utf8_encode($v);
                 }
             }
