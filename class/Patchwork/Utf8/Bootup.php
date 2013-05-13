@@ -202,7 +202,7 @@ class Bootup
                     if (preg_match('//u', $v))
                     {
                         $v = n::normalize($v, $normalization_form);
-                        if (isset($pre_lead_comb[0]) && preg_match('/^\p{Mn}/u', $v)) $v = $pre_lead_comb . $v; // Prevent leading combining chars
+                        if ($v[0] >= "\x80" && isset($pre_lead_comb[0]) && preg_match('/^\p{Mn}/u', $v)) $v = $pre_lead_comb . $v; // Prevent leading combining chars
                     }
                     else $v = u::utf8_encode($v);
                 }
