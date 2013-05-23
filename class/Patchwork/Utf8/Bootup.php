@@ -197,7 +197,7 @@ class Bootup
             foreach ($a[$i] as &$v)
             {
                 if (is_array($v)) $a[$len++] =& $v;
-                else if (preg_match('/[\x80-\xFF]/') && !n::isNormalized($v, $normalization_form))
+                else if (preg_match('/[\x80-\xFF]/', $v) && !n::isNormalized($v, $normalization_form))
                 {
                     if (preg_match('//u', $v))
                     {
