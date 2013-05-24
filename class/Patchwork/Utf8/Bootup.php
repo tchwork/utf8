@@ -197,14 +197,22 @@ class Bootup
             foreach ($a[$i] as &$v)
             {
                 if (is_array($v)) $a[$len++] =& $v;
-                else if (preg_match('/[\x80-\xFF]/', $v) && !n::isNormalized($v, $normalization_form))
+                else if (preg_match('/[\x80-\xFF]/', $v))
                 {
-                    if (preg_match('//u', $v))
+                    if (n::isNormalized($v, $normalization_form)) $w = '';
+                    else
                     {
-                        $v = n::normalize($v, $normalization_form);
-                        if ($v[0] >= "\x80" && isset($pre_lead_comb[0]) && preg_match('/^\p{Mn}/u', $v)) $v = $pre_lead_comb . $v; // Prevent leading combining chars
+                        $w = n::normalize($v, $normalization_form);
+                        if (false === $w) $v = u::utf8_encode($v);
+                        else $v = $w;
                     }
-                    else $v = u::utf8_encode($v);
+
+                    if ($v[0] >= "\x80" && false !== $w && isset($pre_lead_comb[0]) && preg_match('/^\p{Mn}/u', $v))
+                    {
+                        // Prevent leading combining chars
+                        // for NFC-safe concatenations.
+                        $v = $pre_lead_comb . $v;
+                    }
                 }
             }
 
