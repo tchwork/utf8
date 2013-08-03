@@ -86,14 +86,14 @@ class Mbstring
 
         if ('base64' === $to_encoding) return base64_encode($s);
 
-        if ('html-entities' === $to_encoding)
+        if ('html-entities' === strtolower($to_encoding))
         {
             'html-entities' === $from_encoding && $from_encoding = 'Windows-1252';
             'utf-8' === $from_encoding || $s = iconv($from_encoding, 'UTF-8//IGNORE', $s);
             return preg_replace_callback('/[\x80-\xFF]+/', array(__CLASS__, 'html_encoding_callback'), $s);
         }
 
-        if ('html-entities' === $from_encoding)
+        if ('html-entities' === strtolower($from_encoding))
         {
             $s = html_entity_decode($s, ENT_COMPAT, 'UTF-8');
             $from_encoding = 'UTF-8';
