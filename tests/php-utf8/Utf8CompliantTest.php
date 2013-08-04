@@ -22,13 +22,13 @@ class Utf8CompliantTest extends PHPUnit_Framework_TestCase
 
     public function test_invalid_utf8()
     {
-        $str = "Iñtërnâtiôn\xe9àlizætiøn";
+        $str = "Iñtërnâtiôn\xE9àlizætiøn";
         $this->assertFalse(u::isUtf8($str));
     }
 
     public function test_invalid_utf8_ascii()
     {
-        $str = "this is an invalid char '\xe9' here";
+        $str = "this is an invalid char '\xE9' here";
         $this->assertFalse(u::isUtf8($str));
     }
 
@@ -40,61 +40,61 @@ class Utf8CompliantTest extends PHPUnit_Framework_TestCase
 
     public function test_valid_two_octet_id()
     {
-        $str = "\xc3\xb1";
+        $str = "\xC3\xB1";
         $this->assertTrue(u::isUtf8($str));
     }
 
     public function test_invalid_two_octet_sequence()
     {
-        $str = "Iñtërnâtiônàlizætiøn \xc3\x28 Iñtërnâtiônàlizætiøn";
+        $str = "Iñtërnâtiônàlizætiøn \xC3\x28 Iñtërnâtiônàlizætiøn";
         $this->assertFalse(u::isUtf8($str));
     }
 
     public function test_invalid_id_between_twoAnd_three()
     {
-        $str = "Iñtërnâtiônàlizætiøn\xa0\xa1Iñtërnâtiônàlizætiøn";
+        $str = "Iñtërnâtiônàlizætiøn\xA0\xA1Iñtërnâtiônàlizætiøn";
         $this->assertFalse(u::isUtf8($str));
     }
 
     public function test_valid_three_octet_id()
     {
-        $str = "Iñtërnâtiônàlizætiøn\xe2\x82\xa1Iñtërnâtiônàlizætiøn";
+        $str = "Iñtërnâtiônàlizætiøn\xE2\x82\xA1Iñtërnâtiônàlizætiøn";
         $this->assertTrue(u::isUtf8($str));
     }
 
     public function test_invalid_three_octet_sequence_second()
     {
-        $str = "Iñtërnâtiônàlizætiøn\xe2\x28\xa1Iñtërnâtiônàlizætiøn";
+        $str = "Iñtërnâtiônàlizætiøn\xE2\x28\xA1Iñtërnâtiônàlizætiøn";
         $this->assertFalse(u::isUtf8($str));
     }
 
     public function test_invalid_three_octet_sequence_third()
     {
-        $str = "Iñtërnâtiônàlizætiøn\xe2\x82\x28Iñtërnâtiônàlizætiøn";
+        $str = "Iñtërnâtiônàlizætiøn\xE2\x82\x28Iñtërnâtiônàlizætiøn";
         $this->assertFalse(u::isUtf8($str));
     }
 
     public function test_valid_four_octet_id()
     {
-        $str = "Iñtërnâtiônàlizætiøn\xf0\x90\x8c\xbcIñtërnâtiônàlizætiøn";
+        $str = "Iñtërnâtiônàlizætiøn\xF0\x90\x8C\xBCIñtërnâtiônàlizætiøn";
         $this->assertTrue(u::isUtf8($str));
     }
 
     public function test_invalid_four_octet_sequence()
     {
-        $str = "Iñtërnâtiônàlizætiøn\xf0\x28\x8c\xbcIñtërnâtiônàlizætiøn";
+        $str = "Iñtërnâtiônàlizætiøn\xF0\x28\x8C\xBCIñtërnâtiônàlizætiøn";
         $this->assertFalse(u::isUtf8($str));
     }
 
     public function test_invalid_five_octet_sequence()
     {
-        $str = "Iñtërnâtiônàlizætiøn\xf8\xa1\xa1\xa1\xa1Iñtërnâtiônàlizætiøn";
+        $str = "Iñtërnâtiônàlizætiøn\xF8\xA1\xA1\xA1\xA1Iñtërnâtiônàlizætiøn";
         $this->assertFalse(u::isUtf8($str));
     }
 
     public function test_invalid_six_octet_sequence()
     {
-        $str = "Iñtërnâtiônàlizætiøn\xfc\xa1\xa1\xa1\xa1\xa1Iñtërnâtiônàlizætiøn";
+        $str = "Iñtërnâtiônàlizætiøn\xFC\xA1\xA1\xA1\xA1\xA1Iñtërnâtiônàlizætiøn";
         $this->assertFalse(u::isUtf8($str));
     }
 }

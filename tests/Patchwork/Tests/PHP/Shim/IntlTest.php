@@ -48,7 +48,10 @@ class IntlTest extends \PHPUnit_Framework_TestCase
      */
     function testGrapheme_extract_todo()
     {
-        $this->assertSame( 'a', grapheme_extract('abc', 1, GRAPHEME_EXTR_MAXBYTES) );
+        if (extension_loaded('intl'))
+        {
+            $this->assertSame( 'a', grapheme_extract('abc', 1, GRAPHEME_EXTR_MAXBYTES) );
+        }
 
         try
         {

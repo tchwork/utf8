@@ -22,7 +22,7 @@ class Utf8StrposTest extends PHPUnit_Framework_TestCase
 
     public function test_utf8_invalid()
     {
-        $str = "Iñtërnâtiôn\xe9àlizætiøn";
+        $str = "Iñtërnâtiôn\xE9àlizætiøn";
         $this->assertFalse(u::strpos($str, 'æ'));
     }
 

@@ -34,7 +34,7 @@ class Utf8OrdTest extends PHPUnit_Framework_TestCase
 
     public function test_4_byte_char()
     {
-        $str = "\xf0\x90\x8c\xbc";
+        $str = "\xF0\x90\x8C\xBC";
         $this->assertEquals(66364, u::ord($str));
     }
 }

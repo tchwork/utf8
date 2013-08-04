@@ -108,10 +108,12 @@ HEADERS;
             'From' => '<foo@example.com>',
             'Subject' => '=?ks_c_5601-1987?B?UkU6odk=?=',
             'X-Foo' => '=?ks_c_5601-1987?B?UkU6odk=?= Foo',
-            'X-Bar' => '=?ks_c_5601-1987?B?UkU6odk=?=Foo',
+            'X-Bar' => '=?ks_c_5601-1987?B?UkU6odk=?= Foo',
             'To' => '<test@example.com>',
         );
 
         $this->assertSame( $result, iconv_mime_decode_headers($headers, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8') );
+
+        $this->markTestIncomplete( "This currently does not test the pure PHP implementation" );
     }
 }

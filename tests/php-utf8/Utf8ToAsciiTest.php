@@ -22,7 +22,7 @@ class Utf8ToAsciiTest extends PHPUnit_Framework_TestCase
 
     public function test_invalid_char()
     {
-        $str = "tes\xe9ting";
+        $str = "tes\xE9ting";
         $this->assertEmpty(u::toAscii($str));
     }
 
