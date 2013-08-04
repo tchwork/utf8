@@ -71,6 +71,8 @@ class IntlTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame( 3, p::grapheme_strlen('한국어') );
         $this->assertSame( 3, p::grapheme_strlen(n::normalize('한국어', n::NFD)) );
+
+        $this->assertNull( p::grapheme_strlen("\xE9") );
     }
 
     /**
