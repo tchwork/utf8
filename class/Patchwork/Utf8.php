@@ -88,7 +88,7 @@ class Utf8
 
     static function substr($s, $start, $len = 2147483647)
     {
-        static $bug62759;
+/**/    static $bug62759;
 
 /**/    isset($bug62759) or $bug62759 = extension_loaded('intl') && 'à' === grapheme_substr('éà', 1, -2);
 
