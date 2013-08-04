@@ -165,7 +165,16 @@ class IntlTest extends \PHPUnit_Framework_TestCase
 
     function testGrapheme_bugs()
     {
-        $this->assertSame( 17, grapheme_stripos('der Straße nach Paris', 'Paris') ); // Expected fail: the non-bugged result is 16
-        $this->assertSame( 'aris', grapheme_stristr('der Straße nach Paris', 'Paris') );  // Expected fail: the non-bugged result is Paris
+        if (PHP_VERSION_ID < 50501 )
+        {
+            // Buggy behavior see https://bugs.php.net/61860
+            $this->assertSame( 17, grapheme_stripos('der Straße nach Paris', 'Paris') );
+            $this->assertSame( 'aris', grapheme_stristr('der Straße nach Paris', 'Paris') );
+        }
+        else
+        {
+            $this->assertSame( 16, grapheme_stripos('der Straße nach Paris', 'Paris') );
+            $this->assertSame( 'Paris', grapheme_stristr('der Straße nach Paris', 'Paris') );
+        }
     }
 }

@@ -108,18 +108,32 @@ class Utf8
 
     static function stripos($s, $needle, $offset = 0)
     {
-        // Don't use grapheme_stripos because of https://bugs.php.net/61860
-        if ($offset < 0) $offset = 0;
-        if (!$needle = mb_stripos($s, $needle, $offset, 'UTF-8')) return $needle;
-        return grapheme_strlen(iconv_substr($s, 0, $needle, 'UTF-8'));
+/**/    if (PHP_VERSION_ID < 50501)
+/**/    {
+            // Don't use grapheme_stripos because of https://bugs.php.net/61860
+            if ($offset < 0) $offset = 0;
+            if (!$needle = mb_stripos($s, $needle, $offset, 'UTF-8')) return $needle;
+            return grapheme_strlen(iconv_substr($s, 0, $needle, 'UTF-8'));
+/**/    }
+/**/    else
+/**/    {
+            return grapheme_stripos($s, $needle, $offset);
+/**/    }
     }
 
     static function strripos($s, $needle, $offset = 0)
     {
-        // Don't use grapheme_strripos because of https://bugs.php.net/61860
-        if ($offset < 0) $offset = 0;
-        if (!$needle = mb_strripos($s, $needle, $offset, 'UTF-8')) return $needle;
-        return grapheme_strlen(iconv_substr($s, 0, $needle, 'UTF-8'));
+/**/    if (PHP_VERSION_ID < 50501)
+/**/    {
+            // Don't use grapheme_strripos because of https://bugs.php.net/61860
+            if ($offset < 0) $offset = 0;
+            if (!$needle = mb_strripos($s, $needle, $offset, 'UTF-8')) return $needle;
+            return grapheme_strlen(iconv_substr($s, 0, $needle, 'UTF-8'));
+/**/    }
+/**/    else
+/**/    {
+            return grapheme_strripos($s, $needle, $offset);
+/**/    }
     }
 
     static function stristr($s, $needle, $before_needle = false)
