@@ -11,6 +11,39 @@ use Normalizer as n;
 class MbstringTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_internal_encoding
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_list_encodings
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_substitute_character
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    function testmb_stubs()
+    {
+        $this->assertFalse( p::mb_substitute_character('?') );
+        $this->assertSame( 'none', p::mb_substitute_character() );
+
+        $this->assertContains( 'UTF-8', p::mb_list_encodings() );
+
+        $this->assertTrue( p::mb_internal_encoding('utf-8') );
+        $this->assertFalse( p::mb_internal_encoding('no-no') );
+        $this->assertSame( 'utf-8', p::mb_internal_encoding() );
+
+        p::mb_encode_mimeheader('');
+        $this->assertFalse( true, 'mb_encode_mimeheader() is bugged. Please use iconv_mime_encode() instead');
+    }
+
+    /**
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_convert_encoding
+     */
+    function testmb_convert_enconding()
+    {
+        $this->assertSame( utf8_decode('déjà'), p::mb_convert_encoding('déjà', 'Windows-1252') );
+        $this->assertSame( base64_encode('déjà'), p::mb_convert_encoding('déjà', 'Base64') );
+        $this->assertSame( 'd&eacute;j&agrave;', p::mb_convert_encoding('déjà', 'Html-entities') );
+        $this->assertSame( 'déjà', p::mb_convert_encoding(base64_encode('déjà'), 'Utf-8', 'Base64') );
+        $this->assertSame( 'déjà', p::mb_convert_encoding('d&eacute;j&agrave;', 'Utf-8', 'Html-entities') );
+    }
+
+    /**
      * @covers Patchwork\PHP\Shim\Mbstring::mb_strtolower
      * @covers Patchwork\PHP\Shim\Mbstring::mb_strtoupper
      * @covers Patchwork\PHP\Shim\Mbstring::mb_convert_case
@@ -134,6 +167,8 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Patchwork\PHP\Shim\Mbstring::mb_strstr
      * @covers Patchwork\PHP\Shim\Mbstring::mb_stristr
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strrchr
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strrichr
      */
     function testmb_strstr()
     {
@@ -142,5 +177,18 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame( '국어', p::mb_strstr('한국어', '국') );
         $this->assertSame( 'ÉJÀ', p::mb_stristr('DÉJÀ', 'é') );
+
+        $this->assertSame( 'éjàdéjà', p::mb_strstr('déjàdéjà', 'é') );
+        $this->assertSame( 'ÉJÀDÉJÀ', p::mb_stristr('DÉJÀDÉJÀ', 'é') );
+        $this->assertSame( 'ςσb', p::mb_stristr('aςσb', 'ΣΣ') );
+        $this->assertSame( 'éjà', p::mb_strrchr('déjàdéjà', 'é') );
+        $this->assertSame( 'ÉJÀ', p::mb_strrichr('DÉJÀDÉJÀ', 'é') );
+
+        $this->assertSame( 'd', p::mb_strstr('déjàdéjà', 'é', true) );
+        $this->assertSame( 'D', p::mb_stristr('DÉJÀDÉJÀ', 'é', true) );
+        $this->assertSame( 'a', p::mb_stristr('aςσb', 'ΣΣ', true) );
+        $this->assertSame( 'déjàd', p::mb_strrchr('déjàdéjà', 'é', true) );
+        $this->assertSame( 'DÉJÀD', p::mb_strrichr('DÉJÀDÉJÀ', 'é', true) );
+        $this->assertSame( 'Paris', p::mb_stristr('der Straße nach Paris', 'Paris') );
     }
 }

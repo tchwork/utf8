@@ -112,7 +112,7 @@ class Mbstring
 
     static function mb_encode_mimeheader($s, $charset = INF, $transfer_encoding = INF, $linefeed = INF, $indent = INF)
     {
-        user_error('mb_encode_mimeheader() is bugged. Please use iconv_mime_encode() instead.');
+        user_error('mb_encode_mimeheader() is bugged. Please use iconv_mime_encode() instead', E_USER_WARNING);
     }
 
 
@@ -282,6 +282,7 @@ class Mbstring
 
     static function mb_strrchr($haystack, $needle, $part = false, $encoding = INF)
     {
+        INF === $encoding && $encoding = self::$internal_encoding;
         $needle = self::mb_substr($needle, 0, 1, $encoding);
         $pos = iconv_strrpos($haystack, $needle, $encoding);
         return self::getSubpart($pos, $part, $haystack, $encoding);
@@ -322,7 +323,7 @@ class Mbstring
 
     protected static function html_encoding_callback($m)
     {
-        return htmlentities($m, ENT_COMPAT, 'UTF-8');
+        return htmlentities($m[0], ENT_COMPAT, 'UTF-8');
     }
 
     protected static function title_case_callback($s)
