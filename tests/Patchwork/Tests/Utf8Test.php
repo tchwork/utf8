@@ -229,7 +229,7 @@ oooooooooooooooooooooo",
 
         $this->assertSame( $e, u::count_chars($c, 1) );
         $this->assertSame( $e, u::count_chars($c) );
-        $this->assertFalse( true, 'The previous line should trigger a warning (the only allowed $mode is 1)' );
+        $this->assertFalse( true, 'The only allowed $mode is 1' );
     }
 
     /**
@@ -246,12 +246,16 @@ oooooooooooooooooooooo",
 
     /**
      * @covers Patchwork\Utf8::str_pad
+     * @expectedException PHPUnit_Framework_Error_Warning
      */
     function testStr_pad()
     {
         $this->assertSame( 'ÉÈà-à-à-à-', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_RIGHT) );
         $this->assertSame( 'à-à-à-à-ÉÈ', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_LEFT ) );
         $this->assertSame( 'à-à-ÉÈà-à-', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_BOTH ) );
+
+        u::str_pad('ÉÈ', 10, 'à-', -1);
+        $this->assertFalse( true, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH" );
     }
 
     /**
@@ -274,11 +278,15 @@ oooooooooooooooooooooo",
 
     /**
      * @covers Patchwork\Utf8::str_split
+     * @expectedException PHPUnit_Framework_Error_Warning
      */
     function testStr_split()
     {
         $this->assertSame( array('d','é','j','à'), u::str_split('déjà', 1) );
         $this->assertSame( array('dé','jà'), u::str_split('déjà', 2) );
+
+        u::str_split('déjà', 0);
+        $this->assertFalse( true, "The length of each segment must be greater than zero" );
     }
 
     /**
@@ -287,6 +295,24 @@ oooooooooooooooooooooo",
     function testStr_word_count()
     {
         $this->assertSame( array(0 => 'déjà', 5 => 'vu'), u::str_word_count('déjà vu', 2) );
+        $this->assertSame( 2, u::str_word_count('déjà vu', 0) );
+        $this->assertSame( 2, u::str_word_count('déjà vu') );
+    }
+
+    /**
+     * @covers Patchwork\Utf8::strtr
+     */
+    function testStrtr()
+    {
+        $this->assertSame( 'déja', u::strtr('dejà', 'eà', 'éa') );
+    }
+
+    /**
+     * @covers Patchwork\Utf8::number_format
+     */
+    function testNumber_format()
+    {
+        $this->assertSame( '1×234¡56', u::number_format(1234.557, 2, '¡', '×') );
     }
 
     /**

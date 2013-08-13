@@ -26,6 +26,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse( @grapheme_extract(array(), 0) );
         $this->assertFalse( @p::grapheme_extract(array(), 0) );
+        $this->assertFalse( p::grapheme_extract('abc', 1, -1) );
 
         $this->assertSame( grapheme_extract('',    0), p::grapheme_extract('',    0) );
         $this->assertSame( grapheme_extract('abc', 0), p::grapheme_extract('abc', 0) );
@@ -40,28 +41,12 @@ class IntlTest extends \PHPUnit_Framework_TestCase
         $this->assertSame( '한', p::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next) );
         $this->assertSame( '국', p::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next) );
         $this->assertSame( '어', p::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next) );
-        $this->assertSame( '', p::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next) );
-    }
+        $this->assertFalse( p::grapheme_extract('한국어', 1, GRAPHEME_EXTR_COUNT, $next, $next) );
 
-    /**
-     * @covers Patchwork\PHP\Shim\Intl::grapheme_extract
-     */
-    function testGrapheme_extract_todo()
-    {
-        if (extension_loaded('intl'))
-        {
-            $this->assertSame( 'a', grapheme_extract('abc', 1, GRAPHEME_EXTR_MAXBYTES) );
-        }
+        $this->assertSame( str_repeat('-', 69000), p::grapheme_extract(str_repeat('-', 70000), 69000, GRAPHEME_EXTR_COUNT) );
 
-        try
-        {
-            $this->assertSame( 'a', p::grapheme_extract('abc', 1, GRAPHEME_EXTR_MAXBYTES) );
-            $this->assertFalse( true, "As the current implementation is incomplete, this point should not be reached currently." );
-        }
-        catch (\PHPUnit_Framework_Error_Warning $e)
-        {
-            $this->markTestIncomplete( "The current implementation doesn't handle unaligned binary offsets nor modes other than GRAPHEME_EXTR_COUNT." );
-        }
+        $this->assertSame( 'd' , p::grapheme_extract('déjà', 2, GRAPHEME_EXTR_MAXBYTES) );
+        $this->assertSame( 'dé', p::grapheme_extract('déjà', 2, GRAPHEME_EXTR_MAXCHARS) );
     }
 
     /**

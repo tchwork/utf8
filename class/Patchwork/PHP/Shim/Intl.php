@@ -28,9 +28,7 @@ class Intl
 {
     static function grapheme_extract($s, $size, $type = GRAPHEME_EXTR_COUNT, $start = 0, &$next = 0)
     {
-        if (is_array($s)) return !user_error(__METHOD__ . '() expects parameter 1 to be string, array given', E_USER_WARNING);
-
-        $s     = (string) $s;
+        $s = (string) substr($s, $start);
         $size  = (int) $size;
         $type  = (int) $type;
         $start = (int) $start;
@@ -39,32 +37,27 @@ class Intl
         if (0 === $size) return '';
 
         $next = $start;
-        $s = substr($s, $start); //TODO: seek to the first character boundary when needed
 
-        if (GRAPHEME_EXTR_COUNT === $type)
+        $s = preg_split('/(' . GRAPHEME_CLUSTER_RX . ')/u', "\r\n" .  $s, $size + 1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+
+        if (!isset($s[1])) return false;
+
+        $i = 1;
+        $ret = '';
+
+        do
         {
-            if ($size > 65635)
-            {
-                // Workaround PCRE limiting quantifiers to 65635.
-                $rx = floor(sqrt($size));
-                $size -= $rx * $rx; // This can't be greather than 65635: the native intl is limited to 2Gio strings
-                $rx = '(?:' . GRAPHEME_CLUSTER_RX . "{{$rx}}){{$rx}}" . GRAPHEME_CLUSTER_RX . "{1,{$size}}";
-            }
-            else $rx = GRAPHEME_CLUSTER_RX . "{1,{$size}}";
+            if (GRAPHEME_EXTR_COUNT === $type) --$size;
+            else if (GRAPHEME_EXTR_MAXBYTES === $type) $size -= strlen($s[$i]);
+            else $size -= iconv_strlen($s[$i], 'UTF-8//IGNORE');
 
-            $s = preg_split("/({$rx})/u", $s, 2, PREG_SPLIT_DELIM_CAPTURE);
-            $next += strlen($s[0]);
-            $s = isset($s[1]) ? $s[1] : '';
+            if ($size >= 0) $ret .= $s[$i];
         }
-        else
-        {
-            //TODO
-            return !user_error(__METHOD__ . '() with GRAPHEME_EXTR_MAXBYTES or GRAPHEME_EXTR_MAXCHARS is not implemented', E_USER_WARNING);
-        }
+        while (isset($s[++$i]) && $size > 0);
 
-        $next += strlen($s);
+        $next += strlen($ret);
 
-        return $s;
+        return $ret;
     }
 
     static function grapheme_strlen($s)
