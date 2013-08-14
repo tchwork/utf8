@@ -108,7 +108,7 @@ class Utf8
 
     static function stripos($s, $needle, $offset = 0)
     {
-/**/    if (PHP_VERSION_ID < 50501)
+/**/    if (50418 > PHP_VERSION_ID || 50500 == PHP_VERSION_ID)
 /**/    {
             // Don't use grapheme_stripos because of https://bugs.php.net/61860
             if ($offset < 0) $offset = 0;
@@ -123,7 +123,7 @@ class Utf8
 
     static function strripos($s, $needle, $offset = 0)
     {
-/**/    if (PHP_VERSION_ID < 50501)
+/**/    if (50418 > PHP_VERSION_ID || 50500 == PHP_VERSION_ID)
 /**/    {
             // Don't use grapheme_strripos because of https://bugs.php.net/61860
             if ($offset < 0) $offset = 0;
