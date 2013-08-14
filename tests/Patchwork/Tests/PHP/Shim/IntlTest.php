@@ -150,7 +150,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
 
     function testGrapheme_bugs()
     {
-        if (PHP_VERSION_ID < 50501 )
+        if (PHP_VERSION_ID < 50501 && extension_loaded('intl'))
         {
             // Buggy behavior see https://bugs.php.net/61860
             $this->assertSame( 17, grapheme_stripos('der Straße nach Paris', 'Paris') );

@@ -11,31 +11,34 @@ class IconvTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @covers Patchwork\PHP\Shim\Iconv::iconv
-     * @covers Patchwork\PHP\Shim\Iconv::iconv_workaround52211
      */
     function testIconv()
     {
-        if (PHP_VERSION_ID >= 50400)
+        // Native iconv() behavior varies between versions and OS for these two tests
+        // See e.g. https://bugs.php.net/52211
+        if ('\\' === DIRECTORY_SEPARATOR)
+        {
+            $this->assertSame( PHP_VERSION_ID >= 50400 ? false : 'n', iconv('UTF-8', 'ISO-8859-1', 'nœud') );
+            $this->assertSame( 'nud', iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
+        }
+        else if (PHP_VERSION_ID >= 50400)
         {
             $this->assertSame( false, @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
             $this->assertSame( false, @iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
         }
         else
         {
-            // Expected buggy behavior. See https://bugs.php.net/52211
             $this->assertSame( 'n',   @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
             $this->assertSame( 'nud', @iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
         }
 
-        $this->assertFalse( @p::iconv_workaround52211('UTF-8', 'ISO-8859-1', 'nœud') );
-        $this->assertFalse( @p::iconv_workaround52211('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
-
-        $this->assertFalse( @p::iconv('UTF-8', 'ISO-8859-1', 'nœud') );
-        $this->assertFalse( @p::iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
+        // The recent Windows behavior is the most usefull
+        $this->assertFalse( p::iconv('UTF-8', 'ISO-8859-1', 'nœud') );
+        $this->assertSame( 'nud', p::iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
 
         $this->assertSame( utf8_decode('déjà'), p::iconv('CP1252', 'ISO-8859-1', utf8_decode('déjà')) );
         $this->assertSame( 'déjà', p::iconv('UTF-8', 'utf8', 'déjà') );
-        $this->assertSame( 'deja', p::iconv('UTF-8', 'US-ASCII//TRANSLIT', 'déjà') );
+        $this->assertSame( 'deja noeud', p::iconv('UTF-8', 'US-ASCII//TRANSLIT', 'déjà nœud') );
     }
 
     /**

@@ -481,35 +481,6 @@ class Iconv
         else return self::iconv('utf-8', $encoding, $s);
     }
 
-    static function iconv_workaround52211($in_charset, $out_charset, $str)
-    {
-        self::$last_error = false;
-        self::$error_handler = set_error_handler(array(__CLASS__, 'iconv_workaround52211_error_handler'));
-        $str = iconv($in_charset, $out_charset, $str);
-        restore_error_handler();
-        self::$error_handler = null;
-
-        if (true === self::$last_error && is_string($str))
-        {
-            self::$error_handler = null;
-            return false;
-        }
-
-        return $str;
-    }
-
-    protected static function iconv_workaround52211_error_handler($no, $msg, $file, $line, &$context)
-    {
-        if ($h = self::$error_handler)
-        {
-            $no = call_user_func_array($h, array($no, $msg, $file, $line, &$context));
-            self::$error_handler = $h;
-        }
-        else $no = false;
-        self::$last_error = true;
-        return $no;
-    }
-
     protected static function loadMap($type, $charset, &$map)
     {
         if (!isset(self::$convert_map[$type . $charset]))
@@ -613,34 +584,32 @@ class Iconv
                 else $i += $ulen;
             }
 
-            for (;;)
+            if (isset($map[$uchr]))
             {
-                if (isset($map[$uchr]))
+                $result .= $map[$uchr];
+            }
+            else if ($TRANSLIT)
+            {
+                if (isset(self::$translit_map[$uchr]))
                 {
-                    $result .= $map[$uchr];
-                    break;
+                    $uchr = self::$translit_map[$uchr];
                 }
-                else if ($TRANSLIT)
+                else if ($uchr >= "\xC3\x80")
                 {
-                    if (isset(self::$translit_map[$uchr]))
-                    {
-                        $uchr = self::$translit_map[$uchr];
-                        continue;
-                    }
-                    else
-                    {
-                        $uchr = \Normalizer::normalize($uchr, \Normalizer::NFD);
-                        $uchr = preg_split('/(.)/', $uchr, 2, PREG_SPLIT_DELIM_CAPTURE);
+                    $uchr = \Normalizer::normalize($uchr, \Normalizer::NFD);
+                    $uchr = preg_split('/(.)/', $uchr, 2, PREG_SPLIT_DELIM_CAPTURE);
 
-                        if (isset($uchr[2][0]))
-                        {
-                            $uchr = $uchr[1];
-                            continue;
-                        }
-                    }
+                    if (isset($uchr[2][0])) $uchr = $uchr[1];
+                    else if ($IGNORE) continue;
+                    else return false;
                 }
 
-                user_error(self::ERROR_ILLEGAL_CHARACTER);
+                $str = $uchr . substr($str, $i);
+                $len = strlen($str);
+                $i = 0;
+            }
+            else if (!$IGNORE)
+            {
                 return false;
             }
         }
