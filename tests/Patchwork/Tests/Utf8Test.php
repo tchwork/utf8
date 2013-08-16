@@ -57,7 +57,7 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
     function testStrtocasefold()
     {
         $this->assertSame( 'σσσ', u::strtocasefold('Σσς') );
-        $this->assertSame( 'ııii', u::strtocasefold('Iıİi', true, true) ); // Turkish
+        $this->assertSame( 'iıi̇i', u::strtocasefold('Iıİi') );
     }
 
     /**
