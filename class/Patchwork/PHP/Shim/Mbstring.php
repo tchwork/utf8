@@ -163,7 +163,7 @@ class Mbstring
                 }
                 else
                 {
-                    $s = substr_replace($s, $uchr, $i, $ulen);
+                    $s = substr_replace($s, $uchr, $i - $ulen, $ulen);
                     $len += $nlen - $ulen;
                     $i   += $nlen - $ulen;
                 }
