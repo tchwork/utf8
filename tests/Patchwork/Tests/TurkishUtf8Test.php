@@ -7,7 +7,6 @@ use Normalizer as n;
 
 /**
  * @covers Patchwork\TurkishUtf8::<!public>
- * @todo strcasecmp strnatcasecmp strccasecmp substr_compare
  */
 class TurkishUtf8Test extends \PHPUnit_Framework_TestCase
 {
@@ -27,6 +26,20 @@ class TurkishUtf8Test extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame( 'déjà ııii', u::strtolower('DÉJÀ Iıİi') );
         $this->assertSame( 'DÉJÀ IIİİ', u::strtoupper('Déjà Iıİi') );
+    }
+
+    /**
+     * @covers Patchwork\TurkishUtf8::strcasecmp
+     * @covers Patchwork\TurkishUtf8::strnatcasecmp
+     * @covers Patchwork\TurkishUtf8::strncasecmp
+     * @covers Patchwork\TurkishUtf8::substr_compare
+     */
+    function testStrCmp()
+    {
+        $this->assertSame( 0, u::strcasecmp('DÉJÀ Iıİi', 'déjà ııii') );
+        $this->assertSame( 0, u::strnatcasecmp('DÉJÀ Iıİi', 'déjà ııii') );
+        $this->assertSame( 0, u::strncasecmp('Iıİiabc', 'ııiidef', 4) );
+        $this->assertSame( 0, u::substr_compare('abcIıİidef', 'ııii', 3, 4, true) );
     }
 
     /**
@@ -66,10 +79,10 @@ class TurkishUtf8Test extends \PHPUnit_Framework_TestCase
      */
     function testLcFirst()
     {
-        $this->assertSame( 'ia', u::lcfirst('İa') );
-        $this->assertSame( 'ıa', u::lcfirst('Ia') );
-        $this->assertSame( 'İa', u::ucfirst('ia') );
-        $this->assertSame( 'Ia', u::ucfirst('ıa') );
-        $this->assertSame( 'İa Ia', u::ucwords('ia ıa') );
+        $this->assertSame( 'iia', u::lcfirst('İia') );
+        $this->assertSame( 'ııa', u::lcfirst('Iıa') );
+        $this->assertSame( 'İia', u::ucfirst('iia') );
+        $this->assertSame( 'Iıa', u::ucfirst('ııa') );
+        $this->assertSame( 'İia Iıa', u::ucwords('iia ııa') );
     }
 }

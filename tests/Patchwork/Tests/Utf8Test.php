@@ -74,8 +74,8 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      */
     function testStrCase()
     {
-        $this->assertSame( 'déjà σσς', u::strtolower('DÉJÀ Σσς') );
-        $this->assertSame( 'DÉJÀ ΣΣΣ', u::strtoupper('Déjà Σσς') );
+        $this->assertSame( 'déjà σσς iıii', u::strtolower('DÉJÀ Σσς Iıİi') );
+        $this->assertSame( 'DÉJÀ ΣΣΣ IIİI', u::strtoupper('Déjà Σσς Iıİi') );
     }
 
     /**
@@ -133,6 +133,25 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         $this->assertSame( 4, u::strlen($d) );
 
         $this->assertSame( 3, u::strlen(n::normalize('한국어', n::NFD)) );
+    }
+
+    /**
+     * @covers Patchwork\Utf8::strcasecmp
+     * @covers Patchwork\Utf8::strnatcasecmp
+     * @covers Patchwork\Utf8::strncasecmp
+     * @covers Patchwork\Utf8::substr_compare
+     */
+    function testStrCmp()
+    {
+        $this->assertTrue( 0 !== u::strcasecmp('İ', 'i') );
+        $this->assertTrue( 0 === u::strnatcasecmp('İ', 'i') );
+        $this->assertTrue( 0 !== u::strncasecmp('İabc', 'idef', 1) );
+        $this->assertTrue( 0 !== u::substr_compare('abcİdef', 'i', 3, 1, true) );
+
+        $this->assertTrue( 0 !== u::strcasecmp('I', 'ı') );
+        $this->assertTrue( 0 !== u::strnatcasecmp('I', 'ı') );
+        $this->assertTrue( 0 !== u::strncasecmp('Iabc', 'ıdef', 1) );
+        $this->assertTrue( 0 !== u::substr_compare('abcIdef', 'ı', 3, 1, true) );
     }
 
     /**
