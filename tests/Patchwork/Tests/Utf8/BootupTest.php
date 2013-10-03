@@ -26,6 +26,8 @@ class BootupTest extends \PHPUnit_Framework_TestCase
             'd' => $d,
         );
 
+        $_GET['e'] = $_GET;
+
         \Patchwork\Utf8\Bootup::filterRequestInputs();
 
         $expect = array(
@@ -34,6 +36,8 @@ class BootupTest extends \PHPUnit_Framework_TestCase
             'c' => $c,
             'd' => $c,
         );
+
+        $expect['e'] = $expect;
 
         $this->assertSame($expect, $_GET);
 

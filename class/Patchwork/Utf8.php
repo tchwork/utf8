@@ -247,9 +247,20 @@ class Utf8
     static function str_ireplace($search, $replace, $subject, &$count = null)
     {
         $search = (array) $search;
-        foreach ($search as &$s) $s = '' !== (string) $s ? '/' . preg_quote($s, '/') . '/ui' : '/^(?<=.)$/';
+
+        foreach ($search as $i => $s)
+        {
+            is_string($s) or $s = (string) $s;
+
+            if ('' === $s) $s = '/^(?<=.)$/';
+            else $s = '/' . preg_quote($s, '/') . '/ui';
+
+            $search[$i] = $s;
+        }
+
         $subject = preg_replace($search, $replace, $subject, -1, $replace);
         $count = $replace;
+
         return $subject;
     }
 

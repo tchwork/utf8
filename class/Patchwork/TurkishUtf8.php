@@ -73,9 +73,13 @@ class TurkishUtf8 extends Utf8
     static function str_ireplace($search, $replace, $subject, &$count = null)
     {
         $search = (array) $search;
-        foreach ($search as &$s)
+
+        foreach ($search as $i => $s)
         {
-            if ('' !== (string) $s)
+            is_string($s) or $s = (string) $s;
+
+            if ('' === $s) $s = '/^(?<=.)$/';
+            else
             {
                 $s = preg_quote($s, '/');
                 $s = strtr($s, array(
@@ -86,10 +90,13 @@ class TurkishUtf8 extends Utf8
                 ));
                 $s = "/{$s}/ui";
             }
-            else $s = '/^(?<=.)$/';
+
+            $search[$i] = $s;
         }
+
         $subject = preg_replace($search, $replace, $subject, -1, $replace);
         $count = $replace;
+
         return $subject;
     }
 
