@@ -197,21 +197,31 @@ class Bootup
             foreach ($a[$i] as &$v)
             {
                 if (is_array($v)) $a[$len++] =& $v;
-                else if (preg_match('/[\x80-\xFF]/', $v))
+                else
                 {
-                    if (n::isNormalized($v, $normalization_form)) $w = '';
-                    else
+                    if (false !== strpos($v, "\r"))
                     {
-                        $w = n::normalize($v, $normalization_form);
-                        if (false === $w) $v = u::utf8_encode($v);
-                        else $v = $w;
+                        // Workaround https://bugs.php.net/65732
+                        $v = str_replace("\r\n", "\n", $v);
+                        $v = strtr($v, "\r", "\n");
                     }
 
-                    if ($v[0] >= "\x80" && false !== $w && isset($pre_lead_comb[0]) && preg_match('/^\p{Mn}/u', $v))
+                    if (preg_match('/[\x80-\xFF]/', $v))
                     {
-                        // Prevent leading combining chars
-                        // for NFC-safe concatenations.
-                        $v = $pre_lead_comb . $v;
+                        if (n::isNormalized($v, $normalization_form)) $w = '';
+                        else
+                        {
+                            $w = n::normalize($v, $normalization_form);
+                            if (false === $w) $v = u::utf8_encode($v);
+                            else $v = $w;
+                        }
+
+                        if ($v[0] >= "\x80" && false !== $w && isset($pre_lead_comb[0]) && preg_match('/^\p{Mn}/u', $v))
+                        {
+                            // Prevent leading combining chars
+                            // for NFC-safe concatenations.
+                            $v = $pre_lead_comb . $v;
+                        }
                     }
                 }
             }
