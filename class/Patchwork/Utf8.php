@@ -80,6 +80,35 @@ class Utf8
 
     // PHP string functions that need UTF-8 awareness
 
+    static function json_decode($json, $assoc = false, $depth = 512, $options = 0)
+    {
+        if (false !== strpos($json, "\r"))
+        {
+            // Workaround https://bugs.php.net/65732
+            $json = str_replace("\r\n", "\n", $json);
+            $json = strtr($json, "\r", "\n");
+        }
+
+        if (preg_match('/[\x80-\xFF]/', $json))
+        {
+            if (n::isNormalized($j = $json) || false !== $j = n::normalize($j))
+            {
+                // Prevent leading combining chars in strings
+                // for NFC-safe concatenations.
+                $json = preg_replace('/(?<!\\\\)"(\p{Mn})/u', '"◌$1', $j);
+            }
+        }
+
+/**/    if (PHP_VERSION_ID < 50400)
+/**/    {
+            return json_decode($json, $assoc, $depth);
+/**/    }
+/**/    else
+/**/    {
+            return json_decode($json, $assoc, $depth, $options);
+/**/    }
+    }
+
     static function substr($s, $start, $len = 2147483647)
     {
 /**/    static $bug62759;
