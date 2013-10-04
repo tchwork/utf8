@@ -1,12 +1,14 @@
 Patchwork UTF-8
 ===============
 
-Patchwork UTF-8 provides both :
+Patchwork UTF-8 gives PHP developpers extensive, portable and performant
+handling of UTF-8 and [grapheme clusters](http://unicode.org/reports/tr29/).
 
-- a portability layer for Unicode handling in PHP, and
-- a class that mirrors the quasi complete set of native string functions,
-  enhanced to UTF-8 [grapheme clusters](http://unicode.org/reports/tr29/)
-  awareness.
+It provides both :
+
+- a portability layer for `mbstring`, `iconv`, and intl `Normalizer` and
+  `grapheme_*` functions,
+- an UTF-8 grapheme clusters aware replica of native string functions.
 
 It can also serve as a documentation source referencing the practical problems
 that arise when handling UTF-8 in PHP: Unicode concepts, related algorithms,
@@ -21,7 +23,8 @@ to run on many servers, you should be aware that these 4 extensions are not
 always enabled.
 
 Patchwork UTF-8 provides pure PHP implementations for 3 of those 4 extensions.
-Here is the set of portability-fallbacks that are currently implemented:
+`pcre` compiled with unicode support is required but is broadly available.
+The set of portability-fallbacks that are currently implemented is:
 
 - *utf8_encode, utf8_decode*,
 - `mbstring`: *mb_convert_encoding, mb_decode_mimeheader, mb_encode_mimeheader,
@@ -36,8 +39,6 @@ Here is the set of portability-fallbacks that are currently implemented:
   grapheme_strlen, grapheme_strpos, grapheme_strripos, grapheme_strrpos,
   grapheme_strstr, grapheme_substr*.
 
-`pcre` compiled with unicode support is required.
-
 Patchwork\Utf8
 --------------
 
@@ -49,6 +50,7 @@ carefully replicates native PHP string functions so that usage is very easy.
 
 Some more functions are also provided to help handling UTF-8 strings:
 
+- *filter()*: sanitizes an UTF-8 expected input string,
 - *isUtf8()*: checks if a string contains well formed UTF-8 data,
 - *toAscii()*: generic UTF-8 to ASCII transliteration,
 - *strtocasefold()*: unicode transformation for caseless matching,
@@ -60,9 +62,13 @@ strrichr, strtolower, strtoupper, wordwrap, chr, count_chars, ltrim, ord, rtrim,
 trim, str_ireplace, str_pad, str_shuffle, str_split, str_word_count, strcmp,
 strnatcmp, strcasecmp, strnatcasecmp, strncasecmp, strncmp, strcspn, strpbrk,
 strrev, strspn, strtr, substr_compare, substr_count, substr_replace, ucfirst,
-lcfirst, ucwords, number_format, utf8_encode, utf8_decode*.
+lcfirst, ucwords, number_format, utf8_encode, utf8_decode, json_decode,
+filter_input, filter_input_array*.
 
-Missing are *printf*-family functions.
+Notably missing (but hard to replicate) are *printf*-family functions.
+
+The implementation favors performance over full edge cases handling.
+It generally works on UTF-8 normalized strings and provides filters to get them.
 
 Usage
 -----
@@ -105,6 +111,7 @@ through. When dealing with badly formed UTF-8, you should not try to fix it.
 Instead, consider it as ISO-8859-1 and use `utf8_encode()` to get an UTF-8
 string. Don't forget also to choose one unicode normalization form and stick to
 it. NFC is the most in use today.
+`Patchwork\Utf8::filter($var)` implements this behavior.
 
 This library is orthogonal to `mbstring.func_overload` and will not work if the
 php.ini setting is enabled.
