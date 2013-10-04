@@ -347,4 +347,16 @@ oooooooooooooooooooooo",
         $this->assertSame( 1, preg_match('//u', $e) );
         $this->assertSame( $s, u::utf8_decode($e) );
     }
+
+    /**
+     * @covers Patchwork\Utf8::json_decode
+     */
+    function testJson_decode()
+    {
+        $c = "déjà";
+        $d = n::normalize($c, n::NFD);
+        $this->assertSame( $c, u::json_decode(json_encode($d)) );
+        $this->assertSame( '◌' . n::normalize(substr($d, 2)), u::json_decode('"' . substr($d, 2) . '"') );
+        $this->assertSame( "\n\n\n", u::json_decode('"\n\r\n\r"') );
+    }
 }

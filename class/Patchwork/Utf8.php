@@ -17,7 +17,7 @@ use Normalizer as n;
  * set of native PHP string functions that need UTF-8 awareness and more.
  * Missing are printf-family functions.
  */
-class Utf8
+class Utf8 extends Utf8\Bootup
 {
     protected static
 
@@ -80,33 +80,34 @@ class Utf8
 
     // PHP string functions that need UTF-8 awareness
 
+    static function filter_input($type, $var, $filter = FILTER_DEFAULT, $option = null)
+    {
+        if (4 > func_num_args()) $var = filter_input($type, $var, $filter);
+        else $var = filter_input($type, $var, $filter, $option);
+
+        return static::filter($var);
+    }
+
+    static function filter_input_array($type, $def = null, $add_empty = true)
+    {
+        if (2 > func_num_args()) $a = filter_input_array($type);
+        else $a = filter_input_array($type, $def, $add_empty);
+
+        return static::filter($a);
+    }
+
     static function json_decode($json, $assoc = false, $depth = 512, $options = 0)
     {
-        if (false !== strpos($json, "\r"))
-        {
-            // Workaround https://bugs.php.net/65732
-            $json = str_replace("\r\n", "\n", $json);
-            $json = strtr($json, "\r", "\n");
-        }
-
-        if (preg_match('/[\x80-\xFF]/', $json))
-        {
-            if (n::isNormalized($j = $json) || false !== $j = n::normalize($j))
-            {
-                // Prevent leading combining chars in strings
-                // for NFC-safe concatenations.
-                $json = preg_replace('/(?<!\\\\)"(\p{Mn})/u', '"◌$1', $j);
-            }
-        }
-
 /**/    if (PHP_VERSION_ID < 50400)
 /**/    {
-            return json_decode($json, $assoc, $depth);
+            $json = json_decode($json, $assoc, $depth);
 /**/    }
 /**/    else
 /**/    {
-            return json_decode($json, $assoc, $depth, $options);
+            $json = json_decode($json, $assoc, $depth, $options);
 /**/    }
+
+        return static::filter($json);
     }
 
     static function substr($s, $start, $len = 2147483647)
