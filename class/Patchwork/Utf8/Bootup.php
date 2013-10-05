@@ -16,12 +16,6 @@ use Patchwork\Utf8 as u;
 
 class Bootup
 {
-    public static
-
-    $normalizationForm = 4, // n::NFC
-    $leadingCombining = '◌';
-
-
     static function initAll()
     {
         self::initUtf8Encode();
@@ -188,66 +182,74 @@ class Bootup
         }
     }
 
-    static function filterRequestInputs()
+    static function filterRequestInputs($normalization_form = 4 /* n::NFC */, $leading_combining = '◌')
     {
         // Ensures inputs are well formed UTF-8
         // When not, assumes Windows-1252 and converts to UTF-8
         // Tests only values, not keys
 
-        $_ENV = static::filter($_ENV);
-        $_GET = static::filter($_GET);
-        $_POST = static::filter($_POST);
-        $_COOKIE = static::filter($_COOKIE);
-        $_SERVER = static::filter($_SERVER);
-        $_REQUEST = static::filter($_REQUEST);
-
-        foreach ($_FILES as $k => $v)
+        $a = array();
+        foreach ($_ENV as $k => $s) if (is_array($s)) $a[] =& $_ENV[$k]; else $_ENV[$k] = static::filterString($s, $normalization_form, $leading_combining);
+        foreach ($_GET as $k => $s) if (is_array($s)) $a[] =& $_GET[$k]; else $_GET[$k] = static::filterString($s, $normalization_form, $leading_combining);
+        foreach ($_POST as $k => $s) if (is_array($s)) $a[] =& $_POST[$k]; else $_POST[$k] = static::filterString($s, $normalization_form, $leading_combining);
+        foreach ($_COOKIE as $k => $s) if (is_array($s)) $a[] =& $_COOKIE[$k]; else $_COOKIE[$k] = static::filterString($s, $normalization_form, $leading_combining);
+        foreach ($_SERVER as $k => $s) if (is_array($s)) $a[] =& $_SERVER[$k]; else $_SERVER[$k] = static::filterString($s, $normalization_form, $leading_combining);
+        foreach ($_REQUEST as $k => $s) if (is_array($s)) $a[] =& $_REQUEST[$k]; else $_REQUEST[$k] = static::filterString($s, $normalization_form, $leading_combining);
+        foreach ($_FILES as $k => $s)
         {
-            $_FILES[$k]['name'] = static::filter($v['name']);
-            $_FILES[$k]['type'] = static::filter($v['type']);
+            if (is_array($s['name']))
+            {
+                $a[] =& $_FILES[$k]['name'];
+                $a[] =& $_FILES[$k]['type'];
+            }
+            else
+            {
+                $_FILES[$k]['name'] = static::filterString($s['name'], $normalization_form, $leading_combining);
+                $_FILES[$k]['type'] = static::filterString($s['type'], $normalization_form, $leading_combining);
+            }
+        }
+
+        $len = count($a);
+        for ($i = 0; $i < $len; ++$i)
+        {
+            foreach ($a[$i] as &$r)
+            {
+                $s = $r; // $r is a ref, $s a copy
+                if (is_array($s)) $a[$len++] =& $r;
+                else $r = static::filterString($s, $normalization_form, $leading_combining);
+            }
+
+            unset($a[$i]);
         }
     }
 
-    static function filter($var)
+    static function filterString($s, $normalization_form = 4 /* n::NFC */, $leading_combining = '◌')
     {
-        switch (gettype($var))
+        if (false !== strpos($s, "\r"))
         {
-        case 'array':
-            foreach ($var as $k => $v) $var[$k] = static::filter($v);
-            break;
-
-        case 'object':
-            foreach ($var as $k => $v) $var->$k = static::filter($v);
-            break;
-
-        case 'string':
-            if (false !== strpos($var, "\r"))
-            {
-                // Workaround https://bugs.php.net/65732
-                $var = str_replace("\r\n", "\n", $var);
-                $var = strtr($var, "\r", "\n");
-            }
-
-            if (preg_match('/[\x80-\xFF]/', $var))
-            {
-                if (n::isNormalized($var, static::$normalizationForm)) $n = '';
-                else
-                {
-                    $n = n::normalize($var, static::$normalizationForm);
-                    if (false === $n) $var = u::utf8_encode($var);
-                    else $var = $n;
-                }
-
-                if ($var[0] >= "\x80" && false !== $n && isset(static::$leadingCombining[0]) && preg_match('/^\p{Mn}/u', $var))
-                {
-                    // Prevent leading combining chars
-                    // for NFC-safe concatenations.
-                    $var = static::$leadingCombining . $var;
-                }
-            }
-            break;
+            // Workaround https://bugs.php.net/65732
+            $s = str_replace("\r\n", "\n", $s);
+            $s = strtr($s, "\r", "\n");
         }
 
-        return $var;
+        if (preg_match('/[\x80-\xFF]/', $s))
+        {
+            if (n::isNormalized($s, $normalization_form)) $n = '';
+            else
+            {
+                $n = n::normalize($s, $normalization_form);
+                if (false === $n) $s = u::utf8_encode($s);
+                else $s = $n;
+            }
+
+            if ($s[0] >= "\x80" && false !== $n && isset($leading_combining[0]) && preg_match('/^\p{Mn}/u', $s))
+            {
+                // Prevent leading combining chars
+                // for NFC-safe concatenations.
+                $s = $leading_combining . $s;
+            }
+        }
+
+        return $s;
     }
 }

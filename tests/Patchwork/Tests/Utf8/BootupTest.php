@@ -11,7 +11,7 @@ class BootupTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @covers Patchwork\Utf8\Bootup::filterRequestInputs
-     * @covers Patchwork\Utf8\Bootup::filter
+     * @covers Patchwork\Utf8\Bootup::filterString
      */
     function testFilterRequestInputs()
     {

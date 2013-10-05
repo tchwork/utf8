@@ -17,7 +17,7 @@ use Normalizer as n;
  * set of native PHP string functions that need UTF-8 awareness and more.
  * Missing are printf-family functions.
  */
-class Utf8 extends Utf8\Bootup
+class Utf8
 {
     protected static
 
@@ -50,6 +50,49 @@ class Utf8 extends Utf8\Bootup
         }
 
         return $s;
+    }
+
+    static function filter($var, $normalization_form = 4 /* n::NFC */, $leading_combining = '◌')
+    {
+        switch (gettype($var))
+        {
+        case 'array':
+            foreach ($var as $k => $v) $var[$k] = static::filter($v, $normalization_form, $leading_combining);
+            break;
+
+        case 'object':
+            foreach ($var as $k => $v) $var->$k = static::filter($v, $normalization_form, $leading_combining);
+            break;
+
+        case 'string':
+            if (false !== strpos($var, "\r"))
+            {
+                // Workaround https://bugs.php.net/65732
+                $var = str_replace("\r\n", "\n", $var);
+                $var = strtr($var, "\r", "\n");
+            }
+
+            if (preg_match('/[\x80-\xFF]/', $var))
+            {
+                if (n::isNormalized($var, $normalization_form)) $n = '';
+                else
+                {
+                    $n = n::normalize($var, $normalization_form);
+                    if (false === $n) $var = u::utf8_encode($var);
+                    else $var = $n;
+                }
+
+                if ($var[0] >= "\x80" && false !== $n && isset($leading_combining[0]) && preg_match('/^\p{Mn}/u', $var))
+                {
+                    // Prevent leading combining chars
+                    // for NFC-safe concatenations.
+                    $var = $leading_combining . $var;
+                }
+            }
+            break;
+        }
+
+        return $var;
     }
 
     // Unicode transformation for caseless matching
