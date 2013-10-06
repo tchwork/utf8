@@ -78,7 +78,7 @@ class Utf8
                 else
                 {
                     $n = n::normalize($var, $normalization_form);
-                    if (false === $n) $var = u::utf8_encode($var);
+                    if (false === $n) $var = static::utf8_encode($var);
                     else $var = $n;
                 }
 

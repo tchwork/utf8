@@ -359,4 +359,40 @@ oooooooooooooooooooooo",
         $this->assertSame( '◌' . n::normalize(substr($d, 2)), u::json_decode('"' . substr($d, 2) . '"') );
         $this->assertSame( "\n\n\n", u::json_decode('"\n\r\n\r"') );
     }
+
+    /**
+     * @covers Patchwork\Utf8::filter
+     */
+    function testFilter()
+    {
+        $c = "à";
+        $d = n::normalize($c, n::NFD);
+
+        $a = array(
+            'n' => 4,
+            'a' => "\xE9",
+            'b' => substr($d, 1),
+            'c' => $c,
+            'd' => $d,
+            'e' => "\n\r\n\r",
+        );
+
+        $a['f'] = (object) $a;
+
+        $b = \Patchwork\Utf8::filter($a);
+        $b['f'] = (array) $a['f'];
+
+        $expect = array(
+            'n' => 4,
+            'a' => 'é',
+            'b' => '◌' . substr($d, 1),
+            'c' => $c,
+            'd' => $c,
+            'e' => "\n\n\n",
+        );
+
+        $expect['f'] = $expect;
+
+        $this->assertSame($expect, $b);
+    }
 }
