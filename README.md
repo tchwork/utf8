@@ -1,5 +1,5 @@
-Patchwork UTF-8
-===============
+Patchwork UTF-8 for PHP
+=======================
 
 Patchwork UTF-8 gives PHP developpers extensive, portable and performant
 handling of UTF-8 and [grapheme clusters](http://unicode.org/reports/tr29/).
@@ -23,7 +23,7 @@ to run on many servers, you should be aware that these 4 extensions are not
 always enabled.
 
 Patchwork UTF-8 provides pure PHP implementations for 3 of those 4 extensions.
-`pcre` compiled with unicode support is required but is broadly available.
+`pcre` compiled with unicode support is required but is widely available.
 The set of portability-fallbacks that are currently implemented is:
 
 - *utf8_encode, utf8_decode*,
@@ -46,7 +46,8 @@ Patchwork\Utf8
 considered when working with generic Unicode strings. The `Patchwork\Utf8`
 class implements the quasi-complete set of native string functions that need
 UTF-8 grapheme clusters awareness. Function names, arguments and behavior
-carefully replicates native PHP string functions so that usage is very easy.
+carefully replicates native PHP string functions so that usage is
+straightforward.
 
 Some more functions are also provided to help handling UTF-8 strings:
 
@@ -69,6 +70,10 @@ Notably missing (but hard to replicate) are *printf*-family functions.
 
 The implementation favors performance over full edge cases handling.
 It generally works on UTF-8 normalized strings and provides filters to get them.
+
+As the turkish locale requires special cares, a `Patchwork\TurkishUtf8` class
+is provided for working with this locale. It clones all the features of
+`Patchwork\Utf8` but knows about the turkish specificities.
 
 Usage
 -----
@@ -108,10 +113,10 @@ to your application.
 
 Screen your input on the *outer perimeter* so that only well formed UTF-8 pass
 through. When dealing with badly formed UTF-8, you should not try to fix it.
-Instead, consider it as ISO-8859-1 and use `utf8_encode()` to get an UTF-8
-string. Don't forget also to choose one unicode normalization form and stick to
-it. NFC is the most in use today.
-`Patchwork\Utf8::filter($var)` implements this behavior.
+Instead, consider it as [CP-1252](http://wikipedia.org/wiki/CP-1252) and use
+`Patchwork\Utf8::utf8_encode()` to get an UTF-8 string. Don't forget also to
+choose one unicode normalization form and stick to it. NFC is now the defacto
+standard. `Patchwork\Utf8::filter($var)` implements this behavior.
 
 This library is orthogonal to `mbstring.func_overload` and will not work if the
 php.ini setting is enabled.
