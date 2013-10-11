@@ -8,7 +8,7 @@ use Patchwork\PHP\Shim\Normalizer as n;
  */
 class NormalizationTest extends \PHPUnit_Framework_TestCase
 {
-    public $unicodeVersion = 61;
+    public $unicodeVersion = 63;
 
     /**
      * @covers Patchwork\PHP\Shim\Normalizer::normalize

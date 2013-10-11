@@ -13,7 +13,7 @@ namespace Patchwork\PHP\Shim;
 /**
  * Normalizer is a PHP fallback implementation of the Normalizer class provided by the intl extension.
  *
- * It has been validated with Unicode 6.1 Normalization Conformance Test.
+ * It has been validated with Unicode 6.3 Normalization Conformance Test.
  * See http://www.unicode.org/reports/tr15/ for detailed info about Unicode normalizations.
  */
 class Normalizer
