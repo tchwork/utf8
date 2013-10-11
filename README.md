@@ -37,7 +37,8 @@ The set of portability-fallbacks that are currently implemented is:
   iconv_strlen, iconv_strpos, iconv_strrpos, iconv_substr*,
 - `intl`: *Normalizer, grapheme_extract, grapheme_stripos, grapheme_stristr,
   grapheme_strlen, grapheme_strpos, grapheme_strripos, grapheme_strrpos,
-  grapheme_strstr, grapheme_substr*.
+  grapheme_strstr, grapheme_substr, normalizer_is_normalized,
+  normalizer_normalize*.
 
 Patchwork\Utf8
 --------------
@@ -73,7 +74,7 @@ It generally works on UTF-8 normalized strings and provides filters to get them.
 
 As the turkish locale requires special cares, a `Patchwork\TurkishUtf8` class
 is provided for working with this locale. It clones all the features of
-`Patchwork\Utf8` but knows about the turkish specificities.
+`Patchwork\Utf8` but knows about the turkish specifics.
 
 Usage
 -----
@@ -103,7 +104,7 @@ Make sure that you are confident about using UTF-8 by reading
 and [Handling UTF-8 with PHP](http://www.phpwact.org/php/i18n/utf-8),
 or [PHP et UTF-8](http://julp.lescigales.org/articles/3-php-et-utf-8.html) for french readers.
 
-You should also get familar with the concept of
+You should also get familiar with the concept of
 [Unicode Normalization](http://en.wikipedia.org/wiki/Unicode_equivalence) and
 [Grapheme Clusters](http://unicode.org/reports/tr29/).
 
@@ -116,7 +117,7 @@ through. When dealing with badly formed UTF-8, you should not try to fix it.
 Instead, consider it as [CP-1252](http://wikipedia.org/wiki/CP-1252) and use
 `Patchwork\Utf8::utf8_encode()` to get an UTF-8 string. Don't forget also to
 choose one unicode normalization form and stick to it. NFC is now the defacto
-standard. `Patchwork\Utf8::filter($var)` implements this behavior.
+standard. `Patchwork\Utf8::filter()` implements this behavior.
 
 This library is orthogonal to `mbstring.func_overload` and will not work if the
 php.ini setting is enabled.
