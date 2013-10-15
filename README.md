@@ -52,7 +52,7 @@ straightforward.
 
 Some more functions are also provided to help handling UTF-8 strings:
 
-- *filter()*: sanitizes an UTF-8 expected input string,
+- *filter()*: normalizes to UTF-8 NFC, converting from [CP-1252](http://wikipedia.org/wiki/CP-1252) when needed,
 - *isUtf8()*: checks if a string contains well formed UTF-8 data,
 - *toAscii()*: generic UTF-8 to ASCII transliteration,
 - *strtocasefold()*: unicode transformation for caseless matching,
@@ -94,7 +94,7 @@ Then, early in your bootstrap sequence, you have to configure your environment:
 ```php
 \Patchwork\Utf8\Bootup::initAll(); // Enables the portablity layer and configures PHP for UTF-8
 \Patchwork\Utf8\Bootup::filterRequestUri(); // Redirects to an UTF-8 encoded URL if it's not already the case
-\Patchwork\Utf8\Bootup::filterRequestInputs(); // Sanitizes HTTP inputs to UTF-8 NFC
+\Patchwork\Utf8\Bootup::filterRequestInputs(); // Normalizes HTTP inputs to UTF-8 NFC
 ```
 
 Run `phpunit` in the `tests/` directory to see the code in action.
@@ -113,7 +113,8 @@ will not need to, and you will be introducing a significant performance overhead
 to your application.
 
 Screen your input on the *outer perimeter* so that only well formed UTF-8 pass
-through. When dealing with badly formed UTF-8, you should not try to fix it.
+through. When dealing with badly formed UTF-8, you should not try to fix it
+(see [Unicode Security Considerations](http://www.unicode.org/reports/tr36/#Deletion_of_Noncharacters)).
 Instead, consider it as [CP-1252](http://wikipedia.org/wiki/CP-1252) and use
 `Patchwork\Utf8::utf8_encode()` to get an UTF-8 string. Don't forget also to
 choose one unicode normalization form and stick to it. NFC is now the defacto
