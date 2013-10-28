@@ -10,6 +10,20 @@ use Normalizer as in;
  */
 class NormalizerTest extends \PHPUnit_Framework_TestCase
 {
+    function testConstants()
+    {
+        $rpn = new \ReflectionClass('Patchwork\PHP\Shim\Normalizer');
+        $rin = new \ReflectionClass('Normalizer');
+
+        $rpn = $rpn->getConstants();
+        $rin = $rin->getConstants();
+
+        ksort($rpn);
+        ksort($rin);
+
+        $this->assertSame( $rin, $rpn );
+    }
+
     /**
      * @covers Patchwork\PHP\Shim\Normalizer::isNormalized
      */
