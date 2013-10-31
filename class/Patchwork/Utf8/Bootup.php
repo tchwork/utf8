@@ -18,6 +18,8 @@ class Bootup
 {
     static function initAll()
     {
+        ini_set('default_charset', 'UTF-8');
+
         self::initUtf8Encode();
         self::initMbstring();
         self::initIconv();
