@@ -129,8 +129,6 @@ class Bootup
     {
         if (defined('GRAPHEME_CLUSTER_RX')) return;
 
-        preg_match('/^.$/u', '§') or user_error('PCRE is compiled without UTF-8 support', E_USER_WARNING);
-
         extension_loaded('intl') or require __DIR__ . '/Bootup/intl.php';
 
         if (PCRE_VERSION < '8.32')
