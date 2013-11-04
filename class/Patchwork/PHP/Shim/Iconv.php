@@ -38,11 +38,13 @@ class Iconv
     ERROR_WRONG_CHARSET     = 'iconv(): Wrong charset, conversion from `%s\' to `%s\' is not allowed';
 
 
-    protected static
+    public static
 
     $input_encoding = 'utf-8',
     $output_encoding = 'utf-8',
-    $internal_encoding = 'utf-8',
+    $internal_encoding = 'utf-8';
+
+    protected static
 
     $alias = array(
         'utf8' => 'utf-8',
