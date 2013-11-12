@@ -36,14 +36,19 @@ class Utf8
 
     // Generic UTF-8 to ASCII transliteration
 
-    static function toAscii($s)
+    static function toAscii($s, $options = null)
     {
+        static $defaultOptions = array(
+            'normalization_form' => n::NFKD,
+        );
+        $options = is_null($options) ? $defaultOptions : array_replace($defaultOptions, $options);
+
         if (preg_match("/[\x80-\xFF]/", $s))
         {
             static $translitExtra = false;
             $translitExtra or $translitExtra = self::getData('translit_extra');
 
-            $s = n::normalize($s, n::NFKD);
+            $s = n::normalize($s, $options['normalization_form']);
             $s = preg_replace('/\p{Mn}+/u', '', $s);
             $s = str_replace($translitExtra[0], $translitExtra[1], $s);
             $s = iconv('UTF-8', 'ASCII' . ('glibc' !== ICONV_IMPL ? '//IGNORE' : '') . '//TRANSLIT', $s);
