@@ -52,7 +52,7 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
 
         $l = setlocale(LC_CTYPE, '0');
 
-        if ('de_DE.utf8' === setlocale(LC_CTYPE, 'de_DE.utf8', '0'))
+        if ('glibc' === ICONV_IMPL && 'de_DE.utf8' === setlocale(LC_CTYPE, 'de_DE.utf8', '0'))
         {
             $this->assertSame( 'ae', u::toAscii('ä') );
         }

@@ -60,7 +60,9 @@ class Utf8
 /**/            else
 /**/            {
                     $t = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $c);
-                    isset($t[0]) or $t = '?';
+
+                    if (! isset($t[0])) $t = '?';
+                    else if (isset($t[1])) $t = ltrim($t, '\'`"^~');
 /**/            }
 
                 if ('?' === $t)
