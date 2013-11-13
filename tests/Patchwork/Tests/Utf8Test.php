@@ -49,6 +49,15 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         $this->assertSame( '', u::toAscii('') );
         $this->assertSame( 'deja vu', u::toAscii('déjà vu') );
         $this->assertSame( 'i', u::toAscii('ı') );
+
+        $l = setlocale(LC_CTYPE, '0');
+
+        if ('de_DE.utf8' === setlocale(LC_CTYPE, 'de_DE.utf8', '0'))
+        {
+            $this->assertSame( 'ae', u::toAscii('ä') );
+        }
+
+        setlocale(LC_CTYPE, $l);
     }
 
     /**

@@ -36,17 +36,52 @@ class Utf8
 
     // Generic UTF-8 to ASCII transliteration
 
-    static function toAscii($s)
+    static function toAscii($s, $subst_chr = '?')
     {
         if (preg_match("/[\x80-\xFF]/", $s))
         {
-            static $translitExtra = false;
+            static $translitExtra = array();
             $translitExtra or $translitExtra = self::getData('translit_extra');
 
-            $s = n::normalize($s, n::NFKD);
-            $s = preg_replace('/\p{Mn}+/u', '', $s);
-            $s = str_replace($translitExtra[0], $translitExtra[1], $s);
-            $s = iconv('UTF-8', 'ASCII' . ('glibc' !== ICONV_IMPL ? '//IGNORE' : '') . '//TRANSLIT', $s);
+            $s = n::normalize($s, n::NFKC);
+
+/**/        $glibc = 'glibc' === ICONV_IMPL;
+
+            preg_match_all('/./u', $s, $s);
+
+            foreach ($s[0] as &$c)
+            {
+                if (! isset($c[1])) continue;
+
+/**/            if ($glibc)
+/**/            {
+                    $t = iconv('UTF-8', 'ASCII//TRANSLIT', $c);
+/**/            }
+/**/            else
+/**/            {
+                    $t = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $c);
+                    isset($t[0]) or $t = '?';
+/**/            }
+
+                if ('?' === $t)
+                {
+                    if (isset($translitExtra[$c]))
+                    {
+                        $t = $translitExtra[$c];
+                    }
+                    else
+                    {
+                        $t = n::normalize($c, n::NFD);
+
+                        if ($t[0] < "\x80") $t = $t[0];
+                        else $t = $subst_chr;
+                    }
+                }
+
+                $c = $t;
+            }
+
+            $s = implode('', $s[0]);
         }
 
         return $s;
