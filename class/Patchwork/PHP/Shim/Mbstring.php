@@ -127,7 +127,7 @@ class Mbstring
         if (MB_CASE_TITLE == $mode)
         {
             $s = preg_replace_callback('/\b\p{Ll}/u', array(__CLASS__, 'title_case_upper'), $s);
-            $s = preg_replace_callback('/\B[\p{Lu}\p{Lt}]/u', array(__CLASS__, 'title_case_lower'), $s);
+            $s = preg_replace_callback('/\B[\p{Lu}\p{Lt}]+/u', array(__CLASS__, 'title_case_lower'), $s);
         }
         else
         {
