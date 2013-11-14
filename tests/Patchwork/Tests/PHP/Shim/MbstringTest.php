@@ -52,7 +52,7 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame( 'déjà σσς iiıi', p::mb_strtolower('DÉJÀ Σσς İIıi') );
         $this->assertSame( 'DÉJÀ ΣΣΣ İIII', p::mb_strtoupper('Déjà Σσς İIıi') );
-        $this->assertSame( 'Déjà Σσσ Iı Ii',  p::mb_convert_case('DÉJÀ ΣΣΣ ıı iI', MB_CASE_TITLE) );
+        $this->assertSame( 'Déjà Σσσ Iı Ii İi', p::mb_convert_case('DÉJÀ ΣΣΣ ıı iI İİ', MB_CASE_TITLE) );
     }
 
     /**

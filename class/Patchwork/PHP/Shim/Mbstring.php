@@ -124,55 +124,58 @@ class Mbstring
         if ('UTF-8' === strtoupper($encoding)) $encoding = INF;
         else $s = iconv($encoding, 'UTF-8//IGNORE', $s);
 
-        if (MB_CASE_UPPER == $mode)
+        if (MB_CASE_TITLE == $mode)
         {
-            static $upper;
-            isset($upper) || $upper = self::getData('upperCase');
-            $map = $upper;
+            $s = preg_replace_callback('/\b\p{Ll}/u', array(__CLASS__, 'title_case_upper'), $s);
+            $s = preg_replace_callback('/\B[\p{Lu}\p{Lt}]/u', array(__CLASS__, 'title_case_lower'), $s);
         }
         else
         {
-            if (self::MB_CASE_FOLD === $mode) $s = str_replace(self::$caseFold[0], self::$caseFold[1], $s);
-
-            static $lower;
-            isset($lower) || $lower = self::getData('lowerCase');
-            $map = $lower;
-        }
-
-        static $ulen_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
-
-        $i = 0;
-        $len = strlen($s);
-
-        while ($i < $len)
-        {
-            $ulen = $s[$i] < "\x80" ? 1 : $ulen_mask[$s[$i] & "\xF0"];
-            $uchr = substr($s, $i, $ulen);
-            $i += $ulen;
-
-            if (isset($map[$uchr]))
+            if (MB_CASE_UPPER == $mode)
             {
-                $uchr = $map[$uchr];
-                $nlen = strlen($uchr);
+                static $upper;
+                isset($upper) || $upper = self::getData('upperCase');
+                $map = $upper;
+            }
+            else
+            {
+                if (self::MB_CASE_FOLD === $mode) $s = str_replace(self::$caseFold[0], self::$caseFold[1], $s);
 
-                if ($nlen == $ulen)
+                static $lower;
+                isset($lower) || $lower = self::getData('lowerCase');
+                $map = $lower;
+            }
+
+            static $ulen_mask = array("\xC0" => 2, "\xD0" => 2, "\xE0" => 3, "\xF0" => 4);
+
+            $i = 0;
+            $len = strlen($s);
+
+            while ($i < $len)
+            {
+                $ulen = $s[$i] < "\x80" ? 1 : $ulen_mask[$s[$i] & "\xF0"];
+                $uchr = substr($s, $i, $ulen);
+                $i += $ulen;
+
+                if (isset($map[$uchr]))
                 {
-                    $nlen = $i;
-                    do $s[--$nlen] = $uchr[--$ulen];
-                    while ($ulen);
-                }
-                else
-                {
-                    $s = substr_replace($s, $uchr, $i - $ulen, $ulen);
-                    $len += $nlen - $ulen;
-                    $i   += $nlen - $ulen;
+                    $uchr = $map[$uchr];
+                    $nlen = strlen($uchr);
+
+                    if ($nlen == $ulen)
+                    {
+                        $nlen = $i;
+                        do $s[--$nlen] = $uchr[--$ulen];
+                        while ($ulen);
+                    }
+                    else
+                    {
+                        $s = substr_replace($s, $uchr, $i - $ulen, $ulen);
+                        $len += $nlen - $ulen;
+                        $i   += $nlen - $ulen;
+                    }
                 }
             }
-        }
-
-        if (MB_CASE_TITLE == $mode)
-        {
-            $s = preg_replace_callback('/\b\p{Ll}/u', array(__CLASS__, 'title_case_callback'), $s);
         }
 
         if (INF === $encoding) return $s;
@@ -326,7 +329,12 @@ class Mbstring
         return htmlentities($m[0], ENT_COMPAT, 'UTF-8');
     }
 
-    protected static function title_case_callback($s)
+    protected static function title_case_lower($s)
+    {
+        return self::mb_convert_case($s[0], MB_CASE_LOWER, 'UTF-8');
+    }
+
+    protected static function title_case_upper($s)
     {
         return self::mb_convert_case($s[0], MB_CASE_UPPER, 'UTF-8');
     }
