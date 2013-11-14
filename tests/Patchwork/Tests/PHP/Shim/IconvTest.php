@@ -18,7 +18,7 @@ class IconvTest extends \PHPUnit_Framework_TestCase
         // See e.g. https://bugs.php.net/52211
         if ('\\' === DIRECTORY_SEPARATOR)
         {
-            $this->assertSame( PHP_VERSION_ID >= 50400 ? false : 'n', iconv('UTF-8', 'ISO-8859-1', 'nœud') );
+            $this->assertSame( PHP_VERSION_ID >= 50400 ? false : 'n', @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
             $this->assertSame( 'nud', iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
         }
         else if (PHP_VERSION_ID >= 50400)
