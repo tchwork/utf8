@@ -41,7 +41,7 @@ class Utf8
         if (preg_match("/[\x80-\xFF]/", $s))
         {
             static $translitExtra = array();
-            $translitExtra or $translitExtra = self::getData('translit_extra');
+            $translitExtra or $translitExtra = static::getData('translit_extra');
 
             $s = n::normalize($s, n::NFKC);
 
@@ -142,7 +142,7 @@ class Utf8
         if ($full)
         {
             static $fullCaseFold = false;
-            $fullCaseFold || $fullCaseFold = self::getData('caseFolding_full');
+            $fullCaseFold || $fullCaseFold = static::getData('caseFolding_full');
 
             $s = str_replace($fullCaseFold[0], $fullCaseFold[1], $s);
         }

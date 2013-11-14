@@ -166,8 +166,8 @@ class Iconv
 
         // Load charset maps
 
-        if ( ('utf-8' !==  $in_charset && !self::loadMap('from.',  $in_charset,  $in_map))
-          || ('utf-8' !== $out_charset && !self::loadMap(  'to.', $out_charset, $out_map)) )
+        if ( ('utf-8' !==  $in_charset && !static::loadMap('from.',  $in_charset,  $in_map))
+          || ('utf-8' !== $out_charset && !static::loadMap(  'to.', $out_charset, $out_map)) )
         {
             user_error(sprintf(self::ERROR_WRONG_CHARSET, $in_charset, $out_charset));
             return false;
@@ -261,7 +261,7 @@ class Iconv
             if ( (ICONV_MIME_DECODE_CONTINUE_ON_ERROR & $mode)
               && 'utf-8' !== $c
               && !isset(self::$alias[$c])
-              && !self::loadMap('from.', $c,  $d) ) $d = false;
+              && !static::loadMap('from.', $c,  $d) ) $d = false;
             else if ('B' === strtoupper($str[$i+1])) $d = base64_decode($str[$i+2]);
             else $d = rawurldecode(strtr(str_replace('%', '%25', $str[$i+2]), '=_', '% '));
 
@@ -487,9 +487,9 @@ class Iconv
     {
         if (!isset(self::$convert_map[$type . $charset]))
         {
-            if (false === $map = self::getData($type . $charset))
+            if (false === $map = static::getData($type . $charset))
             {
-                if ('to.' === $type && self::loadMap('from.', $charset, $map)) $map = array_flip($map);
+                if ('to.' === $type && static::loadMap('from.', $charset, $map)) $map = array_flip($map);
                 else return false;
             }
 
@@ -564,7 +564,7 @@ class Iconv
         $ulen_mask = self::$ulen_mask;
         $valid     = self::$is_valid_utf8;
 
-        if ($TRANSLIT) self::$translit_map or self::$translit_map = self::getData('translit');
+        if ($TRANSLIT) self::$translit_map or self::$translit_map = static::getData('translit');
 
         $i = 0;
         $len = strlen($str);

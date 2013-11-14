@@ -57,17 +57,17 @@ class Normalizer
 
         if (!strlen($s)) return '';
 
-        if ($K && empty(self::$KD)) self::$KD = self::getData('compatibilityDecomposition');
+        if ($K && empty(self::$KD)) self::$KD = static::getData('compatibilityDecomposition');
 
         if (empty(self::$D))
         {
-            self::$D = self::getData('canonicalDecomposition');
-            self::$cC = self::getData('combiningClass');
+            self::$D = static::getData('canonicalDecomposition');
+            self::$cC = static::getData('combiningClass');
         }
 
         if ($C)
         {
-            if (empty(self::$C)) self::$C = self::getData('canonicalComposition');
+            if (empty(self::$C)) self::$C = static::getData('canonicalComposition');
             return self::recompose(self::decompose($s, $K));
         }
         else return self::decompose($s, $K);

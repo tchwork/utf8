@@ -134,7 +134,7 @@ class Mbstring
             if (MB_CASE_UPPER == $mode)
             {
                 static $upper;
-                isset($upper) || $upper = self::getData('upperCase');
+                isset($upper) || $upper = static::getData('upperCase');
                 $map = $upper;
             }
             else
@@ -142,7 +142,7 @@ class Mbstring
                 if (self::MB_CASE_FOLD === $mode) $s = str_replace(self::$caseFold[0], self::$caseFold[1], $s);
 
                 static $lower;
-                isset($lower) || $lower = self::getData('lowerCase');
+                isset($lower) || $lower = static::getData('lowerCase');
                 $map = $lower;
             }
 
