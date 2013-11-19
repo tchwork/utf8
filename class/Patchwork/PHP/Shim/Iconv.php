@@ -599,9 +599,8 @@ class Iconv
                 else if ($uchr >= "\xC3\x80")
                 {
                     $uchr = \Normalizer::normalize($uchr, \Normalizer::NFD);
-                    $uchr = preg_split('/(.)/', $uchr, 2, PREG_SPLIT_DELIM_CAPTURE);
 
-                    if (isset($uchr[2][0])) $uchr = $uchr[1];
+                    if ($uchr[0] < "\x80") $uchr = $uchr[0];
                     else if ($IGNORE) continue;
                     else return false;
                 }

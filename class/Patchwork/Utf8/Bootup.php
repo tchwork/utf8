@@ -196,29 +196,18 @@ class Bootup
         // When not, assumes Windows-1252 and converts to UTF-8
         // Tests only values, not keys
 
-        $a = array();
-        foreach ($_ENV as $k => $s) if (is_array($s)) $a[] =& $_ENV[$k]; else $_ENV[$k] = static::filterString($s, $normalization_form, $leading_combining);
-        foreach ($_GET as $k => $s) if (is_array($s)) $a[] =& $_GET[$k]; else $_GET[$k] = static::filterString($s, $normalization_form, $leading_combining);
-        foreach ($_POST as $k => $s) if (is_array($s)) $a[] =& $_POST[$k]; else $_POST[$k] = static::filterString($s, $normalization_form, $leading_combining);
-        foreach ($_COOKIE as $k => $s) if (is_array($s)) $a[] =& $_COOKIE[$k]; else $_COOKIE[$k] = static::filterString($s, $normalization_form, $leading_combining);
-        foreach ($_SERVER as $k => $s) if (is_array($s)) $a[] =& $_SERVER[$k]; else $_SERVER[$k] = static::filterString($s, $normalization_form, $leading_combining);
-        foreach ($_REQUEST as $k => $s) if (is_array($s)) $a[] =& $_REQUEST[$k]; else $_REQUEST[$k] = static::filterString($s, $normalization_form, $leading_combining);
-        foreach ($_FILES as $k => $s)
+        $a = array(&$_FILES, &$_ENV, &$_GET, &$_POST, &$_COOKIE, &$_SERVER, &$_REQUEST);
+
+        foreach ($a[0] as &$r)
         {
-            if (is_array($s['name']))
-            {
-                $a[] =& $_FILES[$k]['name'];
-                $a[] =& $_FILES[$k]['type'];
-            }
-            else
-            {
-                $_FILES[$k]['name'] = static::filterString($s['name'], $normalization_form, $leading_combining);
-                $_FILES[$k]['type'] = static::filterString($s['type'], $normalization_form, $leading_combining);
-            }
+            $a[] =& $r['name'];
+            $a[] =& $r['type'];
         }
 
-        $len = count($a);
-        for ($i = 0; $i < $len; ++$i)
+        unset($a[0]);
+
+        $len = count($a) + 1;
+        for ($i = 1; $i < $len; ++$i)
         {
             foreach ($a[$i] as &$r)
             {
