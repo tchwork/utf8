@@ -1,3 +1,11 @@
+## to be released
+
+- u::toAscii() is now locale sensitive and allows a substitution character
+- use LSB for more extension openness
+- fix mbstring MB_CASE_TITLE shim
+- small optimizations
+- add a changelog
+
 ## v1.1.14 (2013-11-04)
 
 - set default_charset to UTF-8 at bootup
@@ -39,7 +47,7 @@
 
 - know that PHP bug 61860 has been fixed in 5.5.1
 - fix intl::grapheme_strlen() shim on edge case
-- fix #5: case insensitive encodings checks for mbstring shim
+- fix case sensitive encoding checks for mbstring shim
 - some more fixes, tests and optimizations
 
 ## v1.1.8 since v1.1.0 (2013-05-24)
