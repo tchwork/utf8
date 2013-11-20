@@ -250,9 +250,10 @@ class Mbstring
         return INF !== $c ? false : 'none';
     }
 
-    static function mb_substr($s, $start, $length = 2147483647, $encoding = INF)
+    static function mb_substr($s, $start, $length = null, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
+
 
         if ($start < 0)
         {
@@ -260,7 +261,8 @@ class Mbstring
             if ($start < 0) $start = 0;
         }
 
-        if ($length < 0)
+        if (null === $length) $length = 2147483647;
+        else if ($length < 0)
         {
             $length = iconv_strlen($s, $encoding . '//IGNORE') + $length - $start;
             if ($length < 0) return '';
