@@ -21,5 +21,10 @@ class XmlTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame( utf8_encode($s), p::utf8_encode($s) );
         $this->assertSame( utf8_decode($e), p::utf8_decode($e) );
+
+        $s = 444;
+
+        $this->assertSame( utf8_encode($s), p::utf8_encode($s) );
+        $this->assertSame( utf8_decode($s), p::utf8_decode($s) );
     }
 }
