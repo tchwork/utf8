@@ -132,8 +132,7 @@ class Iconv
 
     static function iconv($in_charset, $out_charset, $str)
     {
-        if ('' === (string) $str) return '';
-
+        if ('' === $str .= '') return '';
 
         // Prepare for //IGNORE and //TRANSLIT
 
@@ -460,6 +459,7 @@ class Iconv
         if (0 === strncasecmp($encoding, 'utf-8', 5)) $encoding = INF;
         else if (false === $s = self::iconv($encoding, 'utf-8', $s)) return false;
 
+        $s .= '';
         $slen = self::iconv_strlen($s, 'utf-8');
         $start = (int) $start;
 

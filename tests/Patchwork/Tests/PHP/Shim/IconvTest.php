@@ -32,13 +32,15 @@ class IconvTest extends \PHPUnit_Framework_TestCase
             $this->assertSame( 'nud', @iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
         }
 
-        // The recent Windows behavior is the most usefull
+        // The recent Windows behavior is the most useful
         $this->assertFalse( p::iconv('UTF-8', 'ISO-8859-1', 'nœud') );
         $this->assertSame( 'nud', p::iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
 
         $this->assertSame( utf8_decode('déjà'), p::iconv('CP1252', 'ISO-8859-1', utf8_decode('déjà')) );
         $this->assertSame( 'déjà', p::iconv('UTF-8', 'utf8', 'déjà') );
         $this->assertSame( 'deja noeud', p::iconv('UTF-8', 'US-ASCII//TRANSLIT', 'déjà nœud') );
+
+        $this->assertSame( '4', p::iconv('UTF-8', 'UTF-8', 4) );
     }
 
     /**

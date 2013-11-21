@@ -36,14 +36,14 @@ class Normalizer
 
     static function isNormalized($s, $form = self::NFC)
     {
-        if (strspn($s, self::$ASCII) === strlen($s)) return true;
+        if (strspn($s .= '', self::$ASCII) === strlen($s)) return true;
         if (self::NFC === $form && preg_match('//u', $s) && !preg_match('/[^\x00-\x{2FF}]/u', $s)) return true;
         return false; // Pretend false as quick checks implementented in PHP won't be so quick
     }
 
     static function normalize($s, $form = self::NFC)
     {
-        if (!preg_match('//u', $s)) return false;
+        if (!preg_match('//u', $s .= '')) return false;
 
         switch ($form)
         {
@@ -55,7 +55,7 @@ class Normalizer
         default: return false;
         }
 
-        if (!strlen($s)) return '';
+        if ('' === $s) return '';
 
         if ($K && empty(self::$KD)) self::$KD = static::getData('compatibilityDecomposition');
 

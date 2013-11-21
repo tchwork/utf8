@@ -118,7 +118,7 @@ class Mbstring
 
     static function mb_convert_case($s, $mode, $encoding = INF)
     {
-        if ('' === $s) return '';
+        if ('' === $s .= '') return '';
 
         INF === $encoding && $encoding = self::$internal_encoding;
         if ('UTF-8' === strtoupper($encoding)) $encoding = INF;
@@ -209,7 +209,7 @@ class Mbstring
     static function mb_strpos ($haystack, $needle, $offset = 0, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
-        if ('' === (string) $needle)
+        if ('' === $needle .= '')
         {
             user_error(__METHOD__ . ': Empty delimiter', E_USER_WARNING);
             return false;
@@ -268,7 +268,7 @@ class Mbstring
             if ($length < 0) return '';
         }
 
-        return (string) iconv_substr($s, $start, $length, $encoding . '//IGNORE');
+        return iconv_substr($s, $start, $length, $encoding . '//IGNORE') . '';
     }
 
     static function mb_stripos($haystack, $needle, $offset = 0, $encoding = INF)
@@ -322,8 +322,8 @@ class Mbstring
         INF === $encoding && $encoding = self::$internal_encoding;
 
         if (false === $pos) return false;
-        if ($part) return self::mb_substr($haystack,    0,       $pos, $encoding);
-        else return self::mb_substr($haystack, $pos, 2147483647, $encoding);
+        if ($part) return self::mb_substr($haystack, 0, $pos, $encoding);
+        else return self::mb_substr($haystack, $pos, null, $encoding);
     }
 
     protected static function html_encoding_callback($m)

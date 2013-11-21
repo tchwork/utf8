@@ -2,8 +2,8 @@
 
 - u::toAscii() is now locale sensitive and allows a substitution character
 - use LSB for more extension openness
-- fix mbstring shim on edge cases
-- fix utf8_encode/decode shim on edge cases
+- fix casts to string
+- fix mbstring MB_CASE_TITLE shim on edge case
 - small optimizations
 - add a changelog
 

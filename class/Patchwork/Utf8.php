@@ -242,7 +242,7 @@ class Utf8
 
     static function stristr($s, $needle, $before_needle = false)
     {
-        if ('' === (string) $needle) return false;
+        if ('' === $needle .= '') return false;
         return mb_stristr($s, $needle, $before_needle, 'UTF-8');
     }
 
@@ -360,9 +360,7 @@ class Utf8
 
         foreach ($search as $i => $s)
         {
-            is_string($s) or $s = (string) $s;
-
-            if ('' === $s) $s = '/^(?<=.)$/';
+            if ('' === $s .= '') $s = '/^(?<=.)$/';
             else $s = '/' . preg_quote($s, '/') . '/ui';
 
             $search[$i] = $s;
@@ -467,8 +465,8 @@ class Utf8
         return $charlist;
     }
 
-    static function strcmp       ($a, $b) {return (string) $a === (string) $b ? 0 : strcmp(n::normalize($a, n::NFD), n::normalize($b, n::NFD));}
-    static function strnatcmp    ($a, $b) {return (string) $a === (string) $b ? 0 : strnatcmp(self::strtonatfold($a), self::strtonatfold($b));}
+    static function strcmp       ($a, $b) {return $a . '' === $b . '' ? 0 : strcmp(n::normalize($a, n::NFD), n::normalize($b, n::NFD));}
+    static function strnatcmp    ($a, $b) {return $a . '' === $b . '' ? 0 : strnatcmp(self::strtonatfold($a), self::strtonatfold($b));}
     static function strcasecmp   ($a, $b) {return self::strcmp   (static::strtocasefold($a), static::strtocasefold($b));}
     static function strnatcasecmp($a, $b) {return self::strnatcmp(static::strtocasefold($a), static::strtocasefold($b));}
     static function strncasecmp  ($a, $b, $len) {return self::strncmp(static::strtocasefold($a), static::strtocasefold($b), $len);}
@@ -476,7 +474,7 @@ class Utf8
 
     static function strcspn($s, $charlist, $start = 0, $len = 2147483647)
     {
-        if ('' === (string) $charlist) return null;
+        if ('' === $charlist .= '') return null;
         if ($start || 2147483647 != $len) $s = self::substr($s, $start, $len);
 
         return preg_match('/^(.*?)' . self::rxClass($charlist) . '/us', $s, $len) ? grapheme_strlen($len[1]) : grapheme_strlen($s);
