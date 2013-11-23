@@ -1,4 +1,4 @@
-## to be released
+## v1.1.15 (2013-11-23)
 
 - u::toAscii() is now locale sensitive and allows a substitution character
 - use LSB for more extension openness
