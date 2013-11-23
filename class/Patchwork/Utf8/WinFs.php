@@ -125,15 +125,66 @@ class WinFs
         else return file(self::ShortPath($f), $flags, $context);
     }
 
-    static function fileatime($f) {return fileatime(self::ShortPath($f));}
-    static function filectime($f) {return filectime(self::ShortPath($f));}
+    static function fileatime($f)
+    {
+        $a = self::absPath($f);
+        $fs = self::getFs();
+
+        if ($fs->FolderExists($a)) $f = $fs->GetFolder($a);
+        else if ($fs->FileExists($a) $f = $fs->GetFile($a);
+        else return filemtime($f);
+
+        return variant_date_to_timestamp($f->DateLastAccessed);
+    }
+
+    static function filectime($f)
+    {
+        $a = self::absPath($f);
+        $fs = self::getFs();
+
+        if ($fs->FolderExists($a)) $f = $fs->GetFolder($a);
+        else if ($fs->FileExists($a) $f = $fs->GetFile($a);
+        else return filemtime($f);
+
+        return variant_date_to_timestamp($f->DateCreated);
+    }
+
+    static function filemtime($f)
+    {
+        $a = self::absPath($f);
+        $fs = self::getFs();
+
+        if ($fs->FolderExists($a)) $f = $fs->GetFolder($a);
+        else if ($fs->FileExists($a) $f = $fs->GetFile($a);
+        else return filemtime($f);
+
+        return variant_date_to_timestamp($f->DateLastModified);
+    }
+
     static function filegroup($f) {return filegroup(self::ShortPath($f));}
     static function fileinode($f) {return fileinode(self::ShortPath($f));}
-    static function filemtime($f) {return filemtime(self::ShortPath($f));}
     static function fileowner($f) {return fileowner(self::ShortPath($f));}
     static function fileperms($f) {return fileperms(self::ShortPath($f));}
-    static function filesize($f)  {return filesize (self::ShortPath($f));}
-    static function filetype($f)  {return filetype (self::ShortPath($f));}
+
+    static function filesize($f)
+    {
+        $a = self::absPath($f);
+        $fs = self::getFs();
+
+        if ($fs->FolderExists($a)) return filesize(__DIR__);
+        if ($fs->FileExists($a) return variant_int($fs->GetFile($a)->Size);
+        return filesize($f);
+    }
+
+    static function filesize($f)
+    {
+        $a = self::absPath($f);
+        $fs = self::getFs();
+
+        if ($fs->FolderExists($a)) return 'dir';
+        if ($fs->FileExists($a) return 'file';
+        return filetype($f);
+    }
 
     static function fopen($f, $mode, $use_include_path = false, $context = null)
     {
@@ -156,12 +207,12 @@ class WinFs
 
 //  static function glob($f) {return glob($f);}
 
-    static function is_dir($f)           {return is_dir       (self::ShortPath($f));}
+    static function is_dir($f)           {return 'dir' === self::filetype($f);}
     static function is_executable($f)    {return is_executable(self::ShortPath($f));}
-    static function is_file($f)          {return is_file      (self::ShortPath($f));}
-    static function is_readable($f)      {return is_readable  (self::ShortPath($f));}
-    static function is_writable($f)      {return is_writable  (self::ShortPath($f));}
-    static function is_writeable($f)     {return is_writeable (self::ShortPath($f));}
+    static function is_file($f)          {return 'file' === self::filetype($f);}
+    static function is_readable($f)      {return is_readable(self::ShortPath($f));}
+    static function is_writable($f)      {return is_writable(self::ShortPath($f));}
+    static function is_writeable($f)     {return self::is_writable($f);}
 
     static function mkdir($dir, $mode = 0777, $recursive = false, $context = null)
     {
