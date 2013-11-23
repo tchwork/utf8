@@ -2,6 +2,7 @@
 
 - u::toAscii() is now locale sensitive and allows a substitution character
 - use LSB for more extension openness
+- handle null for mb_substr() shim length as in PHP 5.4.8
 - fix casts to string
 - fix mbstring MB_CASE_TITLE shim on edge case
 - small optimizations

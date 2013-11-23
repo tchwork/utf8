@@ -212,6 +212,11 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      */
     function testWordwrap()
     {
+        $text = 'A very long woooooooooooord.';
+
+        $this->assertSame( wordwrap($text, 8, "\n", false), u::wordwrap($text, 8, "\n", false) );
+        $this->assertSame( wordwrap($text, 8, "\n", true ), u::wordwrap($text, 8, "\n", true ) );
+
         $this->assertSame(
 "L’École supérieure de
 physique et de chimie
