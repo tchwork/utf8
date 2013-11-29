@@ -11,51 +11,41 @@
 namespace Patchwork\Utf8;
 
 /**
- * Unicode aware stream based filesystem access on MS-Windows.
+ * Unicode UTF-8 aware stream based filesystem access on MS-Windows.
  *
- * Based on COM Scripting.FileSystemObject object.
+ * Based on COM Scripting.FileSystemObject object and short paths.
+ * Enabled by e.g.: stream_wrapper_register('win', 'Patchwork\Utf8\WinFsStreamWrapper');
  * See also comments on http://www.rooftopsolutions.nl/blog/filesystem-encoding-and-php
  */
 class WinFsStreamWrapper
 {
     public $context;
 
-    protected static $fs;
-
-    protected $path;
-    protected $state;
+    protected $handle;
 
     static function hide($path)
     {
-        new self;
-        $path = self::abs($path);
-        if (self::$fs->FileExists($path)) self::$fs->GetFile($path)->Attributes |= 2;
-        else if (self::$fs->FolderExists($path)) $f = self::$fs->GetFolder($path)->Attributes |= 2;
+        list($fs, $path) = self::fs($path);
+        if ($fs->FileExists($path)) $fs->GetFile($path)->Attributes |= 2;
+        else if ($fs->FolderExists($path)) $f = $fs->GetFolder($path)->Attributes |= 2;
         else return false;
 
         return true;
     }
 
-    function __construct()
-    {
-        isset(self::$fs) or self::$fs = new \COM('Scripting.FileSystemObject', null, CP_UTF8);
-    }
-
     function dir_closedir()
     {
-        $this->state = null;
-        $this->path = null;
+        $this->handle = null;
 
         return true;
     }
 
     function dir_opendir($path, $options)
     {
-        $path = self::abs($path);
-        if (! self::$fs->FolderExists($path)) return false;
+        list($fs, $path) = self::fs($path);
+        if (! $fs->FolderExists($path)) return false;
 
-        $this->path = $path;
-        $dir = self::$fs->GetFolder($path);
+        $dir = $fs->GetFolder($path);
 
         try
         {
@@ -69,28 +59,28 @@ class WinFsStreamWrapper
             $f = array();
         }
 
-        $this->state = $f;
+        $this->handle = $f;
 
         return true;
     }
 
     function dir_readdir()
     {
-        if (list(, $c) = each($this->state)) return $c;
+        if (list(, $c) = each($this->handle)) return $c;
 
         return false;
     }
 
     function dir_rewinddir()
     {
-        reset($this->state);
+        reset($this->handle);
 
         return true;
     }
 
     function mkdir($path, $mode, $options)
     {
-        $path = self::abs($path);
+        list($fs, $path) = self::fs($path);
 
         if ($options & STREAM_MKDIR_RECURSIVE)
         {
@@ -108,15 +98,15 @@ class WinFsStreamWrapper
             $path = $pre . implode('\\', $stack);
             $stack = array();
 
-            while (! self::getFs()->FolderExists(dirname($path)))
+            while (! $fs->FolderExists(dirname($path)))
             {
-                //TODO
+                // @todo
             }
         }
 
         try
         {
-            self::$fs->CreateFolder($path);
+            $fs->CreateFolder($path);
 
             return true;
         }
@@ -128,27 +118,27 @@ class WinFsStreamWrapper
 
     function rename($from, $to)
     {
-        $to = self::abs($to);
+        list($fs, $to) = self::fs($to);
 
-        if (self::$fs->FileExists($to) || self::$fs->FolderExists($to))
+        if ($fs->FileExists($to) || $fs->FolderExists($to))
         {
             return false;
         }
 
-        $from = self::abs($from);
+        list(,$from) = self::fs($from);
 
         try
         {
-            if (self::$fs->FileExists($from))
+            if ($fs->FileExists($from))
             {
-                self::$fs->MoveFile($from, $to);
+                $fs->MoveFile($from, $to);
 
                 return true;
             }
 
-            if (self::$fs->FolderExists($from))
+            if ($fs->FolderExists($from))
             {
-                self::$fs->MoveFolder($from, $to);
+                $fs->MoveFolder($from, $to);
 
                 return true;
             }
@@ -158,26 +148,11 @@ class WinFsStreamWrapper
         return false;
     }
 
-    // @todo? honor $options = STREAM_MKDIR_RECURSIVE
     function rmdir($path, $options)
     {
-        $path = self::abs($path);
+        list($fs, $path) = self::fs($path);
 
-        try
-        {
-            if (self::$fs->FolderExists($path))
-            {
-                $dir = self::$fs->GetFolder($path);
-
-                foreach ($dir->SubFolders() as $v) return false;$f[] = $v->Name;
-                foreach ($dir->Files        as $v) return false;
-
-                $dir->Delete(true);
-
-                return true;
-            }
-        }
-        catch (\Exception $e) {}
+        if ($fs->FolderExists($path)) return rmdir($fs->GetFolder($path)->ShortPath);
 
         return false;
     }
@@ -186,186 +161,211 @@ class WinFsStreamWrapper
 
     function stream_close()
     {
-        $this->state->Close();
-        $this->state = null;
-        $this->path = null;
+        fclose($this->handle);
+        $this->handle = null;
     }
 
     function stream_eof()
     {
-        return $this->state->AtEndOfStream;
+        return feof($this->handle);
     }
 
     function stream_flush()
     {
-        return true;
+        return fflush($this->handle);
     }
 
-    // @todo stream_lock($operation)
+    function stream_lock($operation)
+    {
+        return flock($this->handle, $operation);
+    }
 
     function stream_metadata($path, $option, $value)
     {
-        switch ($option)
+        list($fs, $path) = self::fs($path);
+
+        if ($fs->FileExists($path)) $f = $fs->GetFile($path);
+        else if ($fs->FileExists($path)) $f = $fs->GetFolder($path);
+        else $f = false;
+
+        if (STREAM_META_TOUCH === $option)
         {
-        case STREAM_META_ACCESS:     // chmod()
-        case STREAM_META_TOUCH:      // touch()
-        case STREAM_META_OWNER:      // chown()
-        case STREAM_META_OWNER_NAME: // chown()
-        case STREAM_META_GROUP:      // chgrp()
-        case STREAM_META_GROUP_NAME: // chgrp()
+            if ($f) return touch($f->ShortPath);
+
+            try
+            {
+                $fs->OpenTextFile($path, 8, true, 0)->Close();
+
+                return true;
+            }
+            catch (\Exception $e) {}
         }
 
-        return false;
+        if (! $f) return false;
+
+        switch ($option)
+        {
+        case STREAM_META_ACCESS:     return chmod($short_path, $value);
+        case STREAM_META_OWNER:
+        case STREAM_META_OWNER_NAME: return chown($short_path, $value);
+        case STREAM_META_GROUP:
+        case STREAM_META_GROUP_NAME: return chgrp($short_path, $value);
+        default: return false;
+        }
     }
 
-    // @todo: honor $options = STREAM_USE_PATH | STREAM_REPORT_ERRORS
     function stream_open($path, $mode, $options, &$opened_path)
     {
-        $path = self::abs($path);
+        $mode .= '';
+        list($fs, $path) = self::fs($path);
 
-        if ($options & STREAM_USE_PATH) $opened_path = $path;
-
-        if ('b' !== substr($mode, -1)) return false;
-        else $mode = substr($mode, 0, -1);
+        if ($fs->FolderExists($path)) return false;
 
         try
         {
-            switch ($mode)
+            if ('x' === $m = substr($mode, 0, 1))
             {
-            case 'r':  // ro at start
-                $this->state = self::$fs->OpenTextFile($path, 1, false, 0);
-                break;
-
-            case 'w':  // wo at start, create or trunc
-                $this->state = self::$fs->OpenTextFile($path, 2, true, 0);
-                break;
-
-            case 'a':  // wo at end, create
-                $this->state = self::$fs->OpenTextFile($path, 8, true, 0);
-                break;
-
-            case 'x':  // wo at start, create or fail
-            case 'x+': // rw at start, create or fail
-                $this->state = self::$fs->CreateTextFile($path, false);
-                break;
-
-            case 'w+': // rw at start, create or trunc
-                $this->state = self::$fs->CreateTextFile($path, true);
-                break;
-
-            case 'c':  // wo at start, create
-            case 'r+': // rw at start
-            case 'a+': // rw at end, create
-            case 'c+': // rw at start, create
-            default: return false;
+                $fs->CreateTextFile($path, false)->Close();
+                $f = $fs->GetFile($path);
+                $mode[0] = 'w';
             }
-
-            $this->path = $path;
-
-            return true;
+            else
+            {
+                $f = $fs->GetFile($path);
+            }
         }
-        catch (\Exception $e)
+        catch (\Exception $f)
         {
+            try
+            {
+                switch ($m)
+                {
+                case 'w':
+                case 'c':
+                case 'a':
+                    $h = $fs->CreateTextFile($path, true);
+                    $f = $fs->GetFile($path);
+                    $h->Close();
+                    break;
+
+                default: return false;
+                }
+            }
+            catch (\Exception $e)
+            {
+                return false;
+            }
         }
 
-        return false;
+        if (! (STREAM_REPORT_ERRORS & $options))
+        {
+            set_error_handler('var_dump', 0);
+            $h = error_reporting(0);
+        }
+
+        $this->handle = fopen($f->ShortPath, $mode);
+
+        if (! (STREAM_REPORT_ERRORS & $options))
+        {
+            error_reporting($h);
+            restore_error_handler();
+        }
+
+        return (bool) $this->handle;
     }
 
     function stream_read($count)
     {
-        return $this->state->Read($count);
+        return fread($this->handle, $count);
     }
 
     function stream_seek($offset, $whence = SEEK_SET)
     {
-        switch ($whence)
-        {
-        case SEEK_CUR:
-            $this->state->Skip($offset);
-
-            return true;
-
-        case SEEK_SET:
-        case SEEK_END:
-        }
-
-        return false;
+        return fseek($this->handle, $offset, $whence);
     }
 
-    // @todo: stream_set_option($option, $arg1, $arg2)
+    function stream_set_option($option, $arg1, $arg2)
+    {
+        switch ($option)
+        {
+        case STREAM_OPTION_BLOCKING:     return stream_set_blocking($this->handle, $arg1);
+        case STREAM_OPTION_READ_TIMEOUT: return stream_set_timeout($this->handle, $arg1, $arg2);
+        case STREAM_OPTION_WRITE_BUFFER: return stream_set_write_buffer($this->handle, $arg1, $arg2);
+        default: return false;
+        }
+    }
 
     function stream_stat()
     {
-        return $this->url_stat($this->path);
+        return fstat($this->handle);
     }
 
-    // @todo: stream_tell()
+    function stream_tell()
+    {
+        return ftell($this->handle);
+    }
 
-    // @todo: stream_truncate($new_size)
+    function stream_truncate($new_size)
+    {
+        return ftruncate($this->handle, $new_size);
+    }
 
     function stream_write($data)
     {
-        $this->state->Write($data);
-
-        return strlen($data);
+        return fwrite($this->handle, $data, strlen($data));
     }
 
     function unlink($path)
     {
-        $path = self::abs($path);
+        list($fs, $path) = self::fs($path);
 
-        try
-        {
-            if (self::$fs->FileExists($path))
-            {
-                self::$fs->GetFile($path)->Delete(true);
-
-                return true;
-            }
-        }
-        catch (\Exception $e) {}
+        if ($fs->FileExists($path)) return unlink($fs->GetFile($path)->ShortPath);
 
         return false;
     }
 
-    // @todo: honor $flags = STREAM_URL_STAT_QUIET | STREAM_URL_STAT_LINK
     function url_stat($path, $flags)
     {
-        $path = self::abs($path);
+        list($fs, $path) = self::fs($path);
 
-        if (self::$fs->FileExists($path)) $f = self::$fs->GetFile($path);
-        else if (self::$fs->FolderExists($path)) $f = self::$fs->GetFolder($path);
+        if ($fs->FileExists($path)) $f = $fs->GetFile($path);
+        else if ($fs->FolderExists($path)) $f = $fs->GetFolder($path);
         else return false;
 
-        $s = array(
-            'dev' => 'device number',
-            'ino' => 0,
-            'mode' => 'inode protection mode',
-            'nlink' => 'number of links',
-            'uid' => 0,
-            'gid' => 0,
-            'rdev' => 'device type, if inode device',
-            'size' => $f->Size, // Folders ?
-            'atime' => variant_date_to_timestamp($f->DateLastAccessed),
-            'mtime' => variant_date_to_timestamp($f->DateLastModified),
-            'ctime' => variant_date_to_timestamp($f->DateCreated),
-            'blksize' => -1,
-            'blocks' => -1,
-        );
-
-        return $s + array_values($s);
-    }
-
-    static function abs($path)
-    {
-        $path = strtr($path, '/', '\\');
-
-        if (isset($path[0]))
+        if (STREAM_URL_STAT_QUIET & $flags)
         {
-            if ('/' === $path[0] || '\\' === $path[0]) return $path;
-            if (false !== strpos($path, ':')) return $path;
+            set_error_handler('var_dump', 0);
+            $e = error_reporting(0);
         }
 
-        return getcwd() . '\\' . $path;
+        if (STREAM_URL_STAT_LINK & $flags) $f = lstat($f->ShortPath);
+        else $f = stat($f->ShortPath);
+
+        if (STREAM_URL_STAT_QUIET & $flags)
+        {
+            error_reporting($e);
+            restore_error_handler();
+        }
+
+        return $f;
+    }
+
+    static function fs($path)
+    {
+        static $fs;
+        isset($fs) or $fs = new \COM('Scripting.FileSystemObject', null, CP_UTF8);
+
+        list(,$path) = explode('://', $path, 2);
+        $path = strtr($path, '/', '\\');
+
+        if (! isset($path[0])
+          || (  '/' !== $path[0]
+            && '\\' !== $path[0]
+            && false === strpos($path, ':') ) )
+        {
+            $path = getcwd() . '\\' . $path;
+        }
+
+        return array($fs, $path);
     }
 } 

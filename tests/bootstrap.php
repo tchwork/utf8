@@ -3,6 +3,7 @@
 $dir = dirname(__DIR__);
 
 require $dir . '/class/Patchwork/Utf8/Bootup.php';
+require $dir . '/class/Patchwork/Utf8/WinFsStreamWrapper.php';
 require $dir . '/class/Patchwork/Utf8.php';
 require $dir . '/class/Patchwork/TurkishUtf8.php';
 require $dir . '/class/Patchwork/PHP/Shim/Xml.php';
