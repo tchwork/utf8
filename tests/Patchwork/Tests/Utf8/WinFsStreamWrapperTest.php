@@ -3,7 +3,6 @@
 namespace Patchwork\Tests\Utf8;
 
 /**
- * @requires function variant_date_from_timestamp
  * @covers Patchwork\Utf8\WinFsStreamWrapper::<!public>
  */
 class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
@@ -21,6 +20,11 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     {
         extension_loaded('com_dotnet') and rmdir(self::$dir);
         stream_wrapper_unregister('win');
+    }
+
+    function setUp()
+    {
+        if (! extension_loaded('com_dotnet')) $this->markTestSkipped('Extension com_dotnet is required.');
     }
 
     /**
@@ -107,11 +111,20 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Patchwork\Utf8\WinFsStreamWrapper::mkdir
+     * @covers Patchwork\Utf8\WinFsStreamWrapper::rmdir
      */
     function testMkdir()
     {
         $this->assertTrue(file_exists(self::$dir));
         $this->assertFalse(mkdir(self::$dir));
+
+        $this->assertTrue(mkdir(self::$dir . '/à/é/ï/', 0777, true));
+
+        $this->assertFalse(@rmdir(self::$dir . '/à'));
+
+        $this->assertTrue(rmdir(self::$dir . '/à/é/ï/'));
+        $this->assertTrue(rmdir(self::$dir . '/à/é'));
+        $this->assertTrue(rmdir(self::$dir . '/à'));
     }
 
     /**

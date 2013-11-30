@@ -33,6 +33,25 @@ class WinFsStreamWrapper
         return true;
     }
 
+    static function fs($path)
+    {
+        static $fs;
+        isset($fs) or $fs = new \COM('Scripting.FileSystemObject', null, CP_UTF8);
+
+        list(,$path) = explode('://', $path, 2);
+        $path = strtr($path, '/', '\\');
+
+        if (! isset($path[0])
+          || (  '/' !== $path[0]
+            && '\\' !== $path[0]
+            && false === strpos($path, ':') ) )
+        {
+            $path = getcwd() . '\\' . $path;
+        }
+
+        return array($fs, $path);
+    }
+
     function dir_closedir()
     {
         $this->handle = null;
@@ -82,31 +101,48 @@ class WinFsStreamWrapper
     {
         list($fs, $path) = self::fs($path);
 
-        if ($options & STREAM_MKDIR_RECURSIVE)
-        {
-            $path = explode('\\', $path);
-            $pre = array_shift($path);
-            $stack = array();
-
-            foreach ($path as $path)
-            {
-                if (!isset($path[0]) || '.' === $a) continue;
-                if ('..' === $path) $stack && array_pop($stack);
-                else $stack[]= $a;
-            }
-
-            $path = $pre . implode('\\', $stack);
-            $stack = array();
-
-            while (! $fs->FolderExists(dirname($path)))
-            {
-                // @todo
-            }
-        }
-
         try
         {
-            $fs->CreateFolder($path);
+            if ($options & STREAM_MKDIR_RECURSIVE)
+            {
+                $path = $fs->GetAbsolutePathName($path);
+
+                $path = explode('\\', $path);
+
+                if (isset($path[3]) && '' === $path[0] . $path[1])
+                {
+                    $pre = '\\\\' . $path[2] . '\\' . $path[3] . '\\';
+                    $i = 4;
+                }
+                else if (isset($path[1]))
+                {
+                    $pre = $path[0] . '\\';
+                    $i = 1;
+                }
+                else
+                {
+                    $pre = '';
+                    $i = 0;
+                }
+
+                while (isset($path[$i]) && $fs->FolderExists($pre . $path[$i]))
+                {
+                    $pre .= $path[$i++] . '\\';
+                }
+
+                if (! isset($path[$i])) return false;
+
+                while (isset($path[$i]))
+                {
+                    $fs->CreateFolder($pre .= $path[$i++] . '\\');
+                }
+
+                return true;
+            }
+            else
+            {
+                $fs->CreateFolder($path);
+            }
 
             return true;
         }
@@ -349,23 +385,4 @@ class WinFsStreamWrapper
 
         return $f;
     }
-
-    static function fs($path)
-    {
-        static $fs;
-        isset($fs) or $fs = new \COM('Scripting.FileSystemObject', null, CP_UTF8);
-
-        list(,$path) = explode('://', $path, 2);
-        $path = strtr($path, '/', '\\');
-
-        if (! isset($path[0])
-          || (  '/' !== $path[0]
-            && '\\' !== $path[0]
-            && false === strpos($path, ':') ) )
-        {
-            $path = getcwd() . '\\' . $path;
-        }
-
-        return array($fs, $path);
-    }
-} 
+}
