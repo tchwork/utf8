@@ -2,6 +2,16 @@
 
 namespace Patchwork\Tests\Utf8;
 
+if (! defined('STREAM_META_TOUCH'))
+{
+    define('STREAM_META_TOUCH',      1);
+    define('STREAM_META_ACCESS',     2);
+    define('STREAM_META_OWNER',      3);
+    define('STREAM_META_OWNER_NAME', 4);
+    define('STREAM_META_GROUP',      5);
+    define('STREAM_META_GROUP_NAME', 6);
+}
+
 /**
  * @covers Patchwork\Utf8\WinFsStreamWrapper::<!public>
  */
@@ -18,7 +28,12 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
 
     static function  tearDownAfterClass()
     {
-        extension_loaded('com_dotnet') and rmdir(self::$dir);
+        if (extension_loaded('com_dotnet'))
+        {
+            list($fs, $path) = \Patchwork\Utf8\WinFsStreamWrapper::fs(self::$dir);
+            if ($fs->FolderExists($path)) $fs->GetFolder($path)->Delete(true);
+        }
+
         stream_wrapper_unregister('win');
     }
 
@@ -77,10 +92,11 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::fopen
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::fwrite
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::fread
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::fclose
+     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_open
+     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_write
+     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_read
+     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_eof
+     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_close
      */
     function testFilePutGetContents()
     {
@@ -116,14 +132,43 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     function testMkdir()
     {
         $this->assertTrue(file_exists(self::$dir));
-        $this->assertFalse(mkdir(self::$dir));
+        $this->assertFalse(@mkdir(self::$dir));
 
-        $this->assertTrue(mkdir(self::$dir . '/à/é/ï/', 0777, true));
+        $d = array(
+            'fr' => 'déjà',
+            'jp' => 'は、広く使われているオープンソースの汎用スクリプト言語です。',
+            'cn' => '是一种被广泛应用的开放源代码的多用途脚本语言',
+            'ru' => 'это распространенный язык программирования',
+        );
+
+        foreach ($d as $d)
+        {
+            $this->assertTrue(mkdir(self::$dir . '/' . $d));
+
+            // @todo: remove the @ and fixme
+            @fclose(fopen(self::$dir . '/' . $d . '/' . $d, 'wb'));
+            @unlink(self::$dir . '/' . $d . '/' . $d);
+
+            $this->assertTrue(rmdir(self::$dir . '/' . $d));
+        }
+
+        $h = @fopen(self::$dir . '/' . $d, 'wb');
+        $this->assertFalse($h);
+        $this->markTestIncomplete('fopen() should not fail, this has to be fixed.');
+    }
+
+    /**
+     * @covers Patchwork\Utf8\WinFsStreamWrapper::mkdir
+     * @covers Patchwork\Utf8\WinFsStreamWrapper::rmdir
+     */
+    function testMkdirRecursive()
+    {
+        $this->assertTrue(mkdir(self::$dir . '/à/种/э/', 0777, true));
 
         $this->assertFalse(@rmdir(self::$dir . '/à'));
 
-        $this->assertTrue(rmdir(self::$dir . '/à/é/ï/'));
-        $this->assertTrue(rmdir(self::$dir . '/à/é'));
+        $this->assertTrue(rmdir(self::$dir . '/à/种/э/'));
+        $this->assertTrue(rmdir(self::$dir . '/à/种'));
         $this->assertTrue(rmdir(self::$dir . '/à'));
     }
 
@@ -136,14 +181,22 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @requires PHP 5.4.0
      * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_metadata
      * @covers Patchwork\Utf8\WinFsStreamWrapper::unlink
      */
-    function testTouch()
+    function testStreamtMetadata()
     {
-        $this->assertTrue(touch(self::$dir . '/héhé'));
-        $this->assertTrue(file_exists(self::$dir . '/héhé'));
-        $this->assertTrue(unlink(self::$dir . '/héhé'));
+        $win = new \Patchwork\Utf8\WinFsStreamWrapper;
+        $f = self::$dir . '/это';
+
+        $this->assertFalse(file_exists($f));
+        $this->assertTrue($win->stream_metadata($f, STREAM_META_TOUCH, time()));
+        $this->assertTrue(file_exists($f));
+        $this->assertTrue($win->stream_metadata($f, STREAM_META_TOUCH, time()));
+        $this->assertTrue($win->stream_metadata($f, STREAM_META_ACCESS, 0777));
+        $this->assertFalse($win->stream_metadata($f, STREAM_META_OWNER, 0));
+        $this->assertFalse($win->stream_metadata($f, STREAM_META_GROUP, 0));
+
+        $this->assertTrue(unlink($f));
     }
 }

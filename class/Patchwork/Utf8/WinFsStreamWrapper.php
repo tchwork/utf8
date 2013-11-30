@@ -296,18 +296,21 @@ class WinFsStreamWrapper
         if (! (STREAM_REPORT_ERRORS & $options))
         {
             set_error_handler('var_dump', 0);
-            $h = error_reporting(0);
+            $e = error_reporting(0);
         }
 
         $this->handle = fopen($f->ShortPath, $mode);
 
         if (! (STREAM_REPORT_ERRORS & $options))
         {
-            error_reporting($h);
+            error_reporting($e);
             restore_error_handler();
         }
 
-        return (bool) $this->handle;
+        if ($this->handle) return true;
+        if (isset($h)) $f->Delete(true);
+
+        return false;
     }
 
     function stream_read($count)
