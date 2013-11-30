@@ -241,11 +241,11 @@ class WinFsStreamWrapper
 
         switch ($option)
         {
-        case STREAM_META_ACCESS:     return chmod($short_path, $value);
+        case STREAM_META_ACCESS:     return chmod($f->ShortPath, $value);
         case STREAM_META_OWNER:
-        case STREAM_META_OWNER_NAME: return chown($short_path, $value);
+        case STREAM_META_OWNER_NAME: return chown($f->ShortPath, $value);
         case STREAM_META_GROUP:
-        case STREAM_META_GROUP_NAME: return chgrp($short_path, $value);
+        case STREAM_META_GROUP_NAME: return chgrp($f->ShortPath, $value);
         default: return false;
         }
     }
