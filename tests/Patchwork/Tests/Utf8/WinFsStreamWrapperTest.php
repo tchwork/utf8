@@ -21,9 +21,14 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
 
     static function setUpBeforeClass()
     {
-        self::$dir = 'win://' . __DIR__ . '/../µ€';
-        stream_wrapper_register('win', 'Patchwork\Utf8\WinFsStreamWrapper');
-        extension_loaded('com_dotnet') and mkdir(self::$dir);
+        if (extension_loaded('com_dotnet'))
+        {
+            stream_wrapper_register('win', 'Patchwork\Utf8\WinFsStreamWrapper');
+            $dir = __DIR__;
+            list(,$dir) = \Patchwork\Utf8\WinFsStreamWrapper::fs($dir, false); // Convert $dir to UTF-8
+            self::$dir = 'win://' . $dir . '/../µ€';
+            mkdir(self::$dir);
+        }
     }
 
     static function  tearDownAfterClass()
@@ -32,14 +37,25 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
         {
             list($fs, $path) = \Patchwork\Utf8\WinFsStreamWrapper::fs(self::$dir);
             if ($fs->FolderExists($path)) $fs->GetFolder($path)->Delete(true);
+            stream_wrapper_unregister('win');
         }
-
-        stream_wrapper_unregister('win');
     }
 
     function setUp()
     {
         if (! extension_loaded('com_dotnet')) $this->markTestSkipped('Extension com_dotnet is required.');
+    }
+
+    /**
+     * @covers Patchwork\Utf8\WinFsStreamWrapper::fs
+     */
+    function testRelDir()
+    {
+        $this->assertTrue(file_exists(self::$dir));
+        $cwd = getcwd();
+        chdir(__DIR__ . '/..');
+        $this->assertTrue(file_exists('win://./µ€'));
+        chdir($cwd);
     }
 
     /**

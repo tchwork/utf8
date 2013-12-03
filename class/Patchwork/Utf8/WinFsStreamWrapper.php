@@ -33,23 +33,30 @@ class WinFsStreamWrapper
         return true;
     }
 
-    static function fs($path)
+    static function fs($path, $is_utf8 = true)
     {
         static $fs;
         isset($fs) or $fs = new \COM('Scripting.FileSystemObject', null, CP_UTF8);
 
-        list(,$path) = explode('://', $path, 2);
+        $path = explode('://', $path, 2);
+        $path = $path[(int) isset($path[1])];
         $path = strtr($path, '/', '\\');
+        $pre = '';
 
         if (! isset($path[0])
           || (  '/' !== $path[0]
             && '\\' !== $path[0]
             && false === strpos($path, ':') ) )
         {
-            $path = getcwd() . '\\' . $path;
+            $pre = getcwd() . '\\';
         }
 
-        return array($fs, $path);
+        $pre = new \VARIANT($pre);
+
+        if ($is_utf8) $path = new \VARIANT($path, VT_BSTR, CP_UTF8);
+        else $path = new \VARIANT($path);
+
+        return array($fs, $fs->getAbsolutePathName(variant_cat($pre, $path)));
     }
 
     function dir_closedir()
