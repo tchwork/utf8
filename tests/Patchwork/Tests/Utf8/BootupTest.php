@@ -31,6 +31,23 @@ class BootupTest extends \PHPUnit_Framework_TestCase
 
         $_GET['f'] = $_GET;
 
+        $_FILES = array(
+            'a' => array(
+                'name'     => '',
+                'type'     => '',
+                'tmp_name' => '',
+                'error'    => 4,
+                'size'     => 0,
+            ),
+            'b' => array(
+                'name'     => array('', ''),
+                'type'     => array('', ''),
+                'tmp_name' => array('', ''),
+                'error'    => array(4, 4),
+                'size'     => array(0, 0),
+            ),
+        );
+
         \Patchwork\Utf8\Bootup::filterRequestInputs();
 
         $expect = array(
