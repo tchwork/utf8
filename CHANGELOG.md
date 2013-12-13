@@ -1,3 +1,8 @@
+## to be released
+
+- shims for mb_check_encoding, mb_detect_encoding, mb_detect_order, mb_language
+  and mb_encoding_aliases
+
 ## v1.1.16 (2013-12-06)
 
 - fix $_FILES bootup filtering

@@ -22,7 +22,12 @@ function mb_decode_mimeheader($s) {return s\Mbstring::mb_decode_mimeheader($s);}
 function mb_encode_mimeheader($s, $charset = INF, $transfer_enc = INF, $lf = INF, $indent = INF) {return s\Mbstring::mb_encode_mimeheader($s, $charset, $transfer_enc, $lf, $indent);};
 function mb_convert_case($s, $mode, $enc = INF) {return s\Mbstring::mb_convert_case($s, $mode, $enc);};
 function mb_internal_encoding($enc = INF) {return s\Mbstring::mb_internal_encoding($enc);};
+function mb_language($lang = INF) {return s\Mbstring::mb_language($lang);}
 function mb_list_encodings() {return s\Mbstring::mb_list_encodings();};
+function mb_encoding_aliases($encoding) {return s\Mbstring::mb_encoding_aliases($encoding);}
+function mb_check_encoding($var = INF, $encoding = INF) {return s\Mbstring::mb_check_encoding($var, $encoding);}
+function mb_detect_encoding($str, $encoding_list = INF, $strict = false) {return s\Mbstring::mb_detect_encoding($str, $encoding_list, $strict);}
+function mb_detect_order($encoding_list = INF) {return s\Mbstring::mb_detect_order($encoding_list);}
 function mb_parse_str($s, &$result = array()) {return parse_str($s, $result);};
 function mb_strlen($s, $enc = INF) {return s\Mbstring::mb_strlen($s, $enc);};
 function mb_strpos($s, $needle, $offset = 0, $enc = INF) {return s\Mbstring::mb_strpos($s, $needle, $offset, $enc);};

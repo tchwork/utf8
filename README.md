@@ -28,11 +28,12 @@ The following set of portability-fallbacks allows an application to run on a
 server even if one or more of those extensions are not enabled:
 
 - *utf8_encode, utf8_decode*,
-- `mbstring`: *mb_convert_encoding, mb_decode_mimeheader, mb_encode_mimeheader,
-  mb_convert_case, mb_internal_encoding, mb_list_encodings, mb_strlen,
-  mb_strpos, mb_strrpos, mb_strtolower, mb_strtoupper, mb_substitute_character,
-  mb_substr, mb_stripos, mb_stristr, mb_strrchr, mb_strrichr, mb_strripos,
-  mb_strstr*,
+- `mbstring`: *mb_check_encoding, mb_convert_case, mb_convert_encoding,
+  mb_decode_mimeheader, mb_detect_encoding, mb_detect_order,
+  mb_encode_mimeheader, mb_encoding_aliases, mb_internal_encoding, mb_language,
+  mb_list_encodings, mb_strlen, mb_strpos, mb_strrpos, mb_strtolower,
+  mb_strtoupper, mb_stripos, mb_stristr, mb_strrchr, mb_strrichr, mb_strripos,
+  mb_strstr, mb_substitute_character, mb_substr*,
 - `iconv`: *iconv, iconv_mime_decode, iconv_mime_decode_headers,
   iconv_get_encoding, iconv_set_encoding, iconv_mime_encode, ob_iconv_handler,
   iconv_strlen, iconv_strpos, iconv_strrpos, iconv_substr*,

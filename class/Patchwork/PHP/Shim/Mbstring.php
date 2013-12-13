@@ -35,19 +35,14 @@ namespace Patchwork\PHP\Shim;
  * - mb_strstr               - Finds first occurrence of a string within anothers
  *
  * Not implemented:
- * - mb_check_encoding             - Check if the string is valid for the specified encoding
  * - mb_convert_kana               - Convert "kana" one from another ("zen-kaku", "han-kaku" and more)
  * - mb_convert_variables          - Convert character code in variable(s)
  * - mb_decode_numericentity       - Decode HTML numeric string reference to character
- * - mb_detect_encoding            - Detect character encoding
- * - mb_detect_order               - Set/Get character encoding detection order
  * - mb_encode_numericentity       - Encode character to HTML numeric string reference
  * - mb_ereg*                      - Regular expression with multibyte support
  * - mb_get_info                   - Get internal settings of mbstring
  * - mb_http_input                 - Detect HTTP input character encoding
  * - mb_http_output                - Set/Get HTTP output character encoding
- * - mb_language                   - Set/Get current language
- * - mb_list_encodings_alias_names - Returns an array of all supported alias encodings
  * - mb_list_mime_names            - Returns an array or string of all supported mime names
  * - mb_output_handler             - Callback function converts character encoding in output buffer
  * - mb_parse_str                  - Parse GET/POST/COOKIE data and set global variable
@@ -67,6 +62,8 @@ class Mbstring
 
     protected static
 
+    $encoding_list = array('ASCII', 'UTF-8'),
+    $language = 'neutral',
     $internal_encoding = 'UTF-8',
     $caseFold = array(
         array('µ','ſ',"\xCD\x85",'ς',"\xCF\x90","\xCF\x91","\xCF\x95","\xCF\x96","\xCF\xB0","\xCF\xB1","\xCF\xB5","\xE1\xBA\x9B","\xE1\xBE\xBE"),
@@ -195,9 +192,99 @@ class Mbstring
         return false;
     }
 
+    static function mb_language($lang = INF)
+    {
+        if (INF === $lang) return self::$language;
+
+        switch ($lang = strtolower($lang))
+        {
+        case 'uni':
+        case 'neutral':
+            self::$language = $lang;
+            return true;
+        }
+
+        return false;
+    }
+
     static function mb_list_encodings()
     {
         return array('UTF-8');
+    }
+
+    static function mb_encoding_aliases($encoding)
+    {
+        switch (strtolower($encoding))
+        {
+        case 'utf8':
+        case 'utf-8': return array('utf8');
+        }
+
+        return false;
+    }
+
+    static function mb_check_encoding($var = INF, $encoding = INF)
+    {
+        if (INF === $encoding)
+        {
+            if (INF === $var) return false;
+            $encoding = self::$internal_encoding;
+        }
+
+        return false !== mb_detect_encoding($var, array($encoding), true);
+    }
+
+    static function mb_detect_encoding($str, $encoding_list = INF, $strict = false)
+    {
+        if (INF === $encoding_list) $encoding_list = self::$encoding_list;
+        else
+        {
+            if (! is_array($encoding_list)) $encoding_list = array_map('trim', explode(',', $encoding_list));
+            $encoding_list = array_map('strtoupper', $encoding_list);
+        }
+
+        foreach ($encoding_list as $enc)
+        {
+            switch ($enc)
+            {
+            case 'ASCII':
+                if (! preg_match('/[\x80-\xFF]/', $str)) return $enc;
+                break;
+
+            case 'UTF8':
+            case 'UTF-8':
+                if (preg_match('//u', $str)) return $enc;
+                break;
+
+            default:
+                return strncmp($enc, 'ISO-8859-', 9) ? false : $enc;
+            }
+        }
+
+        return false;
+    }
+
+    static function mb_detect_order($encoding_list = INF)
+    {
+        if (INF === $encoding_list) return self::$encoding_list;
+
+        if (! is_array($encoding_list)) $encoding_list = array_map('trim', explode(',', $encoding_list));
+        $encoding_list = array_map('strtoupper', $encoding_list);
+
+        foreach ($encoding_list as $enc)
+        {
+            switch ($enc)
+            {
+            default: if (strncmp($enc, 'ISO-8859-', 9)) return false;
+            case 'ASCII':
+            case 'UTF8':
+            case 'UTF-8':
+            }
+        }
+
+        self::$encoding_list = $encoding_list;
+
+        return true;
     }
 
     static function mb_strlen($s, $encoding = INF)

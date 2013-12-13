@@ -34,7 +34,7 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Patchwork\PHP\Shim\Mbstring::mb_convert_encoding
      */
-    function testmb_convert_enconding()
+    function testmb_convert_encoding()
     {
         $this->assertSame( utf8_decode('déjà'), p::mb_convert_encoding('déjà', 'Windows-1252') );
         $this->assertSame( base64_encode('déjà'), p::mb_convert_encoding('déjà', 'Base64') );
@@ -196,5 +196,55 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
         $this->assertSame( 'déjàd', p::mb_strrchr('déjàdéjà', 'é', true) );
         $this->assertSame( 'DÉJÀD', p::mb_strrichr('DÉJÀDÉJÀ', 'é', true) );
         $this->assertSame( 'Paris', p::mb_stristr('der Straße nach Paris', 'Paris') );
+    }
+
+    /**
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_check_encoding
+     */
+    function testmb_check_encoding()
+    {
+        $this->assertFalse( p::mb_check_encoding() );
+        $this->assertTrue( p::mb_check_encoding('aςσb', 'UTF8') );
+        $this->assertTrue( p::mb_check_encoding('abc', 'ASCII') );
+    }
+
+    /**
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_detect_encoding
+     */
+    function testmb_detect_encoding()
+    {
+        $this->assertSame( 'ASCII', p::mb_detect_encoding('abc') );
+        $this->assertSame( 'UTF8', p::mb_detect_encoding('abc', 'UTF8, ASCII') );
+        $this->assertSame( 'ISO-8859-1', p::mb_detect_encoding("\x9D", array('UTF-8', 'ASCII', 'ISO-8859-1')) );
+    }
+
+    /**
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_detect_order
+     */
+    function testmb_detect_order()
+    {
+        $this->assertSame( array('ASCII', 'UTF-8'), p::mb_detect_order() );
+        $this->assertTrue( p::mb_detect_order('UTF-8, ASCII') );
+        $this->assertSame( array('UTF-8', 'ASCII'), p::mb_detect_order() );
+    }
+
+    /**
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_language
+     */
+    function testmb_language()
+    {
+        $this->assertSame('neutral', p::mb_language());
+        $this->assertTrue(p::mb_language('UNI'));
+        $this->assertFalse(p::mb_language('ABC'));
+        $this->assertSame('uni', p::mb_language());
+    }
+
+    /**
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_encoding_aliases
+     */
+    function testmb_encoding_aliases()
+    {
+        $this->assertSame(array('utf8'), p::mb_encoding_aliases('UTF-8'));
+        $this->assertFalse(p::mb_encoding_aliases('ASCII'));
     }
 }
