@@ -89,7 +89,9 @@ class Mbstring
         if ('html-entities' === $to_encoding)
         {
             'html-entities' === $from_encoding && $from_encoding = 'Windows-1252';
-            'utf-8' === $from_encoding || $s = iconv($from_encoding, 'UTF-8//IGNORE', $s);
+            'utf-8' === $from_encoding
+                || 'utf8' === $from_encoding
+                || $s = iconv($from_encoding, 'UTF-8//IGNORE', $s);
             return preg_replace_callback('/[\x80-\xFF]+/', array(__CLASS__, 'html_encoding_callback'), $s);
         }
 
@@ -117,8 +119,10 @@ class Mbstring
     {
         if ('' === $s .= '') return '';
 
-        INF === $encoding && $encoding = self::$internal_encoding;
-        if ('UTF-8' === strtoupper($encoding)) $encoding = INF;
+        if (INF === $encoding) $encoding = self::$internal_encoding;
+        else $encoding = strtoupper($encoding);
+
+        if ('UTF-8' === $encoding || 'UTF8' === $encoding) $encoding = INF;
         else $s = iconv($encoding, 'UTF-8//IGNORE', $s);
 
         if (MB_CASE_TITLE == $mode)
@@ -182,10 +186,12 @@ class Mbstring
     static function mb_internal_encoding($encoding = INF)
     {
         if (INF === $encoding) return self::$internal_encoding;
+        else $encoding = strtoupper($encoding);
 
-        if ('UTF-8' === strtoupper($encoding) || false !== @iconv($encoding, $encoding, ' '))
+        if ('UTF-8' === $encoding || 'UTF8' === $encoding || false !== @iconv($encoding, $encoding, ' '))
         {
-            self::$internal_encoding = $encoding;
+            self::$internal_encoding = 'UTF8' === $encoding ? 'UTF-8' : $encoding;
+
             return true;
         }
 

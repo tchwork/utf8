@@ -1,7 +1,8 @@
 ## to be released
 
-- shims for mb_check_encoding, mb_detect_encoding, mb_detect_order, mb_language
-  and mb_encoding_aliases
+- add shims for mb_check_encoding, mb_detect_encoding, mb_detect_order,
+  mb_language and mb_encoding_aliases
+- mbstring shim fix: alias UTF8 to UTF-8
 
 ## v1.1.16 (2013-12-06)
 

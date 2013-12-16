@@ -23,9 +23,9 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains( 'UTF-8', p::mb_list_encodings() );
 
-        $this->assertTrue( p::mb_internal_encoding('utf-8') );
+        $this->assertTrue( p::mb_internal_encoding('utf8') );
         $this->assertFalse( p::mb_internal_encoding('no-no') );
-        $this->assertSame( 'utf-8', p::mb_internal_encoding() );
+        $this->assertSame( 'UTF-8', p::mb_internal_encoding() );
 
         p::mb_encode_mimeheader('');
         $this->assertFalse( true, 'mb_encode_mimeheader() is bugged. Please use iconv_mime_encode() instead');
