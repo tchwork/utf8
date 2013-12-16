@@ -14,6 +14,8 @@ It can also serve as a documentation source referencing the practical problems
 that arise when handling UTF-8 in PHP: Unicode concepts, related algorithms,
 bugs in PHP core, workarounds, etc.
 
+[![Build Status](https://secure.travis-ci.org/nicolas-grekas/Patchwork-UTF8.png)](http://travis-ci.org/nicolas-grekas/Patchwork-UTF8)
+
 Portability
 -----------
 
@@ -98,7 +100,7 @@ Then, early in your bootstrap sequence, you have to configure your environment:
 \Patchwork\Utf8\Bootup::filterRequestInputs(); // Normalizes HTTP inputs to UTF-8 NFC
 ```
 
-Run `phpunit` in the `tests/` directory to see the code in action.
+Run `phpunit` to see the code in action.
 
 Make sure that you are confident about using UTF-8 by reading
 [Character Sets / Character Encoding Issues](http://www.phpwact.org/php/i18n/charsets)

@@ -4,6 +4,7 @@
 use Patchwork\PHP\Shim\Normalizer as n;
 
 /**
+ * @group unicode
  * @covers Patchwork\PHP\Shim\Normalizer::<!public>
  */
 class NormalizationTest extends \PHPUnit_Framework_TestCase
