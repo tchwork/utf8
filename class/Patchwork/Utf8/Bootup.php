@@ -166,28 +166,39 @@ class Bootup
         }
     }
 
-    static function filterRequestUri()
+    static function filterRequestUri($uri = null, $exit = true)
     {
+        if (! isset($uri))
+        {
+            if (! isset($_SERVER['REQUEST_URI'])) return;
+            else $uri = $_SERVER['REQUEST_URI'];
+        }
+
         // Ensures the URL is well formed UTF-8
         // When not, assumes Windows-1252 and redirects to the corresponding UTF-8 encoded URL
 
-        if (isset($_SERVER['REQUEST_URI']) && !preg_match('//u', urldecode($a = $_SERVER['REQUEST_URI'])))
+        if (! preg_match('//u', urldecode($uri)))
         {
-            if ($a === u::utf8_decode($a))
+            if ($uri === u::utf8_decode($uri))
             {
-                $a = preg_replace_callback(
+                $uri = preg_replace_callback(
                     '/(?:%[89A-F][0-9A-F])+/i',
                     function($m) {return urlencode(u::utf8_encode(urldecode($m[0])));},
-                    $a
+                    $uri
                 );
             }
-            else $a = '/';
+            else $uri = '/';
 
-            header('HTTP/1.1 301 Moved Permanently');
-            header('Location: ' . $a);
+            if ($exit)
+            {
+                header('HTTP/1.1 301 Moved Permanently');
+                header('Location: ' . $uri);
 
-            exit;
+                exit; // TODO: remove this in 1.2 (BC)
+            }
         }
+
+        return $uri;
     }
 
     static function filterRequestInputs($normalization_form = 4 /* n::NFC */, $leading_combining = '◌')
