@@ -15,6 +15,7 @@ that arise when handling UTF-8 in PHP: Unicode concepts, related algorithms,
 bugs in PHP core, workarounds, etc.
 
 [![Build Status](https://secure.travis-ci.org/nicolas-grekas/Patchwork-UTF8.png)](http://travis-ci.org/nicolas-grekas/Patchwork-UTF8)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/666c8ae7-0997-4d27-883a-6089ce3cc76b/mini.png)](https://insight.sensiolabs.com/projects/666c8ae7-0997-4d27-883a-6089ce3cc76b)
 
 Portability
 -----------
