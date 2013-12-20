@@ -65,4 +65,27 @@ class BootupTest extends \PHPUnit_Framework_TestCase
 
         list($_GET, $_POST, $_COOKIE, $_REQUEST, $_ENV, $_FILES) = $bak;
     }
+
+    /**
+     * @covers Patchwork\Utf8\Bootup::filterRequestUri
+     */
+    function testFilterRequestUri()
+    {
+        $uriA = '/' . urlencode("bàr");
+        $uriB = '/' . urlencode(utf8_decode("bàr"));
+        $uriC = '/' . utf8_decode("bàr");
+        $uriD = '/' . "bàr";
+
+        $u = \Patchwork\Utf8\Bootup::filterRequestUri($uriA, false);
+        $this->assertSame($uriA, $u);
+
+        $u = \Patchwork\Utf8\Bootup::filterRequestUri($uriB, false);
+        $this->assertSame($uriA, $u);
+
+        $u = \Patchwork\Utf8\Bootup::filterRequestUri($uriC, false);
+        $this->assertSame($uriA, $u);
+
+        $u = \Patchwork\Utf8\Bootup::filterRequestUri($uriD, false);
+        $this->assertSame($uriD, $u);
+    }
 }

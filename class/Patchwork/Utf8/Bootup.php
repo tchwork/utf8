@@ -179,15 +179,17 @@ class Bootup
 
         if (! preg_match('//u', urldecode($uri)))
         {
-            if ($uri === u::utf8_decode($uri))
-            {
-                $uri = preg_replace_callback(
-                    '/(?:%[89A-F][0-9A-F])+/i',
-                    function($m) {return urlencode(u::utf8_encode(urldecode($m[0])));},
-                    $uri
-                );
-            }
-            else $uri = '/';
+            $uri = preg_replace_callback(
+                '/[\x80-\xFF]+/',
+                function($m) {return urlencode($m[0]);},
+                $uri
+            );
+
+            $uri = preg_replace_callback(
+                '/(?:%[89A-F][0-9A-F])+/i',
+                function($m) {return urlencode(u::utf8_encode(urldecode($m[0])));},
+                $uri
+            );
 
             if ($exit)
             {
