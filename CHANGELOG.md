@@ -1,3 +1,7 @@
+## to be released
+
+- require PCRE>=7.3, the first that correctly checks UTF-8 validity
+
 ## v1.1.17 (2014-01-02)
 
 - enable Travis CI and SensioLabsInsight

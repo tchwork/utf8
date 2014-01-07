@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "lib-pcre": ">=7.9"
+        "lib-pcre": ">=7.3"
     },
     "suggest": {
         "ext-intl": "Use Intl for best performance",
