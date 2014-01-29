@@ -1,6 +1,6 @@
 <?php // vi: set fenc=utf-8 ts=4 sw=4 et:
 /*
- * Copyright (C) 2013 Nicolas Grekas - p@tchwork.com
+ * Copyright (C) 2014 Nicolas Grekas - p@tchwork.com
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the (at your option):
@@ -15,7 +15,9 @@ namespace Patchwork\Utf8;
  *
  * Based on COM Scripting.FileSystemObject object and short paths.
  * Enabled by e.g.: stream_wrapper_register('win', 'Patchwork\Utf8\WinFsStreamWrapper');
- * See also comments on http://www.rooftopsolutions.nl/blog/filesystem-encoding-and-php
+ *
+ * See also https://code.google.com/p/php-wfio/ for a PHP extension
+ * and comments on http://www.rooftopsolutions.nl/blog/filesystem-encoding-and-php
  */
 class WinFsStreamWrapper
 {
