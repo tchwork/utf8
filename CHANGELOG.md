@@ -1,3 +1,7 @@
+## v1.1.19 (2014-03-01)
+
+- fix mb_regex_encoding() being disabled on some hosting providers
+
 ## v1.1.18 (2014-02-02)
 
 - require PCRE>=7.3, the first that correctly checks UTF-8 validity

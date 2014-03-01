@@ -48,7 +48,7 @@ class Bootup
                 user_error('php.ini settings: Please disable mbstring.func_overload', E_USER_WARNING);
             }
 
-            mb_regex_encoding('UTF-8');
+            if (function_exists('mb_regex_encoding')) mb_regex_encoding('UTF-8');
             ini_set('mbstring.script_encoding', 'pass');
 
             if ('utf-8' !== strtolower(mb_internal_encoding()))
