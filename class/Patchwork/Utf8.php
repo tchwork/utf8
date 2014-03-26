@@ -257,65 +257,54 @@ class Utf8
 
     static function wordwrap($s, $width = 75, $break = "\n", $cut = false)
     {
-        // This implementation could be extended to handle unicode word boundaries,
-        // but that's enough work for today (see http://www.unicode.org/reports/tr29/)
+        if (false === wordwrap('-', $width, $break, $cut)) return false;
 
-        $width = (int) $width;
+        is_string($break) or $break = (string) $break;
+
+        $w = '';
         $s = explode($break, $s);
-
         $iLen = count($s);
-        $result = array();
-        $line = '';
-        $lineLen = 0;
+        $chars = array();
+
+        if (1 === $iLen && '' === $s[0])
+            return '';
 
         for ($i = 0; $i < $iLen; ++$i)
         {
-            $words = explode(' ', $s[$i]);
-            $line && $result[] = $line;
-            $lineLen = grapheme_strlen($line);
-            $jLen = count($words);
-
-            for ($j = 0; $j < $jLen; ++$j)
+            if ($i)
             {
-                $w = $words[$j];
-                $wLen = grapheme_strlen($w);
+                $chars[] = $break;
+                $w .= '#';
+            }
 
-                if ($lineLen + $wLen < $width)
-                {
-                    if ($j) $line .= ' ';
-                    $line .= $w;
-                    $lineLen += $wLen + 1;
-                }
-                else
-                {
-                    if ($j || $i) $result[] = $line;
-                    $line = '';
-                    $lineLen = 0;
+            $c = $s[$i];
+            unset($s[$i]);
 
-                    if ($cut && $wLen > $width)
-                    {
-                        $w = self::str_split($w);
-
-                        do
-                        {
-                            $result[] = implode('', array_slice($w, 0, $width));
-                            $line = implode('', $w = array_slice($w, $width));
-                            $lineLen = $wLen -= $width;
-                        }
-                        while ($wLen > $width);
-
-                        $w = implode('', $w);
-                    }
-
-                    $line = $w;
-                    $lineLen = $wLen;
-                }
+            foreach (self::str_split($c) as $c)
+            {
+                $chars[] = $c;
+                $w .= ' ' === $c ? ' ' : '?';
             }
         }
 
-        $line && $result[] = $line;
+        $s = '';
+        $j = 0;
+        $b = $i = -1;
+        $w = wordwrap($w, $width, '#', $cut);
 
-        return implode($break, $result);
+        while (false !== $b = strpos($w, '#', $b+1))
+        {
+            for (++$i; $i < $b; ++$i)
+            {
+                $s .= $chars[$j];
+                unset($chars[$j++]);
+            }
+
+            if ($break === $chars[$j] || ' ' === $chars[$j]) unset($chars[$j++]);
+            $s .= $break;
+        }
+
+        return $s . implode('', $chars);
     }
 
     static function chr($c)
