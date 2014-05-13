@@ -232,15 +232,15 @@ class Bootup
 
         if (preg_match('/[\x80-\xFF]/', $s))
         {
-            if (n::isNormalized($s, $normalization_form)) $n = '';
+            if (n::isNormalized($s, $normalization_form)) $n = '-';
             else
             {
                 $n = n::normalize($s, $normalization_form);
-                if (false === $n) $s = u::utf8_encode($s);
-                else $s = $n;
+                if (isset($n[0])) $s = $n;
+                else $s = u::utf8_encode($s);
             }
 
-            if ($s[0] >= "\x80" && false !== $n && isset($leading_combining[0]) && preg_match('/^\p{Mn}/u', $s))
+            if ($s[0] >= "\x80" && isset($n[0], $leading_combining[0]) && preg_match('/^\p{Mn}/u', $s))
             {
                 // Prevent leading combining chars
                 // for NFC-safe concatenations.

@@ -11,12 +11,18 @@ use Normalizer as n;
 class IntlTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
      * @covers Patchwork\PHP\Shim\Intl::grapheme_extract
      */
-    function testGrapheme_extract_arrayWarning()
+    function testGrapheme_extract_arrayError()
     {
-        p::grapheme_extract(array(), 0);
+        try {
+            p::grapheme_extract(array(), 0);
+            $this->fail('Warning or notice expected');
+        } catch (\PHPUnit_Framework_Error_Warning $e) {
+            $this->assertTrue(true, 'Regular PHP throws a warning');
+        } catch (\PHPUnit_Framework_Error_Notice $e) {
+            $this->assertTrue(true, 'HHVM throws a notice');
+        }
     }
 
     /**
@@ -24,8 +30,6 @@ class IntlTest extends \PHPUnit_Framework_TestCase
      */
     function testGrapheme_extract()
     {
-        $this->assertFalse( @grapheme_extract(array(), 0) );
-        $this->assertFalse( @p::grapheme_extract(array(), 0) );
         $this->assertFalse( p::grapheme_extract('abc', 1, -1) );
 
         $this->assertSame( grapheme_extract('',    0), p::grapheme_extract('',    0) );
@@ -47,6 +51,9 @@ class IntlTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame( 'd' , p::grapheme_extract('déjà', 2, GRAPHEME_EXTR_MAXBYTES) );
         $this->assertSame( 'dé', p::grapheme_extract('déjà', 2, GRAPHEME_EXTR_MAXCHARS) );
+
+        $this->assertFalse( @p::grapheme_extract(array(), 0) );
+        $this->assertFalse( @grapheme_extract(array(), 0) );
     }
 
     /**

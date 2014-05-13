@@ -28,12 +28,25 @@ class Intl
 {
     static function grapheme_extract($s, $size, $type = GRAPHEME_EXTR_COUNT, $start = 0, &$next = 0)
     {
-        $s = substr($s, $start) . '';
+        if (!is_scalar($s)) {
+            $hasError = false;
+            set_error_handler(function () use (&$hasError) {$hasError = true;});
+            $next = substr($s, $start);
+            restore_error_handler();
+            if ($hasError) {
+                substr($s, $start);
+                $s = '';
+            } else {
+                $s = $next;
+            }
+        } else {
+            $s = substr($s, $start);
+        }
         $size  = (int) $size;
         $type  = (int) $type;
         $start = (int) $start;
 
-        if ('' === $s || 0 > $size || 0 > $start || 0 > $type || 2 < $type) return false;
+        if (!isset($s[0]) || 0 > $size || 0 > $start || 0 > $type || 2 < $type) return false;
         if (0 === $size) return '';
 
         $next = $start;
