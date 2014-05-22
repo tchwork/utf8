@@ -6,7 +6,11 @@ class HhvmTest extends \PHPUnit_Framework_TestCase
 {
     function test1()
     {
-        $this->assertFalse( @grapheme_extract(array(), 0) );
+        if (defined('HHVM_VERSION')) {
+            $this->assertNull( @grapheme_extract(array(), 0) );
+        } else {
+            $this->assertFalse( @grapheme_extract(array(), 0) );
+        }
     }
 
     function test2()
@@ -56,6 +60,10 @@ class HhvmTest extends \PHPUnit_Framework_TestCase
     {
         $arg = 456;
 
-        $this->assertSame( 123, func_get_arg(0) );
+        if (defined('HHVM_VERSION')) {
+            $this->assertSame( 456, func_get_arg(0) );
+        } else {
+            $this->assertSame( 123, func_get_arg(0) );
+        }
     }
 }
