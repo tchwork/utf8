@@ -6,11 +6,7 @@ class HhvmTest extends \PHPUnit_Framework_TestCase
 {
     function test1()
     {
-        if (defined('HHVM_VERSION')) {
-            $this->assertNull( @grapheme_extract(array(), 0) );
-        } else {
-            $this->assertFalse( @grapheme_extract(array(), 0) );
-        }
+        $this->assertFalse( @grapheme_extract(array(), 0) );
     }
 
     function test2()

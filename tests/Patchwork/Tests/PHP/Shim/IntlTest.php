@@ -53,12 +53,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
         $this->assertSame( 'dé', p::grapheme_extract('déjà', 2, GRAPHEME_EXTR_MAXCHARS) );
 
         $this->assertFalse( @p::grapheme_extract(array(), 0) );
-
-        if (defined('HHVM_VERSION')) {
-            $this->assertNull( @grapheme_extract(array(), 0) );
-        } else {
-            $this->assertFalse( @grapheme_extract(array(), 0) );
-        }
+        $this->assertFalse( @grapheme_extract(array(), 0) );
     }
 
     /**
