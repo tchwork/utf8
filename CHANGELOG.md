@@ -1,3 +1,8 @@
+## v1.1.24 (2014-06-17)
+
+- update tests for latest HHVM fixes
+- move legacy GRAPHEME_CLUSTER_RX version to Intl shim
+
 ## v1.1.23 (2014-05-22)
 
 - enable tests for PHP 5.6
