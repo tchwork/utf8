@@ -29,7 +29,7 @@ class WinFsStreamWrapper
     {
         list($fs, $path) = self::fs($path);
         if ($fs->FileExists($path)) $fs->GetFile($path)->Attributes |= 2;
-        else if ($fs->FolderExists($path)) $f = $fs->GetFolder($path)->Attributes |= 2;
+        else if ($fs->FolderExists($path)) $fs->GetFolder($path)->Attributes |= 2;
         else return false;
 
         return true;
