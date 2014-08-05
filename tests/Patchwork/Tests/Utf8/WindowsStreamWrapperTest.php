@@ -13,9 +13,9 @@ if (! defined('STREAM_META_TOUCH'))
 }
 
 /**
- * @covers Patchwork\Utf8\WinFsStreamWrapper::<!public>
+ * @covers Patchwork\Utf8\WindowsStreamWrapper::<!public>
  */
-class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
+class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
 {
     protected static $dir;
 
@@ -23,9 +23,9 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     {
         if (extension_loaded('com_dotnet'))
         {
-            stream_wrapper_register('win', 'Patchwork\Utf8\WinFsStreamWrapper');
+            stream_wrapper_register('win', 'Patchwork\Utf8\WindowsStreamWrapper');
             $dir = __DIR__;
-            list(,$dir) = \Patchwork\Utf8\WinFsStreamWrapper::fs($dir, false); // Convert $dir to UTF-8
+            list(,$dir) = \Patchwork\Utf8\WindowsStreamWrapper::fs($dir, false); // Convert $dir to UTF-8
             self::$dir = 'win://' . $dir . '/../µ€';
             mkdir(self::$dir);
         }
@@ -35,7 +35,7 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     {
         if (extension_loaded('com_dotnet'))
         {
-            list($fs, $path) = \Patchwork\Utf8\WinFsStreamWrapper::fs(self::$dir);
+            list($fs, $path) = \Patchwork\Utf8\WindowsStreamWrapper::fs(self::$dir);
             if ($fs->FolderExists($path)) $fs->GetFolder($path)->Delete(true);
             stream_wrapper_unregister('win');
         }
@@ -47,7 +47,7 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::fs
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::fs
      */
     function testRelDir()
     {
@@ -59,10 +59,10 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::dir_opendir
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::dir_readdir
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::dir_rewinddir
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::dir_closedir
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::dir_opendir
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::dir_readdir
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::dir_rewinddir
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::dir_closedir
      */
     function testDir()
     {
@@ -95,8 +95,8 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::rename
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::unlink
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::rename
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::unlink
      */
     function testFileOp()
     {
@@ -108,11 +108,11 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_open
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_write
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_read
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_eof
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_close
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::stream_open
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::stream_write
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::stream_read
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::stream_eof
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::stream_close
      */
     function testFilePutGetContents()
     {
@@ -126,8 +126,8 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::fopen
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::fclose
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::fopen
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::fclose
      */
     function testFopenX()
     {
@@ -142,8 +142,8 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::mkdir
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::rmdir
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::mkdir
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::rmdir
      */
     function testMkdir()
     {
@@ -174,8 +174,8 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::mkdir
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::rmdir
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::mkdir
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::rmdir
      */
     function testMkdirRecursive()
     {
@@ -189,7 +189,7 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::url_stat
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::url_stat
      */
     function testStat()
     {
@@ -197,12 +197,12 @@ class WinFsStreamWrapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::stream_metadata
-     * @covers Patchwork\Utf8\WinFsStreamWrapper::unlink
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::stream_metadata
+     * @covers Patchwork\Utf8\WindowsStreamWrapper::unlink
      */
     function testStreamtMetadata()
     {
-        $win = new \Patchwork\Utf8\WinFsStreamWrapper;
+        $win = new \Patchwork\Utf8\WindowsStreamWrapper;
         $f = self::$dir . '/это';
 
         $this->assertFalse(file_exists($f));

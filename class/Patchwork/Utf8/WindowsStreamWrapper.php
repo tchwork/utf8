@@ -14,12 +14,12 @@ namespace Patchwork\Utf8;
  * Unicode UTF-8 aware stream based filesystem access on MS-Windows.
  *
  * Based on COM Scripting.FileSystemObject object and short paths.
- * Enabled by e.g.: stream_wrapper_register('win', 'Patchwork\Utf8\WinFsStreamWrapper');
+ * See Patchwork\Utf8::wrapPath()
  *
  * See also https://code.google.com/p/php-wfio/ for a PHP extension
  * and comments on http://www.rooftopsolutions.nl/blog/filesystem-encoding-and-php
  */
-class WinFsStreamWrapper
+class WindowsStreamWrapper
 {
     public $context;
 
