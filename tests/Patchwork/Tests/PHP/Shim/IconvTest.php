@@ -21,7 +21,7 @@ class IconvTest extends \PHPUnit_Framework_TestCase
             $this->assertSame( PHP_VERSION_ID >= 50400 ? false : 'n', @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
             $this->assertSame( 'nud', iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
         }
-        else if (PHP_VERSION_ID >= 50400 && !defined('HHVM_VERSION'))
+        else if (PHP_VERSION_ID >= 50400)
         {
             $this->assertSame( false, @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
             $this->assertSame( false, @iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
