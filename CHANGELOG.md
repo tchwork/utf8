@@ -3,6 +3,15 @@
 - add best-fit mappings for UTF-8 to Code Page approximations
 - add portable Unicode filesystem access under Windows and other OSes
 
+## v1.1.27 (2015-01-11)
+
+- update to Unicode 7.0
+- fix iconv shim compat layer
+
+## v1.1.26 (2014-11-08)
+
+- tweak composer.json
+
 ## v1.1.25 (2014-08-05)
 
 - update travis matrix

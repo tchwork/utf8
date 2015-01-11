@@ -299,7 +299,7 @@ class Mbstring
         return iconv_strlen($s, $encoding . '//IGNORE');
     }
 
-    static function mb_strpos ($haystack, $needle, $offset = 0, $encoding = INF)
+    static function mb_strpos($haystack, $needle, $offset = 0, $encoding = INF)
     {
         INF === $encoding && $encoding = self::$internal_encoding;
         if ('' === $needle .= '')
