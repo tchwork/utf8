@@ -1,3 +1,17 @@
+## v1.1.27 (2015-01-11)
+
+- update to Unicode 7.0
+- fix iconv shim compat layer
+
+## v1.1.26 (2014-11-08)
+
+- tweak composer.json
+
+## v1.1.25 (2014-08-05)
+
+- update travis matrix
+- add composer branch alias
+
 ## v1.1.24 (2014-06-17)
 
 - update tests for latest HHVM fixes
