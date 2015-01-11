@@ -386,7 +386,7 @@ class WindowsStreamWrapper
             $e = error_reporting(0);
         }
 
-        if (STREAM_URL_STAT_LINK & $flags) $f = lstat($f->ShortPath);
+        if (STREAM_URL_STAT_LINK & $flags) $f = @lstat($f->ShortPath) ?: stat($f->ShortPath);
         else $f = stat($f->ShortPath);
 
         if (STREAM_URL_STAT_QUIET & $flags)
