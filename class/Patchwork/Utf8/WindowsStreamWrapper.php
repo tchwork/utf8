@@ -38,6 +38,11 @@ class WindowsStreamWrapper
     static function fs($path, $is_utf8 = true)
     {
         static $fs;
+
+        if (! class_exists('COM', false)) {
+            throw new \RuntimeException('The `wfio` or `com_dotnet` extension is required to handle UTF-8 filesystem access on Windows');
+        }
+
         isset($fs) or $fs = new \COM('Scripting.FileSystemObject', null, CP_UTF8);
 
         $path = explode('://', $path, 2);

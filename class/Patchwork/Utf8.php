@@ -98,12 +98,15 @@ class Utf8
             {
                 static::$pathPrefix = 'wfio://';
             }
-            else if (defined('PHP_WINDOWS_VERSION_BUILD'))
+            else if ('\\' === DIRECTORY_SEPARATOR && class_exists('COM', false))
             {
                 static::$pathPrefix = 'utf8'.mt_rand();
                 stream_wrapper_register(static::$pathPrefix, 'Patchwork\Utf8\WindowsStreamWrapper');
                 static::$pathPrefix .= '://';
             } else {
+                if ('\\' === DIRECTORY_SEPARATOR) {
+                    trigger_error('The `wfio` or `com_dotnet` extension is required to handle UTF-8 filesystem access on Windows');
+                }
                 static::$pathPrefix = 'file://';
             }
         }
