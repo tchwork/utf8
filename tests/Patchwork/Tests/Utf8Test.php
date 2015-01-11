@@ -405,7 +405,7 @@ oooooooooooooooooooooo"),
 
         $a['f'] = (object) $a;
 
-        $b = \Patchwork\Utf8::filter($a);
+        $b = u::filter($a);
         $b['f'] = (array) $a['f'];
 
         $expect = array(
@@ -420,5 +420,66 @@ oooooooooooooooooooooo"),
         $expect['f'] = $expect;
 
         $this->assertSame($expect, $b);
+    }
+
+    /**
+     * @covers Patchwork\Utf8::strwidth
+     */
+    function testStrwidth()
+    {
+        $this->assertSame(4, u::strwidth('déjà'));
+        $this->assertSame(4, u::strwidth(n::normalize('déjà', n::NFD)));
+
+        $wide = array(
+            0x00 => 0,
+            0x19 => 1,
+            0x7F => 1,
+            0x9F => 1,
+            0xA0 => 1,
+            0xAD => 1,
+            0x0A => 0,
+            0x300 => 0,
+            0x488 => 0,
+            0x600 => 0,
+            0x1160 => 0,
+            0x11FF => 0,
+            0x200B => 0,
+            0x1100 => 2,
+            0x2160 => 1,
+            0x3F60 => 2,
+            0x303F => 1,
+            0x2329 => 2,
+            0xAED0 => 2,
+            0x232A => 2,
+            0xFFA4 => 1,
+            0xFE10 => 2,
+            0xFE30 => 2,
+            0xFF00 => 2,
+            0xF900 => 2,
+        );
+
+        $lines = array(
+            "\x1B[32mZ\x1B[0m\x1B[m" => 1,
+        );
+        $str = '';
+        $width = 0;
+
+        foreach ($wide as $c => $w) {
+            $c = u::chr($c);
+            $this->assertSame($w, u::strwidth($c), '\x'.dechex(u::ord($c)));
+            if ("\n" === $c) {
+                $lines[$str] = $width;
+            } else {
+                $str .= $c;
+                $width += $w;
+            }
+        }
+        $lines[$str] = $width;
+
+        foreach ($lines as $str => $width) {
+            $this->assertSame($width, u::strwidth($str));
+        }
+
+        $this->assertSame(max($lines), u::strwidth(implode("\r", array_keys($lines))));
     }
 }

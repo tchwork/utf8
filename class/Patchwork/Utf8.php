@@ -599,6 +599,30 @@ class Utf8
         return utf8_decode($s);
     }
 
+    static function strwidth($s)
+    {
+        if (false !== strpos($s, "\r"))
+        {
+            $s = str_replace("\r\n", "\n", $s);
+            $s = strtr($s, "\r", "\n");
+        }
+        $width = 0;
+
+        foreach (explode("\n", $s) as $s)
+        {
+            $s = preg_replace('/\x1B\[[\d;]*m/', '', $s);
+            $c = substr_count($s, "\xAD") - substr_count($s, "\x08");
+            $s = preg_replace('/[\x00\x05\x07\p{Mn}\p{Me}\p{Cf}\x{1160}-\x{11FF}\x{200B}]+/u', '', $s);
+            preg_replace('/[\x{1100}-\x{115F}\x{2329}\x{232A}\x{2E80}-\x{303E}\x{3040}-\x{A4CF}\x{AC00}-\x{D7A3}\x{F900}-\x{FAFF}\x{FE10}-\x{FE19}\x{FE30}-\x{FE6F}\x{FF00}-\x{FF60}\x{FFE0}-\x{FFE6}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}]/u', '', $s, -1, $wide);
+
+            if ($width < $c = iconv_strlen($s, 'UTF-8') + $wide + $c)
+            {
+                $width = $c;
+            }
+        }
+
+        return $width;
+    }
 
     protected static function rxClass($s, $class = '')
     {
