@@ -1,3 +1,11 @@
+## v1.2.0 (2015-01-12)
+
+- add u::strwidth() to get the width of a string when printed on a terminal
+- add more mbstring shims
+- add a note about https://bugs.php.net/65358
+- fail properly when COM is not loaded
+- fallback on stat() when lstat() fails
+
 ## v1.2.0-beta (2014-08-05)
 
 - add best-fit mappings for UTF-8 to Code Page approximations

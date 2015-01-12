@@ -247,4 +247,14 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('utf8'), p::mb_encoding_aliases('UTF-8'));
         $this->assertFalse(p::mb_encoding_aliases('ASCII'));
     }
+
+    /**
+     * @covers Patchwork\PHP\Shim\Mbstring::mb_strwidth
+     */
+    function testmb_strwidth()
+    {
+        $this->assertSame( 2, p::mb_strwidth("\0実") );
+        $this->assertSame( 4, p::mb_strwidth('déjà') );
+        $this->assertSame( 4, p::mb_strwidth(utf8_decode('déjà'), 'CP1252') );
+    }
 }
