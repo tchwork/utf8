@@ -1,3 +1,7 @@
+## v1.1.28 (2015-01-12)
+
+- fix mbstring shim for html-entities
+
 ## v1.1.27 (2015-01-11)
 
 - update to Unicode 7.0

@@ -38,9 +38,9 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame( utf8_decode('déjà'), p::mb_convert_encoding('déjà', 'Windows-1252') );
         $this->assertSame( base64_encode('déjà'), p::mb_convert_encoding('déjà', 'Base64') );
-        $this->assertSame( 'd&eacute;j&agrave;', p::mb_convert_encoding('déjà', 'Html-entities') );
+        $this->assertSame( '&#23455;<&>d&eacute;j&agrave;', p::mb_convert_encoding('実<&>déjà', 'Html-entities') );
         $this->assertSame( 'déjà', p::mb_convert_encoding(base64_encode('déjà'), 'Utf-8', 'Base64') );
-        $this->assertSame( 'déjà', p::mb_convert_encoding('d&eacute;j&agrave;', 'Utf-8', 'Html-entities') );
+        $this->assertSame( 'déjà', p::mb_convert_encoding('d&eacute;j&#224;', 'Utf-8', 'Html-entities') );
     }
 
     /**

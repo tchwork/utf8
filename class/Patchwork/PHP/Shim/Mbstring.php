@@ -420,7 +420,27 @@ class Mbstring
 
     protected static function html_encoding_callback($m)
     {
-        return htmlentities($m[0], ENT_COMPAT, 'UTF-8');
+        $i = 1;
+        $entities = '';
+        $m = unpack('C*', htmlentities($m[0], ENT_COMPAT, 'UTF-8'));
+
+        while (isset($m[$i])) {
+            if (0x80 > $m[$i]) {
+                $entities .= chr($m[$i++]);
+                continue;
+            }
+            if (0xF0 <= $m[$i]) {
+                $c = (($m[$i++] - 0xF0) << 18) + (($m[$i++] - 0x80) << 12) + (($m[$i++] - 0x80) << 6) + $m[$i++] - 0x80;
+            } elseif (0xE0 <= $m[$i]) {
+                $c = (($m[$i++] - 0xE0) << 12) + (($m[$i++] - 0x80) << 6) + $m[$i++]  - 0x80;
+            } else {
+                $c = (($m[$i++] - 0xC0) << 6) + $m[$i++] - 0x80;
+            }
+
+            $entities .= '&#'.$c.';';
+        }
+
+        return $entities;
     }
 
     protected static function title_case_lower($s)
