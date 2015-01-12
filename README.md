@@ -20,9 +20,8 @@ that arise when handling UTF-8 in PHP: Unicode concepts, related algorithms,
 bugs in PHP core, workarounds, etc.
 
 Version 1.2 adds best-fit mappings for UTF-8 to *Code Page* approximations.
-It also adds Unicode filesystem access under Windows,
-using [wfio](https://github.com/kenjiuno/php-wfio) when possible
-or a COM based fallback otherwise.
+It also adds Unicode filesystem access under Windows, using preferably
+[wfio](https://github.com/kenjiuno/php-wfio) or a COM based fallback otherwise.
 
 Portability
 -----------

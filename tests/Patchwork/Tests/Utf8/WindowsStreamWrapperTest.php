@@ -152,6 +152,7 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
 
         $d = array(
             'fr' => 'déjà',
+            'gr' => 'Ελλάδα',
             'jp' => 'は、広く使われているオープンソースの汎用スクリプト言語です。',
             'cn' => '是一种被广泛应用的开放源代码的多用途脚本语言',
             'ru' => 'это распространенный язык программирования',
@@ -161,16 +162,19 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
         {
             $this->assertTrue(mkdir(self::$dir . '/' . $d));
 
-            // @todo: remove the @ and fixme
-            @fclose(fopen(self::$dir . '/' . $d . '/' . $d, 'wb'));
-            @unlink(self::$dir . '/' . $d . '/' . $d);
+            if ($h = @fopen(self::$dir . '/' . $d . '/' . $d, 'wb'))
+            {
+                fclose($h);
+                unlink(self::$dir . '/' . $d . '/' . $d);
+            }
 
             $this->assertTrue(rmdir(self::$dir . '/' . $d));
+
+            if (!$h) break;
         }
 
         $h = @fopen(self::$dir . '/' . $d, 'wb');
-        $this->assertFalse($h);
-        $this->markTestIncomplete('fopen() should not fail, this has to be fixed.');
+        $this->assertFalse($h, 'fopen() fails thanks to https://bugs.php.net/65358');
     }
 
     /**
