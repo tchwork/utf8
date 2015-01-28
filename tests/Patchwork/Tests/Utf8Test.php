@@ -379,6 +379,10 @@ oooooooooooooooooooooo"),
      */
     function testJson_decode()
     {
+        if (!function_exists('json_encode')) {
+            $this->markTestSkipped('json extension is not loaded');
+        }
+
         $c = "déjà";
         $d = n::normalize($c, n::NFD);
         $this->assertSame( $c, u::json_decode(json_encode($d)) );

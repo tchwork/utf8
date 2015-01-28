@@ -1,3 +1,7 @@
+## v1.2.1 (2015-01-28)
+
+- fix double declaration in mbstring shim
+
 ## v1.2.0 (2015-01-12)
 
 - add u::strwidth() to get the width of a string when printed on a terminal

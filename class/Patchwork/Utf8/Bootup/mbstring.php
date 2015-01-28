@@ -34,7 +34,6 @@ function mb_strpos($s, $needle, $offset = 0, $enc = INF) {return s\Mbstring::mb_
 function mb_strtolower($s, $enc = INF) {return s\Mbstring::mb_strtolower($s, $enc);};
 function mb_strtoupper($s, $enc = INF) {return s\Mbstring::mb_strtoupper($s, $enc);};
 function mb_substitute_character($char = INF) {return s\Mbstring::mb_substitute_character($char);};
-function mb_substr_count($s, $needle) {return substr_count($s, $needle);};
 function mb_substr($s, $start, $length = 2147483647, $enc = INF) {return s\Mbstring::mb_substr($s, $start, $length, $enc);};
 function mb_stripos($s, $needle, $offset = 0, $enc = INF) {return s\Mbstring::mb_stripos($s, $needle, $offset, $enc);};
 function mb_stristr($s, $needle, $part = false, $enc = INF) {return s\Mbstring::mb_stristr($s, $needle, $part, $enc);};
