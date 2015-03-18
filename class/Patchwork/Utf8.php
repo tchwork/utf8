@@ -555,18 +555,18 @@ class Utf8
     static function ucfirst($s)
     {
         $c = iconv_substr($s, 0, 1, 'UTF-8');
-        return static::ucwords($c) . substr($s, strlen($c));
+        return mb_convert_case($c, MB_CASE_UPPER, 'UTF-8') . mb_substr($s, mb_strlen($c, 'UTF-8'), NULL, 'UTF-8');
     }
 
     static function lcfirst($s)
     {
         $c = iconv_substr($s, 0, 1, 'UTF-8');
-        return static::strtolower($c) . substr($s, strlen($c));
+        return mb_convert_case($c, MB_CASE_LOWER, 'UTF-8') . mb_substr($s, mb_strlen($c, 'UTF-8'), NULL, 'UTF-8');
     }
 
     static function ucwords($s)
     {
-        return mb_convert_case($s, MB_CASE_TITLE, 'UTF-8');
+        return implode(' ', array_map(array('Patchwork\Utf8', 'ucfirst'), explode(' ', $s)));
     }
 
     static function number_format($number, $decimals = 0, $dec_point = '.', $thousands_sep = ',')
