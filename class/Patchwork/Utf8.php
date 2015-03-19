@@ -555,24 +555,31 @@ class Utf8
     static function ucfirst($s)
     {
         $c = iconv_substr($s, 0, 1, 'UTF-8');
-        return mb_convert_case($c, MB_CASE_UPPER, 'UTF-8') . mb_substr($s, mb_strlen($c, 'UTF-8'), NULL, 'UTF-8');
+        return static::strtoupper($c) . substr($s, strlen($c));
     }
 
     static function lcfirst($s)
     {
         $c = iconv_substr($s, 0, 1, 'UTF-8');
-        return mb_convert_case($c, MB_CASE_LOWER, 'UTF-8') . mb_substr($s, mb_strlen($c, 'UTF-8'), NULL, 'UTF-8');
+        return static::strtolower($c) . substr($s, strlen($c));
     }
 
     static function ucwords($s)
     {
-        return mb_ereg_replace_callback(
-            "\b(.)",
-            function ($matches) {
-                return mb_convert_case($matches[1], MB_CASE_UPPER, 'UTF-8');
-            },
-            $s
-        );
+        if (PHP_VERSION_ID < 50401)
+        {
+            return mb_ereg_replace("\b(.)", "mb_convert_case('\\1', MB_CASE_UPPER, 'UTF-8')", $s, 'e');
+        }
+        else
+        {
+            return mb_ereg_replace_callback(
+                "\b(.)",
+                function ($matches) {
+                    return mb_convert_case($matches[1], MB_CASE_UPPER, 'UTF-8');
+                },
+                $s
+            );
+        }
     }
 
     static function number_format($number, $decimals = 0, $dec_point = '.', $thousands_sep = ',')
