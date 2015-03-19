@@ -566,7 +566,13 @@ class Utf8
 
     static function ucwords($s)
     {
-        return implode(' ', array_map(array('Patchwork\Utf8', 'ucfirst'), explode(' ', $s)));
+        return mb_ereg_replace_callback(
+            "\b(.)",
+            function ($matches) {
+                return mb_convert_case($matches[1], MB_CASE_UPPER, 'UTF-8');
+            },
+            $s
+        );
     }
 
     static function number_format($number, $decimals = 0, $dec_point = '.', $thousands_sep = ',')
