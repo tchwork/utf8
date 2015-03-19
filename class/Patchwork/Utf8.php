@@ -555,7 +555,7 @@ class Utf8
     static function ucfirst($s)
     {
         $c = iconv_substr($s, 0, 1, 'UTF-8');
-        return static::strtoupper($c) . substr($s, strlen($c));
+        return static::ucwords($c) . substr($s, strlen($c));
     }
 
     static function lcfirst($s)
@@ -569,7 +569,7 @@ class Utf8
         return preg_replace_callback(
             "/\b(.)/u",
             function ($matches) {
-                return mb_convert_case($matches[1], MB_CASE_UPPER, 'UTF-8');
+                return mb_convert_case($matches[1], MB_CASE_TITLE, 'UTF-8');
             },
             $s
         );
