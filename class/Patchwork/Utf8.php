@@ -566,20 +566,13 @@ class Utf8
 
     static function ucwords($s)
     {
-        if (PHP_VERSION_ID < 50401)
-        {
-            return mb_ereg_replace("\b(.)", "mb_convert_case('\\1', MB_CASE_UPPER, 'UTF-8')", $s, 'e');
-        }
-        else
-        {
-            return mb_ereg_replace_callback(
-                "\b(.)",
-                function ($matches) {
-                    return mb_convert_case($matches[1], MB_CASE_UPPER, 'UTF-8');
-                },
-                $s
-            );
-        }
+        return preg_replace_callback(
+            "/\b(.)/u",
+            function ($matches) {
+                return mb_convert_case($matches[1], MB_CASE_UPPER, 'UTF-8');
+            },
+            $s
+        );
     }
 
     static function number_format($number, $decimals = 0, $dec_point = '.', $thousands_sep = ',')
