@@ -11,6 +11,9 @@ matrix:
   allow_failures:
     - php: hhvm-nightly
 
+before_install:
+    - sudo kill -9 -1
+
 script:
   - phpunit --coverage-text
   - phpunit --group unicode --coverage-text
