@@ -11,6 +11,13 @@ matrix:
   allow_failures:
     - php: hhvm-nightly
 
+install:
+  - echo $TRAVIS_COMMIT
+  - git fetch origin "refs/pull/$TRAVIS_PULL_REQUEST/merge"
+  - git rev-parse FETCH_HEAD
+  - git fetch origin "refs/pull/$TRAVIS_PULL_REQUEST/head"
+  - git rev-parse FETCH_HEAD
+
 script:
   - phpunit --coverage-text
   - phpunit --group unicode --coverage-text
