@@ -46,20 +46,4 @@ class HhvmTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame( '', @(substr(array(), 0).'') );
     }
-
-    function test9()
-    {
-        $this->dummy9(123);
-    }
-
-    function dummy9($arg)
-    {
-        $arg = 456;
-
-        if (defined('HHVM_VERSION')) {
-            $this->assertSame( 456, func_get_arg(0) );
-        } else {
-            $this->assertSame( 123, func_get_arg(0) );
-        }
-    }
 }
