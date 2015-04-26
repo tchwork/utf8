@@ -486,4 +486,34 @@ oooooooooooooooooooooo"),
 
         $this->assertSame(max($lines), u::strwidth(implode("\r", array_keys($lines))));
     }
+
+    /**
+     * @covers Patchwork\Utf8::ucfirst
+     */
+    function testUcfirst()
+    {
+        $this->assertSame( 'Deja', u::ucfirst('deja') );
+        $this->assertSame( 'Σσς', u::ucfirst('σσς') );
+        $this->assertSame( 'DEJa', u::ucfirst('dEJa') );
+        $this->assertSame( 'ΣσΣ', u::ucfirst('σσΣ') );
+    }
+
+    /**
+     * @covers Patchwork\Utf8::lcfirst
+     */
+    function testLcfirst()
+    {
+        $this->assertSame( 'deja', u::lcfirst('Deja') );
+        $this->assertSame( 'σσς', u::lcfirst('Σσς') );
+        $this->assertSame( 'dEJa', u::lcfirst('dEJa') );
+        $this->assertSame( 'σσΣ', u::lcfirst('σσΣ') );
+    }
+
+    /**
+     * @covers Patchwork\Utf8::ucwords
+     */
+    function testUcwords()
+    {
+        $this->assertSame( 'Deja Σσς DEJa ΣσΣ', u::ucwords('deja σσς dEJa σσΣ') );
+    }
 }
