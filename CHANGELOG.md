@@ -1,3 +1,9 @@
+## v1.1.29 (2015-04-26)
+
+- fix ucwords to be functionally the same as in-built PHP version
+- fix iconv_set_encoding deprecation notice in PHP 5.6.0
+- remove legacy test for HHVM/PHP7
+
 ## v1.1.28 (2015-01-12)
 
 - fix mbstring shim for html-entities
