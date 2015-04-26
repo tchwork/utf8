@@ -1,3 +1,10 @@
+## v1.2.2 (2015-04-26)
+
+- Fix ucwords to be functionally the same as in-built PHP version
+- Fix iconv_set_encoding deprecation notice in PHP 5.6.0
+- remove legacy test for HHVM/PHP7
+- mb_parse_str() should have no return value
+
 ## v1.2.1 (2015-01-28)
 
 - fix double declaration in mbstring shim
