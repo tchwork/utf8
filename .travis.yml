@@ -8,11 +8,7 @@ php:
   - nightly
   - hhvm-nightly
 
-matrix:
-  allow_failures:
-    - php: nightly
-    - php: hhvm-nightly
-
 script:
   - phpunit --coverage-text
-  - phpunit --group unicode --coverage-text
+  - if [[ "$TRAVIS_PHP_VERSION" != *"nightly" ]]; then phpenv config-rm xdebug.ini; fi;
+  - phpunit --group unicode
