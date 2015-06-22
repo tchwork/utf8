@@ -31,7 +31,7 @@ class Utf8LcfirstTest extends PHPUnit_Framework_TestCase
     public function test_one_char()
     {
         $str = 'Ñ';
-        $lcfirst = "ñ";
+        $lcfirst = 'ñ';
         $this->assertEquals($lcfirst, u::lcfirst($str));
     }
 

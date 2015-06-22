@@ -10,10 +10,8 @@ use Normalizer as n;
  */
 class Utf8Test extends \PHPUnit_Framework_TestCase
 {
-    static
-
-    $utf8ValidityMap = array(
-        "a" => true,
+    public static $utf8ValidityMap = array(
+        'a' => true,
         "\xC3\xB1" => true,
         "\xC3\x28" => false,
         "\xA0\xA1" => false,
@@ -28,33 +26,33 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
         "\xFC\xA1\xA1\xA1\xA1\xA1" => false,
     );
 
-
     /**
      * @covers Patchwork\Utf8::isUtf8
      */
-    function testIsUtf8()
+    public function testIsUtf8()
     {
-        foreach (self::$utf8ValidityMap as $u => $t)
-        {
-            if ($t) $this->assertTrue( u::isUtf8($u) );
-            else $this->assertFalse( u::isUtf8($u) );
+        foreach (self::$utf8ValidityMap as $u => $t) {
+            if ($t) {
+                $this->assertTrue(u::isUtf8($u));
+            } else {
+                $this->assertFalse(u::isUtf8($u));
+            }
         }
     }
 
     /**
      * @covers Patchwork\Utf8::toAscii
      */
-    function testToASCII()
+    public function testToASCII()
     {
-        $this->assertSame( '', u::toAscii('') );
-        $this->assertSame( 'deja vu', u::toAscii('déjà vu') );
-        $this->assertSame( 'i', u::toAscii('ı') );
+        $this->assertSame('', u::toAscii(''));
+        $this->assertSame('deja vu', u::toAscii('déjà vu'));
+        $this->assertSame('i', u::toAscii('ı'));
 
         $l = setlocale(LC_CTYPE, '0');
 
-        if ('glibc' === ICONV_IMPL && 'de_DE.utf8' === setlocale(LC_CTYPE, 'de_DE.utf8', '0'))
-        {
-            $this->assertSame( 'ae', u::toAscii('ä') );
+        if ('glibc' === ICONV_IMPL && 'de_DE.utf8' === setlocale(LC_CTYPE, 'de_DE.utf8', '0')) {
+            $this->assertSame('ae', u::toAscii('ä'));
         }
 
         setlocale(LC_CTYPE, $l);
@@ -63,85 +61,86 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
     /**
      * @covers Patchwork\Utf8::strtocasefold
      */
-    function testStrtocasefold()
+    public function testStrtocasefold()
     {
-        $this->assertSame( 'σσσ', u::strtocasefold('Σσς') );
-        $this->assertSame( 'iıi̇i', u::strtocasefold('Iıİi') );
+        $this->assertSame('σσσ', u::strtocasefold('Σσς'));
+        $this->assertSame('iıi̇i', u::strtocasefold('Iıİi'));
     }
 
     /**
      * @covers Patchwork\Utf8::strtonatfold
      */
-    function testStrtonatfold()
+    public function testStrtonatfold()
     {
-        $this->assertSame( 'Deja Σσς', u::strtonatfold('Déjà Σσς') );
+        $this->assertSame('Deja Σσς', u::strtonatfold('Déjà Σσς'));
     }
 
     /**
      * @covers Patchwork\Utf8::strtolower
      * @covers Patchwork\Utf8::strtoupper
      */
-    function testStrCase()
+    public function testStrCase()
     {
-        $this->assertSame( 'déjà σσς iıii', u::strtolower('DÉJÀ Σσς Iıİi') );
-        $this->assertSame( 'DÉJÀ ΣΣΣ IIİI', u::strtoupper('Déjà Σσς Iıİi') );
+        $this->assertSame('déjà σσς iıii', u::strtolower('DÉJÀ Σσς Iıİi'));
+        $this->assertSame('DÉJÀ ΣΣΣ IIİI', u::strtoupper('Déjà Σσς Iıİi'));
     }
 
     /**
      * @covers Patchwork\Utf8::substr
      */
-    function testSubstr()
+    public function testSubstr()
     {
-        $b = "deja";
-        $c = "déjà";
+        $b = 'deja';
+        $c = 'déjà';
         $d = n::normalize($c, n::NFD);
-        $this->assertTrue( $c > $d );
+        $this->assertTrue($c > $d);
 
-        $this->assertSame( '국어', u::substr('한국어', 1, 20) );
+        $this->assertSame('국어', u::substr('한국어', 1, 20));
 
-        $this->assertSame( "de", substr($b,  0,  2) );
-        $this->assertSame( "ja", substr($b, -2,  3) );
-        $this->assertSame( "ej", substr($b, -3, -1) );
-        $this->assertSame( "", substr($b,  1, -3) );
-        $this->assertSame( "", substr($c,  5,  0) ); // u::substr() returns false here
-        $this->assertSame( "", substr($c, -5,  0) ); // u::substr() returns false here
-        $this->assertSame( false, substr($b,  1, -4) );
+        $this->assertSame('de', substr($b,  0,  2));
+        $this->assertSame('ja', substr($b, -2,  3));
+        $this->assertSame('ej', substr($b, -3, -1));
+        $this->assertSame('', substr($b,  1, -3));
+        $this->assertSame('', substr($c,  5,  0)); // u::substr() returns false here
+        $this->assertSame('', substr($c, -5,  0)); // u::substr() returns false here
+        $this->assertSame(false, substr($b,  1, -4));
 
-        $this->assertSame( "jà", u::substr($c,  2    ) );
-        $this->assertSame( "jà", u::substr($c, -2    ) );
-        $this->assertSame( "dé", u::substr($c,  0,  2) );
-        $this->assertSame( "jà", u::substr($c, -2,  3) );
-        $this->assertSame( "éj", u::substr($c, -3, -1) );
-        $this->assertSame( "", u::substr($c,  1, -3) );
-        $this->assertSame( false, u::substr($c,  5,  0) ); // Modelled after grapheme_substr(), not substr() (see above)
-        $this->assertSame( false, u::substr($c, -5,  0) ); // Modelled after grapheme_substr(), not substr() (see above)
-        $this->assertSame( false, u::substr($c,  1, -4) );
+        $this->assertSame('jà', u::substr($c,  2));
+        $this->assertSame('jà', u::substr($c, -2));
+        $this->assertSame('dé', u::substr($c,  0,  2));
+        $this->assertSame('jà', u::substr($c, -2,  3));
+        $this->assertSame('éj', u::substr($c, -3, -1));
+        $this->assertSame('', u::substr($c,  1, -3));
+        $this->assertSame(false, u::substr($c,  5,  0)); // Modelled after grapheme_substr(), not substr() (see above)
+        $this->assertSame(false, u::substr($c, -5,  0)); // Modelled after grapheme_substr(), not substr() (see above)
+        $this->assertSame(false, u::substr($c,  1, -4));
 
-        $this->assertSame( n::normalize("dé", n::NFD), u::substr($d,  0,  2) );
-        $this->assertSame( n::normalize("jà", n::NFD), u::substr($d, -2,  3) );
-        $this->assertSame( n::normalize("éj", n::NFD), u::substr($d, -3, -1) );
-        $this->assertSame( "", u::substr($d,  1, -3) );
-        $this->assertSame( false, u::substr($d,  1, -4) );
+        $this->assertSame(n::normalize('dé', n::NFD), u::substr($d,  0,  2));
+        $this->assertSame(n::normalize('jà', n::NFD), u::substr($d, -2,  3));
+        $this->assertSame(n::normalize('éj', n::NFD), u::substr($d, -3, -1));
+        $this->assertSame('', u::substr($d,  1, -3));
+        $this->assertSame(false, u::substr($d,  1, -4));
     }
 
     /**
      * @covers Patchwork\Utf8::strlen
      */
-    function testStrlen()
+    public function testStrlen()
     {
-        foreach (self::$utf8ValidityMap as $u => $t) if ($t)
-        {
-            $this->assertSame( 1, u::strlen($u) );
+        foreach (self::$utf8ValidityMap as $u => $t) {
+            if ($t) {
+                $this->assertSame(1, u::strlen($u));
+            }
         }
 
-        $c = "déjà";
+        $c = 'déjà';
         $d = n::normalize($c, n::NFD);
-        $this->assertTrue( $c > $d );
+        $this->assertTrue($c > $d);
 
-        $this->assertSame( 4, u::strlen($c) );
-        $this->assertSame( 4, u::strlen($d) );
+        $this->assertSame(4, u::strlen($c));
+        $this->assertSame(4, u::strlen($d));
 
-        $this->assertSame( 3, u::strlen(n::normalize('한국어', n::NFD)) );
+        $this->assertSame(3, u::strlen(n::normalize('한국어', n::NFD)));
     }
 
     /**
@@ -150,17 +149,17 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8::strncasecmp
      * @covers Patchwork\Utf8::substr_compare
      */
-    function testStrCmp()
+    public function testStrCmp()
     {
-        $this->assertTrue( 0 !== u::strcasecmp('İ', 'i') );
-        $this->assertTrue( 0 === u::strnatcasecmp('İ', 'i') );
-        $this->assertTrue( 0 !== u::strncasecmp('İabc', 'idef', 1) );
-        $this->assertTrue( 0 !== u::substr_compare('abcİdef', 'i', 3, 1, true) );
+        $this->assertTrue(0 !== u::strcasecmp('İ', 'i'));
+        $this->assertTrue(0 === u::strnatcasecmp('İ', 'i'));
+        $this->assertTrue(0 !== u::strncasecmp('İabc', 'idef', 1));
+        $this->assertTrue(0 !== u::substr_compare('abcİdef', 'i', 3, 1, true));
 
-        $this->assertTrue( 0 !== u::strcasecmp('I', 'ı') );
-        $this->assertTrue( 0 !== u::strnatcasecmp('I', 'ı') );
-        $this->assertTrue( 0 !== u::strncasecmp('Iabc', 'ıdef', 1) );
-        $this->assertTrue( 0 !== u::substr_compare('abcIdef', 'ı', 3, 1, true) );
+        $this->assertTrue(0 !== u::strcasecmp('I', 'ı'));
+        $this->assertTrue(0 !== u::strnatcasecmp('I', 'ı'));
+        $this->assertTrue(0 !== u::strncasecmp('Iabc', 'ıdef', 1));
+        $this->assertTrue(0 !== u::substr_compare('abcIdef', 'ı', 3, 1, true));
     }
 
     /**
@@ -169,20 +168,20 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8::strrpos
      * @covers Patchwork\Utf8::strripos
      */
-    function testStrpos()
+    public function testStrpos()
     {
-        $this->assertSame( false, u::strpos('abc', '') );
-        $this->assertSame( false, u::strpos('abc', 'd') );
-        $this->assertSame( false, u::strpos('abc', 'a', 3) );
-        $this->assertSame( 0, u::strpos('abc', 'a', -1) );
-        $this->assertSame( 1, u::strpos('한국어', '국') );
-        $this->assertSame( 3, u::stripos('DÉJÀ', 'à') );
-        $this->assertSame( 1, u::stripos('aςσb', 'ΣΣ') );
-        $this->assertSame( false, u::strrpos('한국어', '') );
-        $this->assertSame( 1, u::strrpos('한국어', '국') );
-        $this->assertSame( 3, u::strripos('DÉJÀ', 'à') );
-        $this->assertSame( 1, u::strripos('aςσb', 'ΣΣ') );
-        $this->assertSame( 16, u::stripos('der Straße nach Paris', 'Paris') );
+        $this->assertSame(false, u::strpos('abc', ''));
+        $this->assertSame(false, u::strpos('abc', 'd'));
+        $this->assertSame(false, u::strpos('abc', 'a', 3));
+        $this->assertSame(0, u::strpos('abc', 'a', -1));
+        $this->assertSame(1, u::strpos('한국어', '국'));
+        $this->assertSame(3, u::stripos('DÉJÀ', 'à'));
+        $this->assertSame(1, u::stripos('aςσb', 'ΣΣ'));
+        $this->assertSame(false, u::strrpos('한국어', ''));
+        $this->assertSame(1, u::strrpos('한국어', '국'));
+        $this->assertSame(3, u::strripos('DÉJÀ', 'à'));
+        $this->assertSame(1, u::strripos('aςσb', 'ΣΣ'));
+        $this->assertSame(16, u::stripos('der Straße nach Paris', 'Paris'));
     }
 
     /**
@@ -191,41 +190,41 @@ class Utf8Test extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8::strrchr
      * @covers Patchwork\Utf8::strrichr
      */
-    function testStrstr()
+    public function testStrstr()
     {
-        $this->assertSame( 'éjàdéjà', u::strstr('déjàdéjà', 'é') );
-        $this->assertSame( 'ÉJÀDÉJÀ', u::stristr('DÉJÀDÉJÀ', 'é') );
-        $this->assertSame( 'ςσb', u::stristr('aςσb', 'ΣΣ') );
-        $this->assertSame( 'éjà', u::strrchr('déjàdéjà', 'é') );
-        $this->assertSame( 'ÉJÀ', u::strrichr('DÉJÀDÉJÀ', 'é') );
+        $this->assertSame('éjàdéjà', u::strstr('déjàdéjà', 'é'));
+        $this->assertSame('ÉJÀDÉJÀ', u::stristr('DÉJÀDÉJÀ', 'é'));
+        $this->assertSame('ςσb', u::stristr('aςσb', 'ΣΣ'));
+        $this->assertSame('éjà', u::strrchr('déjàdéjà', 'é'));
+        $this->assertSame('ÉJÀ', u::strrichr('DÉJÀDÉJÀ', 'é'));
 
-        $this->assertSame( 'd', u::strstr('déjàdéjà', 'é', true) );
-        $this->assertSame( 'D', u::stristr('DÉJÀDÉJÀ', 'é', true) );
-        $this->assertSame( 'a', u::stristr('aςσb', 'ΣΣ', true) );
-        $this->assertSame( 'déjàd', u::strrchr('déjàdéjà', 'é', true) );
-        $this->assertSame( 'DÉJÀD', u::strrichr('DÉJÀDÉJÀ', 'é', true) );
-        $this->assertSame( 'Paris', u::stristr('der Straße nach Paris', 'Paris') );
+        $this->assertSame('d', u::strstr('déjàdéjà', 'é', true));
+        $this->assertSame('D', u::stristr('DÉJÀDÉJÀ', 'é', true));
+        $this->assertSame('a', u::stristr('aςσb', 'ΣΣ', true));
+        $this->assertSame('déjàd', u::strrchr('déjàdéjà', 'é', true));
+        $this->assertSame('DÉJÀD', u::strrichr('DÉJÀDÉJÀ', 'é', true));
+        $this->assertSame('Paris', u::stristr('der Straße nach Paris', 'Paris'));
     }
 
     /**
      * @covers Patchwork\Utf8::wordwrap
      */
-    function testWordwrap()
+    public function testWordwrap()
     {
         $text = "string\nwith\nnew\nlines";
-        $this->assertSame( $text, u::wordwrap($text) );
+        $this->assertSame($text, u::wordwrap($text));
 
-        $text = "a  #b";
-        $this->assertSame( wordwrap($text, 2, '#', false), u::wordwrap($text, 2, '#', false) );
+        $text = 'a  #b';
+        $this->assertSame(wordwrap($text, 2, '#', false), u::wordwrap($text, 2, '#', false));
 
         $text = 'A very long woooooooooooord.';
 
-        $this->assertSame( wordwrap($text, 8, "\n", false), u::wordwrap($text, 8, "\n", false) );
-        $this->assertSame( wordwrap($text, 8, "\n", true ), u::wordwrap($text, 8, "\n", true ) );
+        $this->assertSame(wordwrap($text, 8, "\n", false), u::wordwrap($text, 8, "\n", false));
+        $this->assertSame(wordwrap($text, 8, "\n", true), u::wordwrap($text, 8, "\n", true));
 
         $this->assertSame(
             str_replace(PHP_EOL, "\n",
-"L’École supérieure de
+'L’École supérieure de
 physique et de chimie
 industrielles de la ville
 de Paris, ou ESPCI
@@ -237,9 +236,9 @@ montagne Sainte-Geneviève
 dans le cinquième
 arrondissement de Paris.
 Yoooooooooooooooooooooooo
-oooooooooooooooooooooo"),
+oooooooooooooooooooooo'),
             u::wordwrap(
-                "L’École supérieure de physique et de chimie industrielles de la ville de Paris, ou ESPCI ParisTech, est une grande école d’ingénieurs fondée en 1882. Elle est située rue Vauquelin sur la montagne Sainte-Geneviève dans le cinquième arrondissement de Paris. Yoooooooooooooooooooooooooooooooooooooooooooooo",
+                'L’École supérieure de physique et de chimie industrielles de la ville de Paris, ou ESPCI ParisTech, est une grande école d’ingénieurs fondée en 1882. Elle est située rue Vauquelin sur la montagne Sainte-Geneviève dans le cinquième arrondissement de Paris. Yoooooooooooooooooooooooooooooooooooooooooooooo',
                 25,
                 "\n",
                 true
@@ -251,9 +250,9 @@ oooooooooooooooooooooo"),
      * @covers Patchwork\Utf8::count_chars
      * @expectedException PHPUnit_Framework_Error_Warning
      */
-    function testCountChars()
+    public function testCountChars()
     {
-        $c = "déjà 한국어";
+        $c = 'déjà 한국어';
         $c .= n::normalize($c, n::NFD);
 
         $e = array(
@@ -272,20 +271,21 @@ oooooooooooooooooooooo"),
             '어' => 1,
         );
 
-        $this->assertSame( $e, u::count_chars($c, 1) );
-        $this->assertSame( $e, u::count_chars($c) );
-        $this->assertFalse( true, 'The only allowed $mode is 1' );
+        $this->assertSame($e, u::count_chars($c, 1));
+        $this->assertSame($e, u::count_chars($c));
+        $this->assertFalse(true, 'The only allowed $mode is 1');
     }
 
     /**
      * @covers Patchwork\Utf8::chr
      * @covers Patchwork\Utf8::ord
      */
-    function testChrOrd()
+    public function testChrOrd()
     {
-        foreach (self::$utf8ValidityMap as $u => $t) if ($t)
-        {
-            $this->assertSame( $u, u::chr(u::ord($u)) );
+        foreach (self::$utf8ValidityMap as $u => $t) {
+            if ($t) {
+                $this->assertSame($u, u::chr(u::ord($u)));
+            }
         }
     }
 
@@ -293,22 +293,22 @@ oooooooooooooooooooooo"),
      * @covers Patchwork\Utf8::str_pad
      * @expectedException PHPUnit_Framework_Error_Warning
      */
-    function testStr_pad()
+    public function testStr_pad()
     {
-        $this->assertSame( 'ÉÈà-à-à-à-', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_RIGHT) );
-        $this->assertSame( 'à-à-à-à-ÉÈ', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_LEFT ) );
-        $this->assertSame( 'à-à-ÉÈà-à-', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_BOTH ) );
+        $this->assertSame('ÉÈà-à-à-à-', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_RIGHT));
+        $this->assertSame('à-à-à-à-ÉÈ', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_LEFT));
+        $this->assertSame('à-à-ÉÈà-à-', u::str_pad('ÉÈ', 10, 'à-', STR_PAD_BOTH));
 
         u::str_pad('ÉÈ', 10, 'à-', -1);
-        $this->assertFalse( true, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH" );
+        $this->assertFalse(true, 'Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH');
     }
 
     /**
      * @covers Patchwork\Utf8::str_shuffle
      */
-    function testStr_shuffle()
+    public function testStr_shuffle()
     {
-        $c = "déjà 한국어";
+        $c = 'déjà 한국어';
         $c .= n::normalize($c, n::NFD);
 
         $this->assertTrue(
@@ -316,86 +316,86 @@ oooooooooooooooooooooo"),
             || $c != ($d = u::str_shuffle($c))
         );
 
-        $this->assertSame( strlen($c), strlen($d) );
-        $this->assertSame( u::strlen($c), u::strlen($d) );
-        $this->assertSame( '', u::trim($d, $c) );
+        $this->assertSame(strlen($c), strlen($d));
+        $this->assertSame(u::strlen($c), u::strlen($d));
+        $this->assertSame('', u::trim($d, $c));
     }
 
     /**
      * @covers Patchwork\Utf8::str_split
      * @expectedException PHPUnit_Framework_Error_Warning
      */
-    function testStr_split()
+    public function testStr_split()
     {
-        $this->assertSame( array('d','é','j','à'), u::str_split('déjà', 1) );
-        $this->assertSame( array('dé','jà'), u::str_split('déjà', 2) );
+        $this->assertSame(array('d', 'é', 'j', 'à'), u::str_split('déjà', 1));
+        $this->assertSame(array('dé', 'jà'), u::str_split('déjà', 2));
 
         u::str_split('déjà', 0);
-        $this->assertFalse( true, "The length of each segment must be greater than zero" );
+        $this->assertFalse(true, 'The length of each segment must be greater than zero');
     }
 
     /**
      * @covers Patchwork\Utf8::str_word_count
      */
-    function testStr_word_count()
+    public function testStr_word_count()
     {
-        $this->assertSame( array(0 => 'déjà', 5 => 'vu'), u::str_word_count('déjà vu', 2) );
-        $this->assertSame( 2, u::str_word_count('déjà vu', 0) );
-        $this->assertSame( 2, u::str_word_count('déjà vu') );
+        $this->assertSame(array(0 => 'déjà', 5 => 'vu'), u::str_word_count('déjà vu', 2));
+        $this->assertSame(2, u::str_word_count('déjà vu', 0));
+        $this->assertSame(2, u::str_word_count('déjà vu'));
     }
 
     /**
      * @covers Patchwork\Utf8::strtr
      */
-    function testStrtr()
+    public function testStrtr()
     {
-        $this->assertSame( 'déja', u::strtr('dejà', 'eà', 'éa') );
+        $this->assertSame('déja', u::strtr('dejà', 'eà', 'éa'));
     }
 
     /**
      * @covers Patchwork\Utf8::number_format
      */
-    function testNumber_format()
+    public function testNumber_format()
     {
-        $this->assertSame( '1×234¡56', u::number_format(1234.557, 2, '¡', '×') );
+        $this->assertSame('1×234¡56', u::number_format(1234.557, 2, '¡', '×'));
     }
 
     /**
      * @covers Patchwork\Utf8::utf8_encode
      * @covers Patchwork\Utf8::utf8_decode
      */
-    function testUtf8EncodeDecode()
+    public function testUtf8EncodeDecode()
     {
         $s = array_map('chr', range(0, 255));
         $s = implode('', $s);
         $e = u::utf8_encode($s);
 
-        $this->assertSame( 1, preg_match('//u', $e) );
-        $this->assertSame( $s, u::utf8_decode($e) );
+        $this->assertSame(1, preg_match('//u', $e));
+        $this->assertSame($s, u::utf8_decode($e));
     }
 
     /**
      * @covers Patchwork\Utf8::json_decode
      */
-    function testJson_decode()
+    public function testJson_decode()
     {
         if (!function_exists('json_encode')) {
             $this->markTestSkipped('json extension is not loaded');
         }
 
-        $c = "déjà";
+        $c = 'déjà';
         $d = n::normalize($c, n::NFD);
-        $this->assertSame( $c, u::json_decode(json_encode($d)) );
-        $this->assertSame( '◌' . n::normalize(substr($d, 2)), u::json_decode('"' . substr($d, 2) . '"') );
-        $this->assertSame( "\n\n\n", u::json_decode('"\n\r\n\r"') );
+        $this->assertSame($c, u::json_decode(json_encode($d)));
+        $this->assertSame('◌'.n::normalize(substr($d, 2)), u::json_decode('"'.substr($d, 2).'"'));
+        $this->assertSame("\n\n\n", u::json_decode('"\n\r\n\r"'));
     }
 
     /**
      * @covers Patchwork\Utf8::filter
      */
-    function testFilter()
+    public function testFilter()
     {
-        $c = "à";
+        $c = 'à';
         $d = n::normalize($c, n::NFD);
 
         $a = array(
@@ -415,7 +415,7 @@ oooooooooooooooooooooo"),
         $expect = array(
             'n' => 4,
             'a' => 'é',
-            'b' => '◌' . substr($d, 1),
+            'b' => '◌'.substr($d, 1),
             'c' => $c,
             'd' => $c,
             'e' => "\n\n\n",
@@ -429,7 +429,7 @@ oooooooooooooooooooooo"),
     /**
      * @covers Patchwork\Utf8::strwidth
      */
-    function testStrwidth()
+    public function testStrwidth()
     {
         $this->assertSame(4, u::strwidth('déjà'));
         $this->assertSame(4, u::strwidth(n::normalize('déjà', n::NFD)));
@@ -490,30 +490,30 @@ oooooooooooooooooooooo"),
     /**
      * @covers Patchwork\Utf8::ucfirst
      */
-    function testUcfirst()
+    public function testUcfirst()
     {
-        $this->assertSame( 'Deja', u::ucfirst('deja') );
-        $this->assertSame( 'Σσς', u::ucfirst('σσς') );
-        $this->assertSame( 'DEJa', u::ucfirst('dEJa') );
-        $this->assertSame( 'ΣσΣ', u::ucfirst('σσΣ') );
+        $this->assertSame('Deja', u::ucfirst('deja'));
+        $this->assertSame('Σσς', u::ucfirst('σσς'));
+        $this->assertSame('DEJa', u::ucfirst('dEJa'));
+        $this->assertSame('ΣσΣ', u::ucfirst('σσΣ'));
     }
 
     /**
      * @covers Patchwork\Utf8::lcfirst
      */
-    function testLcfirst()
+    public function testLcfirst()
     {
-        $this->assertSame( 'deja', u::lcfirst('Deja') );
-        $this->assertSame( 'σσς', u::lcfirst('Σσς') );
-        $this->assertSame( 'dEJa', u::lcfirst('dEJa') );
-        $this->assertSame( 'σσΣ', u::lcfirst('σσΣ') );
+        $this->assertSame('deja', u::lcfirst('Deja'));
+        $this->assertSame('σσς', u::lcfirst('Σσς'));
+        $this->assertSame('dEJa', u::lcfirst('dEJa'));
+        $this->assertSame('σσΣ', u::lcfirst('σσΣ'));
     }
 
     /**
      * @covers Patchwork\Utf8::ucwords
      */
-    function testUcwords()
+    public function testUcwords()
     {
-        $this->assertSame( 'Deja Σσς DEJa ΣσΣ', u::ucwords('deja σσς dEJa σσΣ') );
+        $this->assertSame('Deja Σσς DEJa ΣσΣ', u::ucwords('deja σσς dEJa σσΣ'));
     }
 }

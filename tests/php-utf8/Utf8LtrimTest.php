@@ -53,7 +53,7 @@ class Utf8LtrimTest extends PHPUnit_Framework_TestCase
     public function test_linefeed_mask()
     {
         $str = "ñ\nñtërnâtiônàlizætiøn";
-        $trimmed = "tërnâtiônàlizætiøn";
+        $trimmed = 'tërnâtiônàlizætiøn';
         $this->assertEquals($trimmed, u::ltrim($str, "ñ\n"));
     }
 }

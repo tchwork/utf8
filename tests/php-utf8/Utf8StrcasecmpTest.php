@@ -56,5 +56,4 @@ class Utf8StrcasecmpTest extends PHPUnit_Framework_TestCase
         $str_y = "IÑTËRNÂTIÔN\nÀLIZÆTIØN";
         $this->assertTrue(u::strcasecmp($str_x, $str_y) == 0);
     }
-
 }

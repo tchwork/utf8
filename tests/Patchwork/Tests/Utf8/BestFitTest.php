@@ -12,10 +12,10 @@ class BestFitTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Patchwork\Utf8\BestFit::fit
      */
-    function testBestFit()
+    public function testBestFit()
     {
-        $this->assertSame( '', u::fit(-1, '') );
-        $this->assertSame( iconv('UTF-8', 'CP1252', 'déjà vu'), u::fit(1252, 'déjà vu') );
-        $this->assertSame( iconv('UTF-8',  'CP936', 'déjà vu'), u::fit( 936, 'déjà vu') );
+        $this->assertSame('', u::fit(-1, ''));
+        $this->assertSame(iconv('UTF-8', 'CP1252', 'déjà vu'), u::fit(1252, 'déjà vu'));
+        $this->assertSame(iconv('UTF-8',  'CP936', 'déjà vu'), u::fit(936, 'déjà vu'));
     }
 }

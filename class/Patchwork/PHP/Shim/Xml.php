@@ -1,4 +1,5 @@
-<?php // vi: set fenc=utf-8 ts=4 sw=4 et:
+<?php
+
 /*
  * Copyright (C) 2013 Nicolas Grekas - p@tchwork.com
  *
@@ -11,48 +12,47 @@
 namespace Patchwork\PHP\Shim;
 
 /**
- * utf8_encode/decode
+ * utf8_encode/decode.
  */
 class Xml
 {
-    static function utf8_encode($s)
+    public static function utf8_encode($s)
     {
         $s .= $s;
         $len = strlen($s);
 
-        for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) switch (true)
-        {
-        case $s[$i] < "\x80": $s[$j] = $s[$i]; break;
-        case $s[$i] < "\xC0": $s[$j] = "\xC2"; $s[++$j] = $s[$i]; break;
-        default:              $s[$j] = "\xC3"; $s[++$j] = chr(ord($s[$i]) - 64); break;
+        for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
+            switch (true) {
+                case $s[$i] < "\x80": $s[$j] = $s[$i]; break;
+                case $s[$i] < "\xC0": $s[$j] = "\xC2"; $s[++$j] = $s[$i]; break;
+                default:              $s[$j] = "\xC3"; $s[++$j] = chr(ord($s[$i]) - 64); break;
+            }
         }
 
         return substr($s, 0, $j);
     }
 
-    static function utf8_decode($s)
+    public static function utf8_decode($s)
     {
         $s .= '';
         $len = strlen($s);
 
-        for ($i = 0, $j = 0; $i < $len; ++$i, ++$j)
-        {
-            switch ($s[$i] & "\xF0")
-            {
-            case "\xC0":
-            case "\xD0":
-                $c = (ord($s[$i] & "\x1F") << 6) | ord($s[++$i] & "\x3F");
-                $s[$j] = $c < 256 ? chr($c) : '?';
-                break;
+        for ($i = 0, $j = 0; $i < $len; ++$i, ++$j) {
+            switch ($s[$i] & "\xF0") {
+                case "\xC0":
+                case "\xD0":
+                    $c = (ord($s[$i] & "\x1F") << 6) | ord($s[++$i] & "\x3F");
+                    $s[$j] = $c < 256 ? chr($c) : '?';
+                    break;
 
-            case "\xF0": ++$i;
-            case "\xE0":
-                $s[$j] = '?';
-                $i += 2;
-                break;
+                case "\xF0": ++$i;
+                case "\xE0":
+                    $s[$j] = '?';
+                    $i += 2;
+                    break;
 
-            default:
-                $s[$j] = $s[$i];
+                default:
+                    $s[$j] = $s[$i];
             }
         }
 

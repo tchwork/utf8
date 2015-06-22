@@ -13,9 +13,9 @@ class BootupTest extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8\Bootup::filterRequestInputs
      * @covers Patchwork\Utf8\Bootup::filterString
      */
-    function testFilterRequestInputs()
+    public function testFilterRequestInputs()
     {
-        $c = "à";
+        $c = 'à';
         $d = n::normalize($c, n::NFD);
 
         $bak = array($_GET, $_POST, $_COOKIE, $_REQUEST, $_ENV, $_FILES);
@@ -53,7 +53,7 @@ class BootupTest extends \PHPUnit_Framework_TestCase
         $expect = array(
             'n' => 4,
             'a' => 'é',
-            'b' => '◌' . substr($d, 1),
+            'b' => '◌'.substr($d, 1),
             'c' => $c,
             'd' => $c,
             'e' => "\n\n\n",
@@ -69,12 +69,12 @@ class BootupTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Patchwork\Utf8\Bootup::filterRequestUri
      */
-    function testFilterRequestUri()
+    public function testFilterRequestUri()
     {
-        $uriA = '/' . urlencode("bàr");
-        $uriB = '/' . urlencode(utf8_decode("bàr"));
-        $uriC = '/' . utf8_decode("bàr");
-        $uriD = '/' . "bàr";
+        $uriA = '/'.urlencode('bàr');
+        $uriB = '/'.urlencode(utf8_decode('bàr'));
+        $uriC = '/'.utf8_decode('bàr');
+        $uriD = '/'.'bàr';
 
         $u = \Patchwork\Utf8\Bootup::filterRequestUri($uriA, false);
         $this->assertSame($uriA, $u);

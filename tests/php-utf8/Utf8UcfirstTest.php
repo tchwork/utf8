@@ -38,7 +38,7 @@ class Utf8UcfirstTest extends PHPUnit_Framework_TestCase
     public function test_one_char()
     {
         $str = 'ñ';
-        $ucfirst = "Ñ";
+        $ucfirst = 'Ñ';
         $this->assertEquals($ucfirst, u::ucfirst($str));
     }
 

@@ -2,8 +2,7 @@
 
 namespace Patchwork\Tests\Utf8;
 
-if (! defined('STREAM_META_TOUCH'))
-{
+if (!defined('STREAM_META_TOUCH')) {
     define('STREAM_META_TOUCH',      1);
     define('STREAM_META_ACCESS',     2);
     define('STREAM_META_OWNER',      3);
@@ -19,41 +18,43 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
 {
     protected static $dir;
 
-    static function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
-        if (extension_loaded('com_dotnet'))
-        {
+        if (extension_loaded('com_dotnet')) {
             stream_wrapper_register('win', 'Patchwork\Utf8\WindowsStreamWrapper');
             $dir = __DIR__;
-            list(,$dir) = \Patchwork\Utf8\WindowsStreamWrapper::fs($dir, false); // Convert $dir to UTF-8
-            self::$dir = 'win://' . $dir . '/../µ€';
+            list(, $dir) = \Patchwork\Utf8\WindowsStreamWrapper::fs($dir, false); // Convert $dir to UTF-8
+            self::$dir = 'win://'.$dir.'/../µ€';
             mkdir(self::$dir);
         }
     }
 
-    static function  tearDownAfterClass()
+    public static function tearDownAfterClass()
     {
-        if (extension_loaded('com_dotnet'))
-        {
+        if (extension_loaded('com_dotnet')) {
             list($fs, $path) = \Patchwork\Utf8\WindowsStreamWrapper::fs(self::$dir);
-            if ($fs->FolderExists($path)) $fs->GetFolder($path)->Delete(true);
+            if ($fs->FolderExists($path)) {
+                $fs->GetFolder($path)->Delete(true);
+            }
             stream_wrapper_unregister('win');
         }
     }
 
-    function setUp()
+    public function setUp()
     {
-        if (! extension_loaded('com_dotnet')) $this->markTestSkipped('Extension com_dotnet is required.');
+        if (!extension_loaded('com_dotnet')) {
+            $this->markTestSkipped('Extension com_dotnet is required.');
+        }
     }
 
     /**
      * @covers Patchwork\Utf8\WindowsStreamWrapper::fs
      */
-    function testRelDir()
+    public function testRelDir()
     {
         $this->assertTrue(file_exists(self::$dir));
         $cwd = getcwd();
-        chdir(__DIR__ . '/..');
+        chdir(__DIR__.'/..');
         $this->assertTrue(file_exists('win://./µ€'));
         chdir($cwd);
     }
@@ -64,7 +65,7 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8\WindowsStreamWrapper::dir_rewinddir
      * @covers Patchwork\Utf8\WindowsStreamWrapper::dir_closedir
      */
-    function testDir()
+    public function testDir()
     {
         $e = array(
             '.',
@@ -77,16 +78,20 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
         );
         $d = array();
 
-        $h = opendir(self::$dir . '/..');
+        $h = opendir(self::$dir.'/..');
 
-        while (false !== $f = readdir($h)) $d[] = $f;
+        while (false !== $f = readdir($h)) {
+            $d[] = $f;
+        }
 
         sort($d);
         $this->assertSame($e, $d);
         rewinddir($h);
 
         $e = array();
-        while (false !== $f = readdir($h)) $e[] = $f;
+        while (false !== $f = readdir($h)) {
+            $e[] = $f;
+        }
 
         closedir($h);
 
@@ -98,10 +103,10 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8\WindowsStreamWrapper::rename
      * @covers Patchwork\Utf8\WindowsStreamWrapper::unlink
      */
-    function testFileOp()
+    public function testFileOp()
     {
-        $f = self::$dir . '/déjà';
-        $t = self::$dir . '/Δ';
+        $f = self::$dir.'/déjà';
+        $t = self::$dir.'/Δ';
         fclose(fopen($f, 'wb'));
         $this->assertTrue(rename($f, $t));
         $this->assertTrue(unlink($t));
@@ -114,9 +119,9 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8\WindowsStreamWrapper::stream_eof
      * @covers Patchwork\Utf8\WindowsStreamWrapper::stream_close
      */
-    function testFilePutGetContents()
+    public function testFilePutGetContents()
     {
-        $f = self::$dir . '/déjà';
+        $f = self::$dir.'/déjà';
         $d = implode('', array_map('chr', range(0, 255)));
 
         $this->assertSame(strlen($d), file_put_contents($f, $d));
@@ -129,9 +134,9 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8\WindowsStreamWrapper::fopen
      * @covers Patchwork\Utf8\WindowsStreamWrapper::fclose
      */
-    function testFopenX()
+    public function testFopenX()
     {
-        $f = self::$dir . '/déjà';
+        $f = self::$dir.'/déjà';
 
         $h = fopen($f, 'xb');
         $this->assertTrue(fclose($h));
@@ -145,7 +150,7 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8\WindowsStreamWrapper::mkdir
      * @covers Patchwork\Utf8\WindowsStreamWrapper::rmdir
      */
-    function testMkdir()
+    public function testMkdir()
     {
         $this->assertTrue(file_exists(self::$dir));
         $this->assertFalse(@mkdir(self::$dir));
@@ -158,22 +163,22 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
             'ru' => 'это распространенный язык программирования',
         );
 
-        foreach ($d as $d)
-        {
-            $this->assertTrue(mkdir(self::$dir . '/' . $d));
+        foreach ($d as $d) {
+            $this->assertTrue(mkdir(self::$dir.'/'.$d));
 
-            if ($h = @fopen(self::$dir . '/' . $d . '/' . $d, 'wb'))
-            {
+            if ($h = @fopen(self::$dir.'/'.$d.'/'.$d, 'wb')) {
                 fclose($h);
-                unlink(self::$dir . '/' . $d . '/' . $d);
+                unlink(self::$dir.'/'.$d.'/'.$d);
             }
 
-            $this->assertTrue(rmdir(self::$dir . '/' . $d));
+            $this->assertTrue(rmdir(self::$dir.'/'.$d));
 
-            if (!$h) break;
+            if (!$h) {
+                break;
+            }
         }
 
-        $h = @fopen(self::$dir . '/' . $d, 'wb');
+        $h = @fopen(self::$dir.'/'.$d, 'wb');
         $this->assertFalse($h, 'fopen() fails thanks to https://bugs.php.net/65358');
     }
 
@@ -181,21 +186,21 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8\WindowsStreamWrapper::mkdir
      * @covers Patchwork\Utf8\WindowsStreamWrapper::rmdir
      */
-    function testMkdirRecursive()
+    public function testMkdirRecursive()
     {
-        $this->assertTrue(mkdir(self::$dir . '/à/种/э/', 0777, true));
+        $this->assertTrue(mkdir(self::$dir.'/à/种/э/', 0777, true));
 
-        $this->assertFalse(@rmdir(self::$dir . '/à'));
+        $this->assertFalse(@rmdir(self::$dir.'/à'));
 
-        $this->assertTrue(rmdir(self::$dir . '/à/种/э/'));
-        $this->assertTrue(rmdir(self::$dir . '/à/种'));
-        $this->assertTrue(rmdir(self::$dir . '/à'));
+        $this->assertTrue(rmdir(self::$dir.'/à/种/э/'));
+        $this->assertTrue(rmdir(self::$dir.'/à/种'));
+        $this->assertTrue(rmdir(self::$dir.'/à'));
     }
 
     /**
      * @covers Patchwork\Utf8\WindowsStreamWrapper::url_stat
      */
-    function testStat()
+    public function testStat()
     {
         $this->assertTrue(is_dir(self::$dir));
     }
@@ -204,10 +209,10 @@ class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\Utf8\WindowsStreamWrapper::stream_metadata
      * @covers Patchwork\Utf8\WindowsStreamWrapper::unlink
      */
-    function testStreamtMetadata()
+    public function testStreamtMetadata()
     {
-        $win = new \Patchwork\Utf8\WindowsStreamWrapper;
-        $f = self::$dir . '/это';
+        $win = new \Patchwork\Utf8\WindowsStreamWrapper();
+        $f = self::$dir.'/это';
 
         $this->assertFalse(file_exists($f));
         $this->assertTrue($win->stream_metadata($f, STREAM_META_TOUCH, time()));

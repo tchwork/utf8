@@ -14,20 +14,17 @@ class NormalizationTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Patchwork\PHP\Shim\Normalizer::normalize
      */
-    function testNormalize()
+    public function testNormalize()
     {
-        $t = file(__DIR__ . '/NormalizationTest.' . $this->unicodeVersion . '.txt');
+        $t = file(__DIR__.'/NormalizationTest.'.$this->unicodeVersion.'.txt');
         $c = array();
 
-        foreach ($t as $s)
-        {
-            $t = explode("#", $s);
+        foreach ($t as $s) {
+            $t = explode('#', $s);
             $t = explode(';', $t[0]);
 
-            if (6 === count($t))
-            {
-                foreach ($t as $k => $s)
-                {
+            if (6 === count($t)) {
+                foreach ($t as $k => $s) {
                     $t = explode(' ', $s);
                     $t = array_map('hexdec', $t);
                     $t = array_map('Patchwork\Utf8::chr', $t);

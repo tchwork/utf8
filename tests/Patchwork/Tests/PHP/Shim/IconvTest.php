@@ -12,35 +12,30 @@ class IconvTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Patchwork\PHP\Shim\Iconv::iconv
      */
-    function testIconv()
+    public function testIconv()
     {
         // Native iconv() behavior varies between versions and OS for these two tests
         // See e.g. https://bugs.php.net/52211
-        if ('\\' === DIRECTORY_SEPARATOR)
-        {
-            $this->assertSame( PHP_VERSION_ID >= 50400 ? false : 'n', @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
-            $this->assertSame( 'nud', iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
-        }
-        else if (PHP_VERSION_ID >= 50400)
-        {
-            $this->assertSame( false, @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
-            $this->assertSame( false, @iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
-        }
-        else
-        {
-            $this->assertSame( 'n',   @iconv('UTF-8', 'ISO-8859-1', 'nœud') );
-            $this->assertSame( 'nud', @iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->assertSame(PHP_VERSION_ID >= 50400 ? false : 'n', @iconv('UTF-8', 'ISO-8859-1', 'nœud'));
+            $this->assertSame('nud', iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud'));
+        } elseif (PHP_VERSION_ID >= 50400) {
+            $this->assertSame(false, @iconv('UTF-8', 'ISO-8859-1', 'nœud'));
+            $this->assertSame(false, @iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud'));
+        } else {
+            $this->assertSame('n',   @iconv('UTF-8', 'ISO-8859-1', 'nœud'));
+            $this->assertSame('nud', @iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud'));
         }
 
         // The recent Windows behavior is the most useful
-        $this->assertFalse( p::iconv('UTF-8', 'ISO-8859-1', 'nœud') );
-        $this->assertSame( 'nud', p::iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud') );
+        $this->assertFalse(p::iconv('UTF-8', 'ISO-8859-1', 'nœud'));
+        $this->assertSame('nud', p::iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud'));
 
-        $this->assertSame( utf8_decode('déjà'), p::iconv('CP1252', 'ISO-8859-1', utf8_decode('déjà')) );
-        $this->assertSame( 'déjà', p::iconv('UTF-8', 'utf8', 'déjà') );
-        $this->assertSame( 'deja noeud', p::iconv('UTF-8', 'US-ASCII//TRANSLIT', 'déjà nœud') );
+        $this->assertSame(utf8_decode('déjà'), p::iconv('CP1252', 'ISO-8859-1', utf8_decode('déjà')));
+        $this->assertSame('déjà', p::iconv('UTF-8', 'utf8', 'déjà'));
+        $this->assertSame('deja noeud', p::iconv('UTF-8', 'US-ASCII//TRANSLIT', 'déjà nœud'));
 
-        $this->assertSame( '4', p::iconv('UTF-8', 'UTF-8', 4) );
+        $this->assertSame('4', p::iconv('UTF-8', 'UTF-8', 4));
     }
 
     /**
@@ -48,42 +43,42 @@ class IconvTest extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\PHP\Shim\Iconv::strlen1
      * @covers Patchwork\PHP\Shim\Iconv::strlen2
      */
-    function testIconvStrlen()
+    public function testIconvStrlen()
     {
-        $this->assertSame( 4, p::iconv_strlen('déjà') );
-        $this->assertSame( 3, p::iconv_strlen('한국어') );
+        $this->assertSame(4, p::iconv_strlen('déjà'));
+        $this->assertSame(3, p::iconv_strlen('한국어'));
 
-        $this->assertSame( 4, p::strlen1('déjà') );
-        $this->assertSame( 3, p::strlen2('한국어') );
+        $this->assertSame(4, p::strlen1('déjà'));
+        $this->assertSame(3, p::strlen2('한국어'));
 
-        $this->assertSame( 4, p::strlen1('déjà') );
-        $this->assertSame( 3, p::strlen2('한국어') );
+        $this->assertSame(4, p::strlen1('déjà'));
+        $this->assertSame(3, p::strlen2('한국어'));
     }
 
     /**
      * @covers Patchwork\PHP\Shim\Iconv::iconv_strpos
      * @covers Patchwork\PHP\Shim\Iconv::iconv_strrpos
      */
-    function testIconvStrPos()
+    public function testIconvStrPos()
     {
-        $this->assertSame( 1, p::iconv_strpos('11--', '1-', 0, 'UTF-8') );
-        $this->assertSame( 2, p::iconv_strpos('-11--', '1-', 0, 'UTF-8') );
-        $this->assertSame( false, p::iconv_strrpos('한국어', '', 'UTF-8') );
-        $this->assertSame( 1, p::iconv_strrpos('한국어', '국', 'UTF-8') );
+        $this->assertSame(1, p::iconv_strpos('11--', '1-', 0, 'UTF-8'));
+        $this->assertSame(2, p::iconv_strpos('-11--', '1-', 0, 'UTF-8'));
+        $this->assertSame(false, p::iconv_strrpos('한국어', '', 'UTF-8'));
+        $this->assertSame(1, p::iconv_strrpos('한국어', '국', 'UTF-8'));
     }
 
     /**
      * @covers Patchwork\PHP\Shim\Iconv::iconv_substr
      */
-    function testIconvSubstr()
+    public function testIconvSubstr()
     {
-        $this->assertSame( 'x', p::iconv_substr('x', 0, 1, 'UTF-8') );
+        $this->assertSame('x', p::iconv_substr('x', 0, 1, 'UTF-8'));
     }
 
     /**
      * @covers Patchwork\PHP\Shim\Iconv::iconv_mime_encode
      */
-    function testIconvMimeEncode()
+    public function testIconvMimeEncode()
     {
         $text = "\xE3\x83\x86\xE3\x82\xB9\xE3\x83\x88\xE3\x83\x86\xE3\x82\xB9\xE3\x83\x88";
         $options = array(
@@ -103,21 +98,21 @@ class IconvTest extends \PHPUnit_Framework_TestCase
      * @covers Patchwork\PHP\Shim\Iconv::iconv_mime_decode
      * @expectedException PHPUnit_Framework_Error_Notice
      */
-    function testIconvMimeDecode()
+    public function testIconvMimeDecode()
     {
-        $this->assertSame( 'Legal encoded-word: * .', p::iconv_mime_decode("Legal encoded-word: =?utf-8?B?Kg==?= ."));
-        $this->assertSame( 'Legal encoded-word: * .', p::iconv_mime_decode("Legal encoded-word: =?utf-8?Q?*?= ."));
-        $this->assertSame( 'Illegal encoded-word:  .', p::iconv_mime_decode("Illegal encoded-word: =?utf-8?Q?".chr(0xA1)."?= .", ICONV_MIME_DECODE_CONTINUE_ON_ERROR));
+        $this->assertSame('Legal encoded-word: * .', p::iconv_mime_decode('Legal encoded-word: =?utf-8?B?Kg==?= .'));
+        $this->assertSame('Legal encoded-word: * .', p::iconv_mime_decode('Legal encoded-word: =?utf-8?Q?*?= .'));
+        $this->assertSame('Illegal encoded-word:  .', p::iconv_mime_decode('Illegal encoded-word: =?utf-8?Q?'.chr(0xA1).'?= .', ICONV_MIME_DECODE_CONTINUE_ON_ERROR));
 
-        p::iconv_mime_decode("Illegal encoded-word: =?utf-8?Q?".chr(0xA1)."?= .");
-        $this->assertFalse( true, "An illegal encoded-word should trigger a notice" );
+        p::iconv_mime_decode('Illegal encoded-word: =?utf-8?Q?'.chr(0xA1).'?= .');
+        $this->assertFalse(true, 'An illegal encoded-word should trigger a notice');
     }
 
     /**
      * @covers Patchwork\PHP\Shim\Iconv::iconv_mime_decode_headers
      * @covers Patchwork\PHP\Shim\Iconv::iconv_mime_decode
      */
-    function testIconvMimeDecodeHeaders()
+    public function testIconvMimeDecodeHeaders()
     {
         $headers = <<<HEADERS
 From: =?UTF-8?B?PGZvb0BleGFtcGxlLmNvbT4=?=
@@ -137,14 +132,14 @@ HEADERS;
             'To' => '<test@example.com>',
         );
 
-        $this->assertSame( $result, p::iconv_mime_decode_headers($headers, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8') );
+        $this->assertSame($result, p::iconv_mime_decode_headers($headers, ICONV_MIME_DECODE_CONTINUE_ON_ERROR, 'UTF-8'));
     }
 
     /**
      * @covers Patchwork\PHP\Shim\Iconv::iconv_get_encoding
      * @covers Patchwork\PHP\Shim\Iconv::iconv_set_encoding
      */
-    function testIconvGetEncoding()
+    public function testIconvGetEncoding()
     {
         $a = array(
            'input_encoding' => 'UTF-8',
@@ -152,14 +147,13 @@ HEADERS;
            'internal_encoding' => 'UTF-8',
         );
 
-        foreach ($a as $t => $e)
-        {
-            $this->assertTrue( p::iconv_set_encoding($t, $e) );
-            $this->assertSame( $e, p::iconv_get_encoding($t) );
+        foreach ($a as $t => $e) {
+            $this->assertTrue(p::iconv_set_encoding($t, $e));
+            $this->assertSame($e, p::iconv_get_encoding($t));
         }
 
-        $this->assertSame( $a, p::iconv_get_encoding('all') );
+        $this->assertSame($a, p::iconv_get_encoding('all'));
 
-        $this->assertFalse( p::iconv_set_encoding('foo', 'UTF-8') );
+        $this->assertFalse(p::iconv_set_encoding('foo', 'UTF-8'));
     }
 }
