@@ -23,8 +23,8 @@
     },
     "autoload": {
         "psr-0": {
-            "Patchwork": "class/",
-            "Normalizer": "class/"
+            "Patchwork": "src/",
+            "Normalizer": "src/"
         }
     },
     "extra": {

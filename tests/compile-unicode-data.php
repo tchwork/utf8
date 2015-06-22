@@ -5,12 +5,12 @@ use Patchwork\Utf8\Compiler as c;
 
 $dir = dirname(dirname(__FILE__));
 
-require_once $dir.'/class/Patchwork/Utf8/Compiler.php';
+require_once $dir.'/src/Patchwork/Utf8/Compiler.php';
 
-c::charsetMaps($dir.'/class/Patchwork/PHP/Shim/charset/');
-c::translitMap($dir.'/class/Patchwork/PHP/Shim/charset/');
-c::bestFit($dir.'/class/Patchwork/Utf8/data/');
+c::charsetMaps($dir.'/src/Patchwork/PHP/Shim/charset/');
+c::translitMap($dir.'/src/Patchwork/PHP/Shim/charset/');
+c::bestFit($dir.'/src/Patchwork/Utf8/data/');
 
-c::unicodeMaps($dir.'/class/Patchwork/PHP/Shim/unidata/');
+c::unicodeMaps($dir.'/src/Patchwork/PHP/Shim/unidata/');
 
-rename($dir.'/class/Patchwork/PHP/Shim/unidata/caseFolding_full.ser', $dir.'/class/Patchwork/Utf8/data/caseFolding_full.ser');
+rename($dir.'/src/Patchwork/PHP/Shim/unidata/caseFolding_full.ser', $dir.'/src/Patchwork/Utf8/data/caseFolding_full.ser');
