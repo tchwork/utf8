@@ -17,10 +17,12 @@ class XmlTest extends \PHPUnit_Framework_TestCase
     {
         $s = array_map('chr', range(0, 255));
         $s = implode('', $s);
-        $e = p::utf8_encode($s).'Σ어';
+        $e = p::utf8_encode($s);
 
         $this->assertSame(utf8_encode($s), p::utf8_encode($s));
         $this->assertSame(utf8_decode($e), p::utf8_decode($e));
+
+        $this->assertSame('??', p::utf8_decode('Σ어'));
 
         $s = 444;
 

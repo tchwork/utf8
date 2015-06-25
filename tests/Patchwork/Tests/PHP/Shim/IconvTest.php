@@ -16,7 +16,7 @@ class IconvTest extends \PHPUnit_Framework_TestCase
     {
         // Native iconv() behavior varies between versions and OS for these two tests
         // See e.g. https://bugs.php.net/52211
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (!defined('HHVM_VERSION') && (PHP_VERSION_ID >= 50610 || (PHP_VERSION_ID >= 50526 && PHP_VERSION_ID < 50600) || '\\' === DIRECTORY_SEPARATOR)) {
             $this->assertSame(PHP_VERSION_ID >= 50400 ? false : 'n', @iconv('UTF-8', 'ISO-8859-1', 'nœud'));
             $this->assertSame('nud', iconv('UTF-8', 'ISO-8859-1//IGNORE', 'nœud'));
         } elseif (PHP_VERSION_ID >= 50400) {
