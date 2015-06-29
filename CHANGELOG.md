@@ -1,3 +1,7 @@
+## v1.1.30 (2015-06-29)
+
+- fix mb_strrpos shim with negative offset
+
 ## v1.1.29 (2015-04-26)
 
 - fix ucwords to be functionally the same as in-built PHP version
