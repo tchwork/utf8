@@ -72,6 +72,14 @@ class Mbstring
     {
         INF === $from_encoding and $from_encoding = self::$internal_encoding;
 
+        if (is_array($from_encoding)) {
+            $from_encoding = implode(',', $from_encoding);
+        }
+
+        if (false !== strpos($from_encoding, ',')) {
+            $from_encoding = self::mb_detect_encoding($s, $from_encoding);
+        }
+
         $from_encoding = strtolower($from_encoding);
         $to_encoding = strtolower($to_encoding);
 
@@ -271,7 +279,10 @@ class Mbstring
                     break;
 
                 default:
-                    return strncmp($enc, 'ISO-8859-', 9) ? false : $enc;
+                    if (0 === strncmp($enc, 'ISO-8859-', 9)) {
+                        return $enc;
+                    }
+                    break;
             }
         }
 
