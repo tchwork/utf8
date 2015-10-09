@@ -282,7 +282,6 @@ class Mbstring
                     if (0 === strncmp($enc, 'ISO-8859-', 9)) {
                         return $enc;
                     }
-                    break;
             }
         }
 
