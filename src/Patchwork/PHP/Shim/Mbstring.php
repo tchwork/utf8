@@ -72,11 +72,7 @@ class Mbstring
     {
         INF === $from_encoding and $from_encoding = self::$internal_encoding;
 
-        if (is_array($from_encoding)) {
-            $from_encoding = implode(',', $from_encoding);
-        }
-
-        if (false !== strpos($from_encoding, ',')) {
+        if (is_array($from_encoding) || false !== strpos($from_encoding, ',')) {
             $from_encoding = self::mb_detect_encoding($s, $from_encoding);
         }
 
