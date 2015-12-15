@@ -1,3 +1,7 @@
+## v1.1.31 (2015-12-15)
+
+- fix compat with symfony-polyfill
+
 ## v1.1.30 (2015-06-29)
 
 - fix mb_strrpos shim with negative offset
