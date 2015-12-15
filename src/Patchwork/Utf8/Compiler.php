@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Nicolas Grekas - p@tchwork.com
+ * Copyright (C) 2016 Nicolas Grekas - p@tchwork.com
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the (at your option):
@@ -19,6 +19,8 @@ namespace Patchwork\Utf8;
  * See http://unicode.org/Public/MAPPINGS/ for charset conversion maps
  * See http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/ for mappings
  * See http://unicode.org/repos/cldr/trunk/common/transforms/ for Latin-ASCII.xml
+ *
+ * @internal
  */
 class Compiler
 {

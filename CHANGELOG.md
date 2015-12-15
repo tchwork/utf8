@@ -1,3 +1,11 @@
+## v1.3.0 (2015-12-15)
+
+- add shim for mb_convert_variables
+- marked all shims as @internal
+- test on appveyor
+- a few fixes in iconv and mbstring shims
+- cleanup refacto for preparing v2 based on symfony-polyfill
+
 ## v1.2.5 (2015-10-14)
 
 - handle the third argument of mb_convert_encoding() being an array
