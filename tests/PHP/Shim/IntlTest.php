@@ -122,7 +122,7 @@ class IntlTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(false, grapheme_strpos('abc', ''));
         $this->assertSame(false, grapheme_strpos('abc', 'd'));
         $this->assertSame(false, grapheme_strpos('abc', 'a', 3));
-        $this->assertSame(0, grapheme_strpos('abc', 'a', -1));
+        $this->assertSame(0, grapheme_strpos('abc', 'a', 0));
         $this->assertSame(1, grapheme_strpos('한국어', '국'));
         $this->assertSame(3, grapheme_stripos('DÉJÀ', 'à'));
         $this->assertSame(false, grapheme_strrpos('한국어', ''));

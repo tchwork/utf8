@@ -12,7 +12,8 @@ class HhvmTest extends \PHPUnit_Framework_TestCase
     public function test2()
     {
         // Negative offset are not allowed but native PHP silently casts them to zero
-        $this->assertSame(0, grapheme_strpos('abc', 'a', -1));
+        // Starting with 5.5.35, 5.6.21, 7.0.6, PHP refuse them
+        $this->assertSame(0, grapheme_strpos('abc', 'a', 0));
     }
 
     public function test3()

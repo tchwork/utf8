@@ -235,7 +235,9 @@ class Utf8
     }
     public static function strpos($s, $needle, $offset = 0)
     {
-        return grapheme_strpos($s, $needle, $offset);
+        // ignore invalid negative offset to keep compatility
+        // with php < 5.5.35, < 5.6.21, < 7.0.6
+        return grapheme_strpos($s, $needle, $offset > 0 ? $offset : 0);
     }
     public static function strrpos($s, $needle, $offset = 0)
     {
