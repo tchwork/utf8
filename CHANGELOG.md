@@ -1,3 +1,8 @@
+## v1.3.1 (2016-05-18)
+
+- Normalizer fixes from @gitlost
+- fix tests for php 5.5.35/5.6.21/7.0.6
+
 ## v1.3.0 (2015-12-15)
 
 - add shim for mb_convert_variables
