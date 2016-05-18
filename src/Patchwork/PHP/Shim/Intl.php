@@ -213,7 +213,11 @@ class Intl
         if ($offset > 0) {
             $s = self::grapheme_substr($s, $offset);
         } elseif ($offset < 0) {
-            $offset = 0;
+            if (defined('HHVM_VERSION_ID') || PHP_VERSION_ID < 50535 || (50600 <= PHP_VERSION_ID && PHP_VERSION_ID < 50621) || (70000 <= PHP_VERSION_ID && PHP_VERSION_ID < 70006)) {
+                $offset = 0;
+            } else {
+                return false;
+            }
         }
 
         switch ($mode) {
