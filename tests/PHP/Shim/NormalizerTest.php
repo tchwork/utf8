@@ -42,6 +42,8 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(pn::isNormalized($c, pn::NFD));
         $this->assertFalse(pn::isNormalized($d, pn::NFC));
         $this->assertFalse(pn::isNormalized("\xFF"));
+        $this->assertFalse(pn::isNormalized('', pn::NONE));
+        $this->assertFalse(pn::isNormalized('', 6));
     }
 
     /**
@@ -67,6 +69,9 @@ class NormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse(pn::normalize($c, -1));
         $this->assertFalse(pn::normalize("\xFF"));
+
+        $this->assertSame("\xcc\x83\xc3\x92\xd5\x9b", pn::normalize("\xcc\x83\xc3\x92\xd5\x9b"));
+        $this->assertSame("\xe0\xbe\xb2\xe0\xbd\xb1\xe0\xbe\x80\xe0\xbe\x80", pn::normalize("\xe0\xbd\xb6\xe0\xbe\x81", pn::NFD));
     }
 
     /**
