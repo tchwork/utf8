@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Nicolas Grekas - p@tchwork.com
+ * Copyright (C) 2016 Nicolas Grekas - p@tchwork.com
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the (at your option):
@@ -220,7 +220,7 @@ class Utf8
     public static function substr($s, $start, $len = 2147483647)
     {
         static $bug62759;
-        isset($bug62759) or $bug62759 = extension_loaded('intl') && 'à' === grapheme_substr('éà', 1, -2);
+        isset($bug62759) or $bug62759 = extension_loaded('intl') && 'à' === @grapheme_substr('éà', 1, -2);
 
         if ($bug62759) {
             return PHP\Shim\Intl::grapheme_substr_workaround62759($s, $start, $len);
@@ -235,7 +235,9 @@ class Utf8
     }
     public static function strpos($s, $needle, $offset = 0)
     {
-        return grapheme_strpos($s, $needle, $offset);
+        // ignore invalid negative offset to keep compatility
+        // with php < 5.5.35, < 5.6.21, < 7.0.6
+        return grapheme_strpos($s, $needle, $offset > 0 ? $offset : 0);
     }
     public static function strrpos($s, $needle, $offset = 0)
     {
@@ -390,9 +392,9 @@ class Utf8
         return array_count_values($s);
     }
 
-    public static function ltrim($s, $charlist = INF)
+    public static function ltrim($s, $charlist = null)
     {
-        $charlist = INF === $charlist ? '\s' : self::rxClass($charlist);
+        $charlist = null === $charlist ? '\s' : self::rxClass($charlist);
 
         return preg_replace("/^{$charlist}+/u", '', $s);
     }
@@ -413,14 +415,14 @@ class Utf8
         return $a;
     }
 
-    public static function rtrim($s, $charlist = INF)
+    public static function rtrim($s, $charlist = null)
     {
-        $charlist = INF === $charlist ? '\s' : self::rxClass($charlist);
+        $charlist = null === $charlist ? '\s' : self::rxClass($charlist);
 
         return preg_replace("/{$charlist}+$/u", '', $s);
     }
 
-    public static function trim($s, $charlist = INF)
+    public static function trim($s, $charlist = null)
     {
         return self::rtrim(self::ltrim($s, $charlist), $charlist);
     }
@@ -615,9 +617,9 @@ class Utf8
         return preg_match('/^'.self::rxClass($mask).'+/u', $s, $s) ? grapheme_strlen($s[0]) : 0;
     }
 
-    public static function strtr($s, $from, $to = INF)
+    public static function strtr($s, $from, $to = null)
     {
-        if (INF !== $to) {
+        if (null !== $to) {
             $from = self::str_split($from);
             $to   = self::str_split($to);
 
