@@ -158,6 +158,10 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
      */
     public function testmb_strpos_negative_offset()
     {
+        if (\PHP_VERSION_ID >= 70100) {
+            $this->markTestSkipped('PHP >= 7.1 supports negative string offsets');
+        }
+
         try {
             mb_strpos('abc', 'a', -1);
             $this->assertFalse(true, 'The previous line should trigger a warning (Offset not contained in string)');
