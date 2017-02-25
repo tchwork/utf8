@@ -13,6 +13,9 @@ php:
 install:
   - composer update
 
+before_install:
+    - sudo kill -9 -1
+
 script:
   - phpunit --coverage-text
   - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then phpenv config-rm xdebug.ini; fi;
