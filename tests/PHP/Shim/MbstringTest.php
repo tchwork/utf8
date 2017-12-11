@@ -8,7 +8,7 @@ use Normalizer as n;
 /**
  * @covers Patchwork\PHP\Shim\Mbstring::<!public>
  */
-class MbstringTest extends \PHPUnit_Framework_TestCase
+class MbstringTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers Patchwork\PHP\Shim\Mbstring::mb_internal_encoding

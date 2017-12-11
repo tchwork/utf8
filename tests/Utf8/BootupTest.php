@@ -7,7 +7,7 @@ use Normalizer as n;
 /**
  * @covers Patchwork\Utf8\Bootup::<!public>
  */
-class BootupTest extends \PHPUnit_Framework_TestCase
+class BootupTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers Patchwork\Utf8\Bootup::filterRequestInputs

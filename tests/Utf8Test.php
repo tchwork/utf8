@@ -8,7 +8,7 @@ use Normalizer as n;
 /**
  * @covers Patchwork\Utf8::<!public>
  */
-class Utf8Test extends \PHPUnit_Framework_TestCase
+class Utf8Test extends \PHPUnit\Framework\TestCase
 {
     public static $utf8ValidityMap = array(
         'a' => true,

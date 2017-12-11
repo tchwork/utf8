@@ -14,7 +14,7 @@ if (!defined('STREAM_META_TOUCH')) {
 /**
  * @covers Patchwork\Utf8\WindowsStreamWrapper::<!public>
  */
-class WindowsStreamWrapperTest extends \PHPUnit_Framework_TestCase
+class WindowsStreamWrapperTest extends \PHPUnit\Framework\TestCase
 {
     protected static $dir;
 

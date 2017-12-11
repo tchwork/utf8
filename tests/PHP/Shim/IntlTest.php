@@ -8,7 +8,7 @@ use Normalizer as n;
 /**
  * @covers Patchwork\PHP\Shim\Intl::<!public>
  */
-class IntlTest extends \PHPUnit_Framework_TestCase
+class IntlTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers Patchwork\PHP\Shim\Intl::grapheme_extract

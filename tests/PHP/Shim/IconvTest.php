@@ -7,7 +7,7 @@ use Patchwork\PHP\Shim\Iconv as p;
 /**
  * @covers Patchwork\PHP\Shim\Iconv::<!public>
  */
-class IconvTest extends \PHPUnit_Framework_TestCase
+class IconvTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers Patchwork\PHP\Shim\Iconv::iconv
