@@ -7,7 +7,7 @@ use Patchwork\PHP\Shim\Xml as p;
 /**
  * @covers Patchwork\PHP\Shim\Xml::<!public>
  */
-class XmlTest extends \PHPUnit_Framework_TestCase
+class XmlTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers Patchwork\PHP\Shim\Xml::utf8_encode

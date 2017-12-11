@@ -2,7 +2,7 @@
 
 namespace Patchwork\Tests\Utf8;
 
-class HhvmTest extends \PHPUnit_Framework_TestCase
+class HhvmTest extends \PHPUnit\Framework\TestCase
 {
     public function test1()
     {

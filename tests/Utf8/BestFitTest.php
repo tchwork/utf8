@@ -7,7 +7,7 @@ use Patchwork\Utf8\BestFit as u;
 /**
  * @covers Patchwork\Utf8\BestFit::<!public>
  */
-class BestFitTest extends \PHPUnit_Framework_TestCase
+class BestFitTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers Patchwork\Utf8\BestFit::fit

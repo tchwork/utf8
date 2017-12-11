@@ -8,7 +8,7 @@ use Patchwork\Utf8 as u;
  * @covers Patchwork\Utf8::ord
  * @covers Patchwork\Utf8::<!public>
  */
-class Utf8OrdTest extends \PHPUnit_Framework_TestCase
+class Utf8OrdTest extends \PHPUnit\Framework\TestCase
 {
     public function test_empty_str()
     {
