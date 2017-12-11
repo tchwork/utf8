@@ -18,7 +18,7 @@ class IntlTest extends \PHPUnit\Framework\TestCase
         try {
             p::grapheme_extract(array(), 0);
             $this->fail('Warning or notice expected');
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
             $this->assertTrue(true, 'Regular PHP throws a warning');
         } catch (\PHPUnit_Framework_Error_Notice $e) {
             $this->assertTrue(true, 'HHVM throws a notice');
