@@ -16,14 +16,17 @@ const ICONV_VERSION = '1.0';
 const ICONV_MIME_DECODE_STRICT = 1;
 const ICONV_MIME_DECODE_CONTINUE_ON_ERROR = 2;
 
-@trigger_error('You are using a fallback implementation of the iconv extension. Installing the native one is highly recommended instead.', E_USER_DEPRECATED);
+if (!extension_loaded('iconv'))
+{
+    @trigger_error('You are using a fallback implementation of the iconv extension. Installing the native one is highly recommended instead.', E_USER_DEPRECATED);
 
-function iconv($from, $to, $s) {return s\Iconv::iconv($from, $to, $s);}
-function iconv_get_encoding($type = 'all') {return s\Iconv::iconv_get_encoding($type);}
-function iconv_set_encoding($type, $charset) {return s\Iconv::iconv_set_encoding($type, $charset);}
-function iconv_mime_encode($name, $value, $pref = null) {return s\Iconv::iconv_mime_encode($name, $value, $pref);}
+    function iconv($from, $to, $s) {return s\Iconv::iconv($from, $to, $s);}
+    function iconv_get_encoding($type = 'all') {return s\Iconv::iconv_get_encoding($type);}
+    function iconv_set_encoding($type, $charset) {return s\Iconv::iconv_set_encoding($type, $charset);}
+    function iconv_mime_encode($name, $value, $pref = null) {return s\Iconv::iconv_mime_encode($name, $value, $pref);}
+    function iconv_mime_decode_headers($encoded_headers, $mode = 0, $enc = null) {return s\Iconv::iconv_mime_decode_headers($encoded_headers, $mode, $enc);}
+}
 function ob_iconv_handler($buffer, $mode) {return s\Iconv::ob_iconv_handler($buffer, $mode);}
-function iconv_mime_decode_headers($encoded_headers, $mode = 0, $enc = null) {return s\Iconv::iconv_mime_decode_headers($encoded_headers, $mode, $enc);}
 
 if (extension_loaded('mbstring'))
 {
