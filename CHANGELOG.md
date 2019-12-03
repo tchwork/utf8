@@ -1,3 +1,8 @@
+## v1.3.2 (2019-12-03)
+
+- update maps for Unicode 12
+- check if MB_OVERLOAD_STRING exists before using it
+
 ## v1.3.1 (2016-05-18)
 
 - Normalizer fixes from @gitlost
