@@ -117,12 +117,10 @@ class Compiler
         fclose($h);
 
         foreach (file(self::getFile('Latin-ASCII.xml')) as $line) {
-            if (preg_match('/<tRule>(.) → (.*?) ;/u', $line, $m)) {
-                if ('\u' === $m[1][0]) {
+            if (preg_match('/^(.|\\\\u.*?) → (.*?) ;/u', $line, $m)) {
+                if ('\u' === substr($m[1], 0, 2)) {
                     $m[1] = self::chr(hexdec(substr($m[1], 2)));
                 }
-
-                $m[2] = htmlspecialchars_decode($m[2]);
 
                 switch ($m[2][0]) {
                     case '\\': $m[2] = substr($m[2], 1); break;
