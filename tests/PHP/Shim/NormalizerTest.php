@@ -8,7 +8,7 @@ use Normalizer as in;
 /**
  * @covers Patchwork\PHP\Shim\Normalizer::<!public>
  */
-class NormalizerTest extends \PHPUnit_Framework_TestCase
+class NormalizerTest extends \PHPUnit\Framework\TestCase
 {
     public $unicodeVersion = 70;
 

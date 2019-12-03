@@ -8,7 +8,7 @@ use Patchwork\Utf8 as u;
  * @covers Patchwork\Utf8::strrev
  * @covers Patchwork\Utf8::<!public>
  */
-class Utf8StrrevTest extends \PHPUnit_Framework_TestCase
+class Utf8StrrevTest extends \PHPUnit\Framework\TestCase
 {
     public function test_reverse()
     {

@@ -8,7 +8,7 @@ use Patchwork\Utf8 as u;
  * @covers Patchwork\Utf8::isUtf8
  * @covers Patchwork\Utf8::<!public>
  */
-class Utf8IsValidTest extends \PHPUnit_Framework_TestCase
+class Utf8IsValidTest extends \PHPUnit\Framework\TestCase
 {
     public function test_valid_utf8()
     {

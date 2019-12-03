@@ -8,7 +8,7 @@ use Patchwork\Utf8 as u;
  * @covers Patchwork\Utf8::rtrim
  * @covers Patchwork\Utf8::<!public>
  */
-class Utf8RtrimTest extends \PHPUnit_Framework_TestCase
+class Utf8RtrimTest extends \PHPUnit\Framework\TestCase
 {
     public function test_trim()
     {

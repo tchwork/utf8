@@ -7,7 +7,7 @@ use Patchwork\TurkishUtf8 as u;
 /**
  * @covers Patchwork\TurkishUtf8::<!public>
  */
-class TurkishUtf8Test extends \PHPUnit_Framework_TestCase
+class TurkishUtf8Test extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers Patchwork\TurkishUtf8::strtocasefold

@@ -8,13 +8,13 @@ use Normalizer as n;
 /**
  * @covers Patchwork\PHP\Shim\Mbstring::<!public>
  */
-class MbstringTest extends \PHPUnit_Framework_TestCase
+class MbstringTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers Patchwork\PHP\Shim\Mbstring::mb_internal_encoding
      * @covers Patchwork\PHP\Shim\Mbstring::mb_list_encodings
      * @covers Patchwork\PHP\Shim\Mbstring::mb_substitute_character
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException PHPUnit\Framework\Error\Warning
      */
     public function testmb_stubs()
     {
@@ -139,14 +139,14 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Patchwork\PHP\Shim\Mbstring::mb_strpos
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException PHPUnit\Framework\Error\Warning
      */
     public function testmb_strpos_empty_delimiter()
     {
         try {
             mb_strpos('abc', '');
             $this->assertFalse(true, 'The previous line should trigger a warning (Empty delimiter)');
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
             p::mb_strpos('abc', '');
             $this->assertFalse(true, 'The previous line should trigger a warning (Empty delimiter)');
         }
@@ -154,14 +154,14 @@ class MbstringTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Patchwork\PHP\Shim\Mbstring::mb_strpos
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException PHPUnit\Framework\Error\Warning
      */
     public function testmb_strpos_negative_offset()
     {
         try {
             mb_strpos('abc', 'a', -1);
             $this->assertFalse(true, 'The previous line should trigger a warning (Offset not contained in string)');
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
             p::mb_strpos('abc', 'a', -1);
             $this->assertFalse(true, 'The previous line should trigger a warning (Offset not contained in string)');
         }

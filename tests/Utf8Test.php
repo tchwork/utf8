@@ -8,7 +8,7 @@ use Normalizer as n;
 /**
  * @covers Patchwork\Utf8::<!public>
  */
-class Utf8Test extends \PHPUnit_Framework_TestCase
+class Utf8Test extends \PHPUnit\Framework\TestCase
 {
     public static $utf8ValidityMap = array(
         'a' => true,
@@ -248,7 +248,7 @@ oooooooooooooooooooooo'),
 
     /**
      * @covers Patchwork\Utf8::count_chars
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException PHPUnit\Framework\Error\Warning
      */
     public function testCountChars()
     {
@@ -291,7 +291,7 @@ oooooooooooooooooooooo'),
 
     /**
      * @covers Patchwork\Utf8::str_pad
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException PHPUnit\Framework\Error\Warning
      */
     public function testStr_pad()
     {
@@ -323,7 +323,7 @@ oooooooooooooooooooooo'),
 
     /**
      * @covers Patchwork\Utf8::str_split
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException PHPUnit\Framework\Error\Warning
      */
     public function testStr_split()
     {

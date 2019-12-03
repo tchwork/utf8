@@ -8,7 +8,7 @@ use Patchwork\Utf8 as u;
  * @covers Patchwork\Utf8::wordwrap
  * @covers Patchwork\Utf8::<!public>
  */
-class Utf8StrWordwrapTest extends \PHPUnit_Framework_TestCase
+class Utf8StrWordwrapTest extends \PHPUnit\Framework\TestCase
 {
     public function test_no_args()
     {
