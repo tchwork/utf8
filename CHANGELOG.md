@@ -1,3 +1,7 @@
+## v1.3.3 (2021-01-07)
+
+- minor fixes
+
 ## v1.3.2 (2019-12-03)
 
 - update maps for Unicode 12
